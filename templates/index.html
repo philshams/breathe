@@ -45,13 +45,13 @@
                 socket.emit('disconnect', { data: user_id })
             }
 
-            socket.on('add_user', function (message) {
-                for (const [id, count] of Object.entries(message)) {
-                    // check if div exists
-                    document.getElementById(msg.user_id).innerHTML = msg.count;
-                    // if not, make it
-                }
-            });
+            // socket.on('add_user', function (message) {
+            //     for (const [id, count] of Object.entries(message)) {
+            //         // check if div exists
+            //         document.getElementById(msg.user_id).innerHTML = msg.count;
+            //         // if not, make it
+            //     }
+            // });
 
             // a user disconnected
             // remove that div
