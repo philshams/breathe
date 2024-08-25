@@ -14,55 +14,74 @@ app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, async_mode=async_mode)
 thread = None
 thread_lock = Lock()
+
+# this is the state of the app
+# all events update and/or use this state
 user_counts = {}
 
-def background_thread():
-    """Example of how to send server generated events to clients."""
-    count = 0
-    while True:
-        socketio.sleep(10)
-        count += 1
-        socketio.emit('my_response',
-                      {'data': 'Server generated event', 'count': count})
+# def background_thread():
+#     """Example of how to send server generated events to clients."""
+#     count = 0
+#     while True:
+#         socketio.sleep(10)
+#         count += 1
+#         socketio.emit('my_response',
+#                       {'data': 'Server generated event', 'count': count})
 
 
 @app.route('/')
 def index():
     return render_template('index.html', async_mode=socketio.async_mode)
 
-
 @socketio.event
-def my_event(message):
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': message['data'], 'count': session['receive_count']})
+def ping():
+    emit('pong')
 
 
-@socketio.event
-def my_broadcast_event(message):
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': message['data'], 'count': session['receive_count']},
-         broadcast=True)
+# @socketio.event
+# def my_event(message):
+#     session['receive_count'] = session.get('receive_count', 0) + 1
+#     emit('my_response',
+#          {'data': message['data'], 'count': session['receive_count']})
 
 
-@socketio.event
-def disconnect_request():
-    @copy_current_request_context
-    def can_disconnect():
-        disconnect()
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    # for this emit we use a callback function
-    # when the callback function is invoked we know that the message has been
-    # received and it is safe to disconnect
-    emit('my_response',
-         {'data': 'Disconnected!', 'count': session['receive_count']},
-         callback=can_disconnect)
+# @socketio.event
+# def my_broadcast_event(message):
+#     session['receive_count'] = session.get('receive_count', 0) + 1
+#     emit('my_response',
+#          {'data': message['data'], 'count': session['receive_count']},
+#          broadcast=True)
 
 
-@socketio.event
-def my_ping():
-    emit('my_pong')
+# @socketio.event
+# def disconnect_request():
+#     @copy_current_request_context
+#     def can_disconnect():
+#         disconnect()
+#     session['receive_count'] = session.get('receive_count', 0) + 1
+#     # for this emit we use a callback function
+#     # when the callback function is invoked we know that the message has been
+#     # received and it is safe to disconnect
+#     emit('my_response',
+#          {'data': 'Disconnected!', 'count': session['receive_count']},
+#          callback=can_disconnect)
+
+
+
+
+
+# when a client connects
+@socketio.on('connect')
+def on_connect(message):
+    # global thread
+    # with thread_lock:
+    #     if thread is None:
+    #         thread = socketio.start_background_task(background_thread)
+    user_id = message['id']
+    user_counts.update({user_id: 0})
+    # send everyone new user list
+    emit('add_user', user_counts, broadcast=True)
+
 
 
 # when a client presses a key
@@ -72,24 +91,18 @@ def client_keydown(message):
     # get the count and increment, or if it's a new one, set to 0 and increment
     new_count = user_counts.get(user_id, 0) + 1
     user_counts.update({user_id: new_count})
-    emit('user_counts', {'data': user_counts})
-
-
-# when a client connects
-@socketio.event
-def connect():
-    global thread
-    with thread_lock:
-        if thread is None:
-            thread = socketio.start_background_task(background_thread)
-    emit('my_response', {'data': 'Connected', 'count': 0})
+    # send everyone just this keypress update
+    print({'user_id': user_id, 'count': new_count})
+    emit('update_count', {'user_id': user_id, 'count': new_count}, broadcast=True)
 
 
 # when a client refreshes
 @socketio.event
-def refresh_disconnect(message):
-    disconnected_id = message['data']
-    user_counts.pop(disconnected_id)
+def disconnect():
+    # disconnected_id = message['data']
+    # user_counts.pop(disconnected_id)
+    # send everyone new user list
+    emit('user_disconnected', user_counts, broadcast=True)
 
 
 if __name__ == '__main__':
