@@ -88,12 +88,17 @@ def on_connect(message):
 @socketio.event
 def client_keydown(message):
     user_id = message['data']
-    # get the count and increment, or if it's a new one, set to 0 and increment
-    new_count = user_counts.get(user_id, 0) + 1
-    user_counts.update({user_id: new_count})
     # send everyone just this keypress update
-    print({'user_id': user_id, 'count': new_count})
-    emit('update_count', {'user_id': user_id, 'count': new_count}, broadcast=True)
+    print({'user_id': user_id, 'key_state': "down"})
+    emit('update_state', {'user_id': user_id, 'key_state': 'down'}, broadcast=True)
+
+# when a client releases a key
+@socketio.event
+def client_keyup(message):
+    user_id = message['data']
+    # send everyone just this keypress update
+    print({'user_id': user_id, 'key_state': "up"})
+    emit('update_state', {'user_id': user_id, 'key_state': 'up'}, broadcast=True)
 
 
 # when a client refreshes

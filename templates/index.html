@@ -35,8 +35,16 @@
             // keypress thingy
             document.addEventListener("keydown", function (event) {
                 if (event.keyCode == key_code) {
+                    event.preventDefault();
                     socket.emit('client_keydown', { data: user_id });
                 }
+            });
+
+            // keypress thingy
+            document.addEventListener("keyup", function (event) {
+            if (event.keyCode == key_code) {
+                socket.emit('client_keyup', { data: user_id });
+            }
             });
 
             // https://stackoverflow.com/questions/62355914/flask-socketio-disconnect-a-client
@@ -45,22 +53,9 @@
                 socket.emit('disconnect', { data: user_id })
             }
 
-            // socket.on('add_user', function (message) {
-            //     for (const [id, count] of Object.entries(message)) {
-            //         // check if div exists
-            //         document.getElementById(msg.user_id).innerHTML = msg.count;
-            //         // if not, make it
-            //     }
-            // });
-
-            // a user disconnected
-            // remove that div
-            // socket.on('user_disconnected', function (msg) {
-            //     document.getElementById(msg.user_id).remove();
-            // });
 
             // loop through and update count divs
-            socket.on('update_count', function (msg) {
+            socket.on('update_state', function (msg) {
                 $('#log').append("<br>" + JSON.stringify(msg));
                 // document.getElementById(msg.user_id).innerHTML = msg.count;
             });
@@ -74,11 +69,6 @@
                 if (cb)
                     cb();
             });
-
-            // socket.on('user_counts', function(msg) {
-            //     console.log(msg.data)
-            //     $('#log').append('<br>' + $('<div/>').text('Space bar pressed!: ' + JSON.stringify(msg.data) + " (" + (new Date()).toLocaleTimeString() + ")").html());
-            // });
 
             // Interval function that tests message latency by sending a "ping"
             // message. The server then responds with a "pong" message and the
@@ -121,7 +111,6 @@
     <h2>User: <span id="user_id"></span></h2>
     <p>Average ping/pong latency: <b><span id="ping-pong"></span>ms</b></p>
     <h2>Receive:</h2>
-    <div id="blah"></div>
     <div id="log"></div>
 </body>
 
