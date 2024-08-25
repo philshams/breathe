@@ -17,7 +17,8 @@ thread_lock = Lock()
 
 # this is the state of the app
 # all events update and/or use this state
-user_counts = {}
+users_inhaling = {}
+users_exhaling = {}
 
 # def background_thread():
 #     """Example of how to send server generated events to clients."""
@@ -88,17 +89,21 @@ def on_connect(message):
 @socketio.event
 def client_keydown(message):
     user_id = message['data']
+    users_inhaling.add(user_id)
+    users_exhaling.discard(user_id)
     # send everyone just this keypress update
     print({'user_id': user_id, 'key_state': "down"})
-    emit('update_state', {'user_id': user_id, 'key_state': 'down'}, broadcast=True)
+    emit('update_state', {'inhaling': users_inhaling, 'exhaling': users_exhaling}, broadcast=True)
 
 # when a client releases a key
 @socketio.event
 def client_keyup(message):
     user_id = message['data']
+    users_inhaling.discard(user_id)
+    users_exhaling.add(user_id)
     # send everyone just this keypress update
     print({'user_id': user_id, 'key_state': "up"})
-    emit('update_state', {'user_id': user_id, 'key_state': 'up'}, broadcast=True)
+    emit('update_state', {'inhaling': users_inhaling, 'exhaling': users_exhaling}, broadcast=True)
 
 
 # when a client refreshes
