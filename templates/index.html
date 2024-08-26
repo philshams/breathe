@@ -111,33 +111,59 @@
                 requestAnimationFrame(animate);
             }
 
+            function key_down_response(event) {
+                if (last_event != 'down') {
+
+                    socket.emit('client_keydown', { data: user_id });
+                    num_breaths = num_breaths + 1
+                    setTimeout(timeout, timeout_counter, num_breaths);
+
+                    last_event = 'down'
+                }
+            }
+
+            function key_up_response(event) {
+                if (last_event != 'up') {
+                    socket.emit('client_keyup', { data: user_id });
+                    last_event = 'up'
+                    }
+
+            }
+
             // Add event listener for the "keydown" event on the document object
             document.addEventListener('keydown', (event) => {
                 if (event.code === 'Space') {
                     // Prevent default behavior of the spacebar key
                     event.preventDefault();
-
-                    if (last_event != 'down') {
-
-                        socket.emit('client_keydown', { data: user_id });
-                        num_breaths = num_breaths + 1
-                        setTimeout(timeout, timeout_counter, num_breaths);
-
-                        last_event = 'down'
-                    }
+                    key_down_response(event)
                 }
             });
 
             // Add event listener for the "keyup" event on the document object
             document.addEventListener('keyup', (event) => {
-                if (event.code === 'Space' && last_event != 'up') {
-
-                    socket.emit('client_keyup', { data: user_id });
-
-                    last_event = 'up'
-                }
-
+                key_up_response(event)
             });
+
+            // Add event listener for the "keydown" event on the document object
+            document.addEventListener('mousedown', (event) => {
+                key_down_response(event)
+            });
+
+            // Add event listener for the "keyup" event on the document object
+            document.addEventListener('mouseup', (event) => {
+                key_up_response(event)
+            });
+
+            // Add event listener for the "keydown" event on the document object
+            document.addEventListener('touchstart', (event) => {
+                key_down_response(event)
+            });
+
+            // Add event listener for the "keyup" event on the document object
+            document.addEventListener('touchend', (event) => {
+                key_up_response(event)
+            });
+
 
             window.onbeforeunload = function () {
                 socket.emit('leave', { data: user_id });
