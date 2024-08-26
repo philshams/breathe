@@ -174,12 +174,12 @@
                 var num_inhaling = msg["inhaling"].length
                 var num_exhaling = msg["exhaling"].length
                 speed_factor = (num_inhaling - num_exhaling) / (num_inhaling + num_exhaling)
-                $('#log').append("<br> Inhales: " + num_inhaling.toString() + ", Exhales: " + num_exhaling.toString() + ", Speed: " + speed_factor.toString());
+                console.log("Inhales" + num_inhaling.toString() + ", Exhales: " + num_exhaling.toString() + ", Speed: " + speed_factor.toString());
             });
 
             // loop through and update count divs
             socket.on('user_connection', function (msg) {
-                $('#log').append("<br>" + JSON.stringify(msg));
+                console.log(JSON.stringify(msg));
             });
 
 
@@ -228,19 +228,6 @@
 </script>
 
 <body>
-
-    <font color="green">
-    <h2>User: <span id="user_id"></span></h2>
-    <h2>Receive:</h2>
-    <div 
-    -webkit-touch-callout:none;
-    -webkit-user-select:none;
-    -khtml-user-select:none;
-    -moz-user-select:none;
-    -ms-user-select:none;
-    user-select:none;
-    id="log"></div>
-    </font>
 </body>
 
 </html>
