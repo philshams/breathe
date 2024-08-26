@@ -47,10 +47,10 @@
             const max_radius = 350;
             const max_alpha = 1.0;
             const max_redness = 255;
-            const alpha_change = 0.0007;
-            const redness_change = 0.25;
-            const radius_change = 0.25;
-            const speed = 1.5;
+            const alpha_change = 0.00105;
+            const redness_change = 0.375;
+            const radius_change = 0.375;
+            var speed_factor = 1.0;
             var dot_color = "black"
             initial_state = true;
             const circle = {
@@ -59,11 +59,10 @@
                 radius: 70,
                 alpha: 0.31,
                 redness: 75,
-                flash: false,
             };
 
             var num_breaths = 0
-            const timeout_counter = 60000
+            const timeout_counter = 40000
             var last_event = 'up'
             var key_code = 32;
             function getRandomInt(max) {
@@ -106,19 +105,11 @@
                 ctx.fill();
             }
 
-            function drawDot(color) {
-                ctx.fillStyle = color;
-                ctx.fillRect(10,10,1,1);
-            }
-
             function animate() {
                 ctx.clearRect(0, 0, meditationCanvas.width, meditationCanvas.height);
                 drawCircle(circle);
-                drawDot(dot_color)
                 requestAnimationFrame(animate);
             }
-
-            animate();
 
             // Add event listener for the "keydown" event on the document object
             document.addEventListener('keydown', (event) => {
@@ -133,9 +124,6 @@
                         setTimeout(timeout, timeout_counter, num_breaths);
 
                         last_event = 'down'
-                        circle.flash = true;
-                        initial_state = false;
-                        dot_color = "white";
                     }
                 }
             });
@@ -147,8 +135,6 @@
                     socket.emit('client_keyup', { data: user_id });
 
                     last_event = 'up'
-                    circle.flash = false;
-                    dot_color = "black";
                 }
 
             });
@@ -161,7 +147,8 @@
             socket.on('update_state', function (msg) {
                 var num_inhaling = msg["inhaling"].length
                 var num_exhaling = msg["exhaling"].length
-                $('#log').append("<br> Inhales: " + num_inhaling.toString() + ", Exhales: " + num_exhaling.toString());
+                speed_factor = (num_inhaling - num_exhaling) / (num_inhaling + num_exhaling)
+                $('#log').append("<br> Inhales: " + num_inhaling.toString() + ", Exhales: " + num_exhaling.toString() + ", Speed: " + speed_factor.toString());
             });
 
             // loop through and update count divs
@@ -169,41 +156,46 @@
                 $('#log').append("<br>" + JSON.stringify(msg));
             });
 
-            // Update the circle color on each frame
-            function update() {
-                if (circle.flash) {
-                circle.alpha += alpha_change * speed;
-                circle.redness += redness_change * speed;
-                circle.radius += radius_change * speed;
+
+            function check_value_limits() {
+
                 if (circle.alpha >= max_alpha) {
                     circle.alpha = max_alpha;
-                }
-                if (circle.redness >= max_redness) {
-                    circle.redness = max_redness;
-                }
-                if (circle.radius >= max_radius) {
-                    circle.radius = max_radius;
-                }
-                }
-                else if (initial_state == false){
-                circle.alpha -= alpha_change * speed;
-                circle.redness -= redness_change * speed;
-                circle.radius -= radius_change * speed;
-                if (circle.radius <= min_radius) {
-                    circle.radius = min_radius;
-                    
                 }
                 if (circle.alpha <= min_alpha) {
                     circle.alpha = min_alpha;
                 }
+                if (circle.redness >= max_redness) {
+                    circle.redness = max_redness;
+                }
                 if (circle.redness <= min_redness) {
                     circle.redness = min_redness;
                 }
+                if (circle.radius >= max_radius) {
+                    circle.radius = max_radius;
+                }
+                if (circle.radius <= min_radius) {
+                    circle.radius = min_radius;
+                    
+                }
+            }
+
+
+            // Update the circle color on each frame
+            function update() {
+                if (num_breaths > 0) {
+                circle.alpha += alpha_change * speed_factor;
+                circle.redness += redness_change * speed_factor;
+                circle.radius += radius_change * speed_factor;
+
+                check_value_limits()
 
                 }
             }
 
             setInterval(update, 16);
+
+            animate();
            
 
         });
