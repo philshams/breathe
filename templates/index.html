@@ -33,9 +33,121 @@
         integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ=="
         crossorigin="anonymous">
 </script>
-
+<canvas id="meditationCanvas"></canvas>
 <script type="text/javascript" charset="utf-8">
         $(document).ready(function () {
+
+            const meditationCanvas = document.getElementById('meditationCanvas');
+            meditationCanvas.width = window.innerWidth;
+            meditationCanvas.height = window.innerHeight;
+            const ctx = meditationCanvas.getContext('2d');
+            const min_radius = 10;
+            const min_alpha = 0.1;
+            const min_redness = 0;
+            const max_radius = 350;
+            const max_alpha = 1.0;
+            const max_redness = 255;
+            const alpha_change = 0.0007;
+            const redness_change = 0.25;
+            const radius_change = 0.25;
+            const speed = 1.5;
+            var dot_color = "black"
+            initial_state = true;
+            const circle = {
+                x: meditationCanvas.width / 2,
+                y: meditationCanvas.height / 2,
+                radius: 70,
+                alpha: 0.31,
+                redness: 75,
+                flash: false,
+            };
+
+            function createGradientCircle(circle) {
+                const gradient = ctx.createRadialGradient(circle.x, circle.y, 0, circle.x, circle.y, circle.radius);
+                gradient.addColorStop(0, `rgba(${circle.redness}, 180, 255, ${circle.alpha})`);
+                gradient.addColorStop(1, `rgba(${circle.redness}, 180, 255, 0)`);
+                return gradient;
+            }
+
+            function drawCircle(circle) {
+                const gradient = createGradientCircle(circle);
+                ctx.beginPath();
+                ctx.arc(circle.x, circle.y, circle.radius, 0, 2 * Math.PI);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+            }
+
+            function drawDot(color) {
+                ctx.fillStyle = color;
+                ctx.fillRect(10,10,1,1);
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, meditationCanvas.width, meditationCanvas.height);
+                drawCircle(circle);
+                drawDot(dot_color)
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+
+            // Add event listener for the "keydown" event on the document object
+            document.addEventListener('keydown', (event) => {
+                if (event.code === 'Space') {
+                // Prevent default behavior of the spacebar key
+                event.preventDefault();
+
+                circle.flash = true;
+                initial_state = false;
+                dot_color = "white";
+                }
+            });
+
+            // Add event listener for the "keyup" event on the document object
+            document.addEventListener('keyup', (event) => {
+                if (event.code === 'Space') {
+                circle.flash = false;
+                dot_color = "black";
+                }
+
+            });
+
+            // Update the circle color on each frame
+            function update() {
+                if (circle.flash) {
+                circle.alpha += alpha_change * speed;
+                circle.redness += redness_change * speed;
+                circle.radius += radius_change * speed;
+                if (circle.alpha >= max_alpha) {
+                    circle.alpha = max_alpha;
+                }
+                if (circle.redness >= max_redness) {
+                    circle.redness = max_redness;
+                }
+                if (circle.radius >= max_radius) {
+                    circle.radius = max_radius;
+                }
+                }
+                else if (initial_state == false){
+                circle.alpha -= alpha_change * speed;
+                circle.redness -= redness_change * speed;
+                circle.radius -= radius_change * speed;
+                if (circle.radius <= min_radius) {
+                    circle.radius = min_radius;
+                    
+                }
+                if (circle.alpha <= min_alpha) {
+                    circle.alpha = min_alpha;
+                }
+                if (circle.redness <= min_redness) {
+                    circle.redness = min_redness;
+                }
+
+                }
+            }
+            
+            setInterval(update, 16);
+
             var num_breaths = 0
             var timeout_counter = 60000
             var key_code = 32;
