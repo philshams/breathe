@@ -156,6 +156,7 @@
 
             // Add event listener for the "keydown" event on the document object
             document.addEventListener('touchstart', (event) => {
+                event.preventDefault();
                 key_down_response(event)
             });
 
