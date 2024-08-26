@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-    <title>Breathe Together</title>
+    <title>Synchrony</title>
     <style>
         body {
             margin: 0;
@@ -62,6 +62,35 @@
                 flash: false,
             };
 
+            var num_breaths = 0
+            const timeout_counter = 60000
+            var last_event = 'up'
+            var key_code = 32;
+            function getRandomInt(max) {
+                return Math.floor(Math.random() * max);
+            }
+            var user_id = getRandomInt(100000000000);
+            $('#user_id').append(user_id)
+
+
+            // Connect to the Socket.IO server.
+            // The connection URL has the following format, relative to the current page:
+            //     http[s]://<domain>:<port>[/<namespace>]
+            var socket = io("/", 
+            {
+                reconnectionDelayMax: 10000, 
+                // this is used to keep track of which user has joined
+                auth: { id: user_id }
+            });
+            console.log(socket)
+
+
+            function timeout(prev_num_breaths) {
+                if (prev_num_breaths == num_breaths) {
+                    socket.emit('timeout', { data: user_id });
+                }
+            }
+
             function createGradientCircle(circle) {
                 const gradient = ctx.createRadialGradient(circle.x, circle.y, 0, circle.x, circle.y, circle.radius);
                 gradient.addColorStop(0, `rgba(${circle.redness}, 180, 255, ${circle.alpha})`);
@@ -94,22 +123,50 @@
             // Add event listener for the "keydown" event on the document object
             document.addEventListener('keydown', (event) => {
                 if (event.code === 'Space') {
-                // Prevent default behavior of the spacebar key
-                event.preventDefault();
+                    // Prevent default behavior of the spacebar key
+                    event.preventDefault();
 
-                circle.flash = true;
-                initial_state = false;
-                dot_color = "white";
+                    if (last_event != 'down') {
+
+                        socket.emit('client_keydown', { data: user_id });
+                        num_breaths = num_breaths + 1
+                        setTimeout(timeout, timeout_counter, num_breaths);
+
+                        last_event = 'down'
+                        circle.flash = true;
+                        initial_state = false;
+                        dot_color = "white";
+                    }
                 }
             });
 
             // Add event listener for the "keyup" event on the document object
             document.addEventListener('keyup', (event) => {
-                if (event.code === 'Space') {
-                circle.flash = false;
-                dot_color = "black";
+                if (event.code === 'Space' && last_event != 'up') {
+
+                    socket.emit('client_keyup', { data: user_id });
+
+                    last_event = 'up'
+                    circle.flash = false;
+                    dot_color = "black";
                 }
 
+            });
+
+            window.onbeforeunload = function () {
+                socket.emit('leave', { data: user_id });
+            }
+
+            // loop through and update count divs
+            socket.on('update_state', function (msg) {
+                var num_inhaling = msg["inhaling"].length
+                var num_exhaling = msg["exhaling"].length
+                $('#log').append("<br> Inhales: " + num_inhaling.toString() + ", Exhales: " + num_exhaling.toString());
+            });
+
+            // loop through and update count divs
+            socket.on('user_connection', function (msg) {
+                $('#log').append("<br>" + JSON.stringify(msg));
             });
 
             // Update the circle color on each frame
@@ -145,69 +202,9 @@
 
                 }
             }
-            
+
             setInterval(update, 16);
-
-            var num_breaths = 0
-            var timeout_counter = 60000
-            var key_code = 32;
-            function getRandomInt(max) {
-                return Math.floor(Math.random() * max);
-            }
-            var user_id = getRandomInt(100000000000);
-            $('#user_id').append(user_id)
-
-
-            // Connect to the Socket.IO server.
-            // The connection URL has the following format, relative to the current page:
-            //     http[s]://<domain>:<port>[/<namespace>]
-            var socket = io("/", 
-            {
-                reconnectionDelayMax: 10000, 
-                // this is used to keep track of which user has joined
-                auth: { id: user_id }
-            });
-            console.log(socket)
-
-
-            function timeout(prev_num_breaths) {
-                if (prev_num_breaths == num_breaths) {
-                    socket.emit('timeout', { data: user_id });
-                }
-            }
-
-            // keypress thingy
-            document.addEventListener("keydown", function (event) {
-                if (event.keyCode == key_code) {
-                    event.preventDefault();
-                    socket.emit('client_keydown', { data: user_id });
-                    num_breaths = num_breaths + 1
-                    setTimeout(timeout, timeout_counter, num_breaths);
-                    
-                }
-            });
-
-            // keypress thingy
-            document.addEventListener("keyup", function (event) {
-            if (event.keyCode == key_code) {
-                socket.emit('client_keyup', { data: user_id });
-            }
-            });
-
-            window.onbeforeunload = function () {
-                socket.emit('leave', { data: user_id });
-            }
-
-
-            // loop through and update count divs
-            socket.on('update_state', function (msg) {
-                $('#log').append("<br>" + JSON.stringify(msg));
-            });
-
-            // loop through and update count divs
-            socket.on('user_connection', function (msg) {
-                $('#log').append("<br>" + JSON.stringify(msg));
-            });
+           
 
         });
 </script>
