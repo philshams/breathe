@@ -156,7 +156,6 @@
 
             // Add event listener for the "keydown" event on the document object
             document.addEventListener('touchstart', (event) => {
-                event.preventDefault();
                 key_down_response(event)
             });
 
@@ -229,10 +228,18 @@
 </script>
 
 <body>
+
     <font color="green">
     <h2>User: <span id="user_id"></span></h2>
     <h2>Receive:</h2>
-    <div id="log"></div>
+    <div 
+    -webkit-touch-callout:none;
+    -webkit-user-select:none;
+    -khtml-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+    id="log"></div>
     </font>
 </body>
 
