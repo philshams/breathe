@@ -52,6 +52,15 @@ def client_keyup(message):
     # send everyone just this keypress update
     emit('update_state', {'inhaling': list(users_inhaling), 'exhaling': list(users_exhaling)}, broadcast=True)
 
+# when a client times out
+@socketio.event
+def timeout(message):
+    user_id = message['data']
+    users_inhaling.discard(user_id)
+    users_exhaling.discard(user_id)
+    # send everyone new user list
+    emit('update_state', {'inhaling': list(users_inhaling), 'exhaling': list(users_exhaling)}, broadcast=True)
+
 
 # when a client refreshes
 @socketio.event
