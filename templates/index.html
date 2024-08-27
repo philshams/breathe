@@ -232,7 +232,7 @@
             socket.on('user_connection', function (msg) {
                 console.log(JSON.stringify(msg));
                 const divElement = document.getElementById("num_online"); 
-                divElement.textContent = msg.length.toString(); 
+                divElement.textContent = (msg.length-1).toString(); 
             });
 
 
