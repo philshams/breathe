@@ -55,9 +55,23 @@
             const alpha_change = 0.001;
             const redness_change = 0.45;
             const radius_change = 0.6;
-            var speed_factor = 1.5;
+            const speed_factor = 1.0;
 
-            var circle = {
+            var update_multiplier_server = 0
+            var update_multiplier_client = 0
+
+            var circle_server = {
+                x: meditationCanvas.width / 2,
+                y: meditationCanvas.height / 2,
+                radius: 70,
+                alpha: 0.31,
+                redness: 75,
+                outer_radius: 70 + max_ring_width,
+                ring_width: max_ring_width,
+                ring_offset: max_ring_offset,
+            };
+
+            var circle_client = {
                 x: meditationCanvas.width / 2,
                 y: meditationCanvas.height / 2,
                 radius: 70,
@@ -70,7 +84,7 @@
 
             var num_breaths = 0
             const timeout_counter = 40000
-            var last_event = 'up'
+            var last_client_event = 'n/a'
 
             function getRandomInt(max) {
                 return Math.floor(Math.random() * max);
@@ -131,25 +145,27 @@
 
             function animate() {
                 ctx.clearRect(0, 0, meditationCanvas.width, meditationCanvas.height);
-                drawInnerCircle(circle);
-                drawOuterCircle(circle);
+                drawInnerCircle(circle_server);
+                drawOuterCircle(circle_client);
                 requestAnimationFrame(animate);
             }
 
             function key_down_response(event) {
-                if (last_event != 'down') {
+                if (last_client_event != 'inhale') {
                     socket.emit('client_keydown', { data: user_id });
                     num_breaths = num_breaths + 1
                     setTimeout(timeout, timeout_counter, num_breaths);
 
-                    last_event = 'down'
+                    last_client_event = 'inhale'
+                    update_multiplier_client = speed_factor
                 }
             }
 
             function key_up_response(event) {
-                if (last_event != 'up') {
+                if (last_client_event != 'exhale') {
                     socket.emit('client_keyup', { data: user_id });
-                    last_event = 'up'
+                    last_client_event = 'exhale'
+                    update_multiplier_client = -speed_factor
                     }
 
             }
@@ -195,9 +211,21 @@
 
             // loop through and update count divs
             socket.on('update_state', function (msg) {
-                var num_inhaling = msg["inhaling"].length
-                var num_exhaling = msg["exhaling"].length
-                speed_factor = (num_inhaling - num_exhaling) / (num_inhaling + num_exhaling)
+                inhaling_users = msg["inhaling"]
+                inhaling_users = inhaling_users.filter(inhaling_users => inhaling_users !== user_id);
+                exhaling_users = msg["exhaling"]
+                exhaling_users = exhaling_users.filter(exhaling_users => exhaling_users !== user_id);
+
+                num_inhaling = inhaling_users.length
+                num_exhaling = exhaling_users.length
+
+                update_multiplier_server = 0
+                if (num_inhaling > num_exhaling) {
+                    update_multiplier_server = speed_factor
+                }
+                if (num_exhaling > num_inhaling) {
+                    update_multiplier_server = -speed_factor
+                }
             });
 
             // loop through and update count divs
@@ -208,7 +236,7 @@
             });
 
 
-            function check_value_limits() {
+            function check_value_limits(circle) {
                 circle.alpha = Math.min(circle.alpha, max_alpha)
                 circle.alpha = Math.max(circle.alpha, min_alpha)
                 circle.redness = Math.min(circle.redness, max_redness)
@@ -217,15 +245,15 @@
                 circle.radius = Math.max(circle.radius, min_radius)
             }
 
-            function update_inner_circle() {
-                circle.alpha += alpha_change * speed_factor;
-                circle.redness += redness_change * speed_factor;
-                circle.radius += radius_change * speed_factor;
+            function update_inner_circle(circle, update_multiplier) {
+                circle.alpha += alpha_change * update_multiplier;
+                circle.redness += redness_change * update_multiplier;
+                circle.radius += radius_change * update_multiplier;
 
-                check_value_limits()
+                check_value_limits(circle)
             }
 
-            function update_outer_circle() {
+            function update_outer_circle(circle) {
                 circle.ring_width = max_ring_width * Math.min(0.75, Math.max(0.25, (1 - circle.radius / max_radius)))
                 circle.ring_offset = max_ring_offset * (1 - 5 * circle.radius / max_radius)
                 circle.outer_radius = circle.radius + circle.ring_offset + circle.ring_width
@@ -234,8 +262,9 @@
             // Update the circle color on each frame
             function update() {
                 if (num_breaths > 0) {
-                    update_inner_circle()
-                    update_outer_circle()                
+                    update_inner_circle(circle_server, update_multiplier_server)
+                    update_inner_circle(circle_client, update_multiplier_client)
+                    update_outer_circle(circle_client)                
                 }
             }
 
