@@ -41,30 +41,35 @@
             meditationCanvas.width = window.innerWidth;
             meditationCanvas.height = window.innerHeight;
             const ctx = meditationCanvas.getContext('2d');
+
             const min_radius = 10;
-            const min_alpha = 0.1;
+            const min_alpha = 0.2;
             const min_redness = 0;
-            const max_radius = 350;
+            const max_radius = 300;
             const max_alpha = 1.0;
-            const max_redness = 255;
-            const alpha_change = 0.0013;
-            const redness_change = 0.47;
-            const radius_change = 0.47;
-            var speed_factor = 1.0;
-            var dot_color = "black"
-            initial_state = true;
-            const circle = {
+            const max_redness = 210;
+
+            const ring_width = 15
+            const max_ring_offset = 10
+
+            const alpha_change = 0.001;
+            const redness_change = 0.45;
+            const radius_change = 0.6;
+            var speed_factor = 1.5;
+
+            var circle = {
                 x: meditationCanvas.width / 2,
                 y: meditationCanvas.height / 2,
                 radius: 70,
                 alpha: 0.31,
                 redness: 75,
+                outer_radius: 70 + ring_width,
             };
 
             var num_breaths = 0
             const timeout_counter = 40000
             var last_event = 'up'
-            var key_code = 32;
+
             function getRandomInt(max) {
                 return Math.floor(Math.random() * max);
             }
@@ -90,24 +95,42 @@
                 }
             }
 
-            function createGradientCircle(circle) {
+            function createInnerCircle(circle) {
                 const gradient = ctx.createRadialGradient(circle.x, circle.y, 0, circle.x, circle.y, circle.radius);
-                gradient.addColorStop(0, `rgba(${circle.redness}, 180, 255, ${circle.alpha})`);
-                gradient.addColorStop(1, `rgba(${circle.redness}, 180, 255, 0)`);
+                gradient.addColorStop(0, `rgba(${circle.redness}, 200, 255, ${circle.alpha})`);
+                gradient.addColorStop(1, `rgba(${circle.redness}, 200, 255, 0)`);
                 return gradient;
             }
 
-            function drawCircle(circle) {
-                const gradient = createGradientCircle(circle);
+            function createOuterCircle(circle){
+                const gradient = ctx.createRadialGradient(circle.x, circle.y, 0, circle.x, circle.y, circle.outer_radius);
+                gradient.addColorStop(0, `rgba(255, 255, 255, 0)`);
+                gradient.addColorStop( (circle.radius + ring_width) / circle.outer_radius, `rgba(255, 255, 255, 0)`);
+                gradient.addColorStop((1 + (circle.radius + ring_width) / circle.outer_radius) / 2, `rgba(255, 255, 255, 1)`);
+                gradient.addColorStop(1, `rgba(255, 255, 255, 0)`);
+                return gradient;
+            }
+
+            function drawInnerCircle(circle) {
+                const gradient = createInnerCircle(circle);
                 ctx.beginPath();
                 ctx.arc(circle.x, circle.y, circle.radius, 0, 2 * Math.PI);
                 ctx.fillStyle = gradient;
                 ctx.fill();
             }
 
+            function drawOuterCircle(circle) {
+                const gradient = createOuterCircle(circle);
+                ctx.beginPath();
+                ctx.arc(circle.x, circle.y, circle.outer_radius, 0, 2 * Math.PI);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+            }
+
             function animate() {
                 ctx.clearRect(0, 0, meditationCanvas.width, meditationCanvas.height);
-                drawCircle(circle);
+                drawInnerCircle(circle);
+                drawOuterCircle(circle);
                 requestAnimationFrame(animate);
             }
 
@@ -174,7 +197,6 @@
                 var num_inhaling = msg["inhaling"].length
                 var num_exhaling = msg["exhaling"].length
                 speed_factor = (num_inhaling - num_exhaling) / (num_inhaling + num_exhaling)
-                console.log("Inhales" + num_inhaling.toString() + ", Exhales: " + num_exhaling.toString() + ", Speed: " + speed_factor.toString());
             });
 
             // loop through and update count divs
@@ -186,28 +208,13 @@
 
 
             function check_value_limits() {
-
-                if (circle.alpha >= max_alpha) {
-                    circle.alpha = max_alpha;
-                }
-                if (circle.alpha <= min_alpha) {
-                    circle.alpha = min_alpha;
-                }
-                if (circle.redness >= max_redness) {
-                    circle.redness = max_redness;
-                }
-                if (circle.redness <= min_redness) {
-                    circle.redness = min_redness;
-                }
-                if (circle.radius >= max_radius) {
-                    circle.radius = max_radius;
-                }
-                if (circle.radius <= min_radius) {
-                    circle.radius = min_radius;
-                    
-                }
+                circle.alpha = Math.min(circle.alpha, max_alpha)
+                circle.alpha = Math.max(circle.alpha, min_alpha)
+                circle.redness = Math.min(circle.redness, max_redness)
+                circle.redness = Math.max(circle.redness, min_redness)
+                circle.radius = Math.min(circle.radius, max_radius)
+                circle.radius = Math.max(circle.radius, min_radius)
             }
-
 
             // Update the circle color on each frame
             function update() {
@@ -215,6 +222,9 @@
                 circle.alpha += alpha_change * speed_factor;
                 circle.redness += redness_change * speed_factor;
                 circle.radius += radius_change * speed_factor;
+
+                ring_offset = max_ring_offset * Math.min(0.75, Math.max(0.25, (1 - circle.radius / max_radius)))
+                circle.outer_radius = circle.radius + ring_offset + ring_width
 
                 check_value_limits()
 
@@ -228,17 +238,20 @@
 
         });
 </script>
-
+<!-- <style> 
+.noselect {
+    cursor: default;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+</style>  -->
 <body>
     <font color="green">
-    <div 
-    -webkit-touch-callout:none;
-    -webkit-user-select:none;
-    -khtml-user-select:none;
-    -moz-user-select:none;
-    -ms-user-select:none;
-    user-select:none;
-    id="num_online"></div>
+    <div id="num_online"></div>
     </font>
 </body>
 
