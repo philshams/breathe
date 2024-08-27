@@ -138,7 +138,6 @@
 
             function key_down_response(event) {
                 if (last_event != 'down') {
-
                     socket.emit('client_keydown', { data: user_id });
                     num_breaths = num_breaths + 1
                     setTimeout(timeout, timeout_counter, num_breaths);
@@ -218,21 +217,25 @@
                 circle.radius = Math.max(circle.radius, min_radius)
             }
 
-            // Update the circle color on each frame
-            function update() {
-                if (num_breaths > 0) {
+            function update_inner_circle() {
                 circle.alpha += alpha_change * speed_factor;
                 circle.redness += redness_change * speed_factor;
                 circle.radius += radius_change * speed_factor;
 
                 check_value_limits()
+            }
 
+            function update_outer_circle() {
                 circle.ring_width = max_ring_width * Math.min(0.75, Math.max(0.25, (1 - circle.radius / max_radius)))
                 circle.ring_offset = max_ring_offset * (1 - 5 * circle.radius / max_radius)
                 circle.outer_radius = circle.radius + circle.ring_offset + circle.ring_width
+            }
 
-                
-
+            // Update the circle color on each frame
+            function update() {
+                if (num_breaths > 0) {
+                    update_inner_circle()
+                    update_outer_circle()                
                 }
             }
 
