@@ -291,19 +291,19 @@
 
             function facilitate_catch_up() {
                 if (last_client_event == "inhale" && last_server_event == "inhale") {
-                    if (circle_server.radius > circle_client.radius) {
+                    if ((circle_server.radius - circle_client.radius) > 3) {
                         speed_multiplier_client = speed_multiplier_client * catchup_factor
                     }
-                    if (circle_server.radius < circle_client.radius) {
+                    if ((circle_client.radius - circle_server.radius) > 3) {
                         speed_multiplier_server = speed_multiplier_server * catchup_factor
                     }
                 }
                 if (last_client_event == "exhale" && last_server_event == "exhale") {
-                    if (circle_server.radius > circle_client.radius) {
-                        speed_multiplier_server = speed_multiplier_server * catchup_factor
-                    }
-                    if (circle_server.radius < circle_client.radius) {
+                    if ((circle_client.radius - circle_server.radius) > 3) {
                         speed_multiplier_client = speed_multiplier_client * catchup_factor
+                    }
+                    if ((circle_server.radius - circle_client.radius) > 3) {
+                        speed_multiplier_server = speed_multiplier_server * catchup_factor
                     }
                 }
                 
@@ -313,8 +313,8 @@
             function update() {
                 speed_multiplier_server = calculate_speed(last_server_event, circle_server)
                 speed_multiplier_client = calculate_speed(last_client_event, circle_client)
-                console.log(speed_multiplier_client)
                 facilitate_catch_up()
+                console.log(speed_multiplier_client)
 
                 update_inner_circle(circle_server, speed_multiplier_server)
                 update_inner_circle(circle_client, speed_multiplier_client)
