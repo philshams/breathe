@@ -71,6 +71,7 @@ def leave(message):
     users_online.discard(user_id)
     # send everyone new user list
     emit('user_connection', list(users_online), broadcast=True)
+    emit('update_state', {'inhaling': list(users_inhaling), 'exhaling': list(users_exhaling)}, roadcast=True)
 
 
 if __name__ == '__main__':

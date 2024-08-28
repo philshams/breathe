@@ -47,7 +47,7 @@
             const fast_radius_start = start_radius
             const min_alpha = 0.3;
             const min_redness = 0;
-            const fast_radius_end = 250;
+            const fast_radius_end = 200;
             const max_radius = 350;
             const max_alpha = 1.0;
             const max_redness = 180;
@@ -62,12 +62,12 @@
             const redness_change = 0.45;
             const radius_change = 0.6;
             const speed_factor = 1.0;
-            const inhale_speed_boost = 1.5;
+            const inhale_speed_boost = 1.25;
             const out_of_bounds_slowdown = 5;
-            const catchup_factor = 2;
+            const catchup_factor = 1.75;
 
-            var update_multiplier_server = 0
-            var update_multiplier_client = 0
+            var speed_multiplier_server = 0
+            var speed_multiplier_client = 0
 
             var circle_server = {
                 x: meditationCanvas.width / 2,
@@ -227,6 +227,8 @@
                 num_inhaling = inhaling_users.length
                 num_exhaling = exhaling_users.length
 
+                last_server_event = "none"
+
                 if (num_inhaling > num_exhaling) {
                     last_server_event = "inhale"
                 }
@@ -252,10 +254,10 @@
                 circle.radius = Math.max(circle.radius, min_radius)
             }
 
-            function update_inner_circle(circle, update_multiplier) {
-                circle.alpha += alpha_change * update_multiplier;
-                circle.redness += redness_change * update_multiplier;
-                circle.radius += radius_change * update_multiplier;
+            function update_inner_circle(circle, speed_multiplier) {
+                circle.alpha += alpha_change * speed_multiplier;
+                circle.redness += redness_change * speed_multiplier;
+                circle.radius += radius_change * speed_multiplier;
 
                 check_value_limits(circle)
             }
@@ -288,20 +290,20 @@
             }
 
             function facilitate_catch_up() {
-                if (last_client_event == "inhale" && last_client_event == "inhale") {
+                if (last_client_event == "inhale" && last_server_event == "inhale") {
                     if (circle_server.radius > circle_client.radius) {
-                        update_multiplier_server = update_multiplier_server / catchup_factor
+                        speed_multiplier_client = speed_multiplier_client * catchup_factor
                     }
                     if (circle_server.radius < circle_client.radius) {
-                        update_multiplier_server = update_multiplier_server * catchup_factor
+                        speed_multiplier_server = speed_multiplier_server * catchup_factor
                     }
                 }
-                if (last_client_event == "exhale" && last_client_event == "exhale") {
+                if (last_client_event == "exhale" && last_server_event == "exhale") {
                     if (circle_server.radius > circle_client.radius) {
-                        update_multiplier_server = update_multiplier_server * catchup_factor
+                        speed_multiplier_server = speed_multiplier_server * catchup_factor
                     }
                     if (circle_server.radius < circle_client.radius) {
-                        update_multiplier_server = update_multiplier_server / catchup_factor
+                        speed_multiplier_client = speed_multiplier_client * catchup_factor
                     }
                 }
                 
@@ -309,12 +311,12 @@
 
             // Update the circle color on each frame
             function update() {
-                update_multiplier_server = update_speed(last_server_event, circle_server)
+                speed_multiplier_server = update_speed(last_server_event, circle_server)
+                speed_multiplier_client = update_speed(last_client_event, circle_client)
                 facilitate_catch_up()
-                update_inner_circle(circle_server, update_multiplier_server)
 
-                update_multiplier_client = update_speed(last_client_event, circle_client)
-                update_inner_circle(circle_client, update_multiplier_client)
+                update_inner_circle(circle_server, speed_multiplier_server)
+                update_inner_circle(circle_client, speed_multiplier_client)
                 update_outer_circle(circle_client) 
 
             }
