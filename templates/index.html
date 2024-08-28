@@ -42,12 +42,12 @@
             meditationCanvas.height = window.innerHeight;
             const ctx = meditationCanvas.getContext('2d');
 
-            const start_radius = 80;
+            const start_radius = 100;
             const min_radius = 20;
             const fast_radius_start = start_radius
             const min_alpha = 0.3;
             const min_redness = 0;
-            const fast_radius_end = 200;
+            const fast_radius_end = 240;
             const max_radius = 350;
             const max_alpha = 1.0;
             const max_redness = 180;
@@ -61,7 +61,7 @@
             const alpha_change = 0.001;
             const redness_change = 0.45;
             const radius_change = 0.6;
-            const speed_factor = 1.0;
+            const speed_factor = 0.75;
             const inhale_speed_boost = 1.25;
             const out_of_bounds_slowdown = 5;
             const catchup_factor = 1.75;
@@ -92,7 +92,7 @@
             };
 
             var num_breaths = 0
-            const timeout_counter = 40000
+            const timeout_counter = 25000
             var last_client_event = 'n/a'
             var last_server_event = 'unknown'
 
@@ -211,7 +211,6 @@
                 key_up_response(event)
             });
 
-
             window.onbeforeunload = function () {
                 socket.emit('leave', { data: user_id });
             }
@@ -235,6 +234,7 @@
                 if (num_exhaling > num_inhaling) {
                     last_server_event = "exhale"
                 }
+                console.log(last_server_event)
             });
 
             // loop through and update count divs
@@ -268,7 +268,7 @@
                 circle.outer_radius = circle.radius + circle.ring_offset + circle.ring_width
             }
 
-            function update_speed(last_event, circle) {
+            function calculate_speed(last_event, circle) {
                 if (last_event == "inhale") {
                     if (circle.radius > fast_radius_end) {
                         return speed_factor * inhale_speed_boost / out_of_bounds_slowdown;
@@ -311,8 +311,9 @@
 
             // Update the circle color on each frame
             function update() {
-                speed_multiplier_server = update_speed(last_server_event, circle_server)
-                speed_multiplier_client = update_speed(last_client_event, circle_client)
+                speed_multiplier_server = calculate_speed(last_server_event, circle_server)
+                speed_multiplier_client = calculate_speed(last_client_event, circle_client)
+                console.log(speed_multiplier_client)
                 facilitate_catch_up()
 
                 update_inner_circle(circle_server, speed_multiplier_server)
