@@ -42,20 +42,28 @@
             meditationCanvas.height = window.innerHeight;
             const ctx = meditationCanvas.getContext('2d');
 
-            const min_radius = 30;
+            const start_radius = 80;
+            const min_radius = 20;
+            const fast_radius_start = start_radius
             const min_alpha = 0.3;
             const min_redness = 0;
-            const max_radius = 300;
+            const fast_radius_end = 250;
+            const max_radius = 350;
             const max_alpha = 1.0;
             const max_redness = 180;
 
             const max_ring_width = 10
             const max_ring_offset = 10
 
+            const start_alpha = 0.4
+            const start_redness = 100
+
             const alpha_change = 0.001;
             const redness_change = 0.45;
             const radius_change = 0.6;
             const speed_factor = 1.0;
+            const inhale_speed_boost = 1.5;
+            const out_of_bounds_slowdown = 5;
 
             var update_multiplier_server = 0
             var update_multiplier_client = 0
@@ -63,10 +71,10 @@
             var circle_server = {
                 x: meditationCanvas.width / 2,
                 y: meditationCanvas.height / 2,
-                radius: 70,
-                alpha: 0.31,
-                redness: 75,
-                outer_radius: 70 + max_ring_width,
+                radius: start_radius,
+                alpha: start_alpha,
+                redness: start_redness,
+                outer_radius: start_radius + max_ring_width,
                 ring_width: max_ring_width,
                 ring_offset: max_ring_offset,
             };
@@ -74,10 +82,10 @@
             var circle_client = {
                 x: meditationCanvas.width / 2,
                 y: meditationCanvas.height / 2,
-                radius: 70,
-                alpha: 0.31,
-                redness: 75,
-                outer_radius: 70 + max_ring_width,
+                radius: start_radius,
+                alpha: start_alpha,
+                redness: start_redness,
+                outer_radius: start_radius + max_ring_width,
                 ring_width: max_ring_width,
                 ring_offset: max_ring_offset,
             };
@@ -85,6 +93,7 @@
             var num_breaths = 0
             const timeout_counter = 40000
             var last_client_event = 'n/a'
+            var last_server_event = 'unknown'
 
             function getRandomInt(max) {
                 return Math.floor(Math.random() * max);
@@ -155,9 +164,7 @@
                     socket.emit('client_keydown', { data: user_id });
                     num_breaths = num_breaths + 1
                     setTimeout(timeout, timeout_counter, num_breaths);
-
                     last_client_event = 'inhale'
-                    update_multiplier_client = speed_factor
                 }
             }
 
@@ -165,7 +172,6 @@
                 if (last_client_event != 'exhale') {
                     socket.emit('client_keyup', { data: user_id });
                     last_client_event = 'exhale'
-                    update_multiplier_client = -speed_factor
                     }
 
             }
@@ -219,12 +225,11 @@
                 num_inhaling = inhaling_users.length
                 num_exhaling = exhaling_users.length
 
-                update_multiplier_server = 0
                 if (num_inhaling > num_exhaling) {
-                    update_multiplier_server = speed_factor
+                    last_server_event = "inhale"
                 }
                 if (num_exhaling > num_inhaling) {
-                    update_multiplier_server = -speed_factor
+                    last_server_event = "exhale"
                 }
             });
 
@@ -259,13 +264,36 @@
                 circle.outer_radius = circle.radius + circle.ring_offset + circle.ring_width
             }
 
+            function modulate_speed(last_event, circle) {
+                if (last_event == "inhale") {
+                    if (circle.radius > fast_radius_end) {
+                        return speed_factor * inhale_speed_boost / out_of_bounds_slowdown;
+                }
+                    else {
+                        return speed_factor * inhale_speed_boost
+                    }
+                        
+                    }
+                if (last_event == "exhale") {
+                    if (circle.radius < fast_radius_start) {
+                        return -speed_factor / out_of_bounds_slowdown
+                    }
+                    else {
+                        return -speed_factor
+                    }
+                }
+                return 0
+            }
+
             // Update the circle color on each frame
             function update() {
-                if (num_breaths > 0) {
-                    update_inner_circle(circle_server, update_multiplier_server)
-                    update_inner_circle(circle_client, update_multiplier_client)
-                    update_outer_circle(circle_client)                
-                }
+                update_multiplier_server = modulate_speed(last_server_event, circle_server)
+                update_inner_circle(circle_server, update_multiplier_server)
+
+                update_multiplier_client = modulate_speed(last_client_event, circle_client)
+                update_inner_circle(circle_client, update_multiplier_client)
+                update_outer_circle(circle_client) 
+
             }
 
             setInterval(update, 16);
