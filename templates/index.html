@@ -64,6 +64,7 @@
             const speed_factor = 1.0;
             const inhale_speed_boost = 1.5;
             const out_of_bounds_slowdown = 5;
+            const catchup_factor = 2;
 
             var update_multiplier_server = 0
             var update_multiplier_client = 0
@@ -264,7 +265,7 @@
                 circle.outer_radius = circle.radius + circle.ring_offset + circle.ring_width
             }
 
-            function modulate_speed(last_event, circle) {
+            function update_speed(last_event, circle) {
                 if (last_event == "inhale") {
                     if (circle.radius > fast_radius_end) {
                         return speed_factor * inhale_speed_boost / out_of_bounds_slowdown;
@@ -285,12 +286,33 @@
                 return 0
             }
 
+            function facilitate_catch_up() {
+                if (last_client_event == "inhale" && last_client_event == "inhale") {
+                    if (circle_server.radius > circle_client.radius) {
+                        update_multiplier_server = update_multiplier_server / catchup_factor
+                    }
+                    if (circle_server.radius < circle_client.radius) {
+                        update_multiplier_server = update_multiplier_server * catchup_factor
+                    }
+                }
+                if (last_client_event == "exhale" && last_client_event == "exhale") {
+                    if (circle_server.radius > circle_client.radius) {
+                        update_multiplier_server = update_multiplier_server * catchup_factor
+                    }
+                    if (circle_server.radius < circle_client.radius) {
+                        update_multiplier_server = update_multiplier_server / catchup_factor
+                    }
+                }
+                
+            }
+
             // Update the circle color on each frame
             function update() {
-                update_multiplier_server = modulate_speed(last_server_event, circle_server)
+                update_multiplier_server = update_speed(last_server_event, circle_server)
+                facilitate_catch_up()
                 update_inner_circle(circle_server, update_multiplier_server)
 
-                update_multiplier_client = modulate_speed(last_client_event, circle_client)
+                update_multiplier_client = update_speed(last_client_event, circle_client)
                 update_inner_circle(circle_client, update_multiplier_client)
                 update_outer_circle(circle_client) 
 
