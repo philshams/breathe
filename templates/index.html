@@ -218,6 +218,7 @@
 
             // loop through and update count divs
             socket.on('update_state', function (msg) {
+                console.log(JSON.stringify(msg));
                 inhaling_users = msg["inhaling"]
                 inhaling_users = inhaling_users.filter(inhaling_users => inhaling_users !== user_id);
                 exhaling_users = msg["exhaling"]
