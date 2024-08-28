@@ -62,7 +62,7 @@
             const redness_change = 0.45;
             const radius_change = 0.6;
             const speed_factor = 0.75;
-            const inhale_speed_boost = 1.25;
+            const inhale_speed_boost = 1.5;
             const out_of_bounds_slowdown = 3;
             const catchup_factor = 1.75;
 
@@ -215,33 +215,34 @@
                 socket.emit('leave', { data: user_id });
             }
 
+            function display_num_active_users(num_active) {
+                const divElement = document.getElementById("num_online"); 
+                divElement.textContent = "active: " + num_active.toString(); 
+            }
             // loop through and update count divs
             socket.on('update_state', function (msg) {
                 console.log(JSON.stringify(msg));
                 inhaling_users = msg["inhaling"]
-                inhaling_users = inhaling_users.filter(inhaling_users => inhaling_users !== user_id);
                 exhaling_users = msg["exhaling"]
+                display_num_active_users(inhaling_users.length + exhaling_users.length)
+                
+                inhaling_users = inhaling_users.filter(inhaling_users => inhaling_users !== user_id);
+                
                 exhaling_users = exhaling_users.filter(exhaling_users => exhaling_users !== user_id);
 
-                num_inhaling = inhaling_users.length
-                num_exhaling = exhaling_users.length
+                num_others_inhaling = inhaling_users.length
+                num_others_exhaling = exhaling_users.length
 
                 last_server_event = "none"
 
-                if (num_inhaling > num_exhaling) {
+                if (num_others_inhaling > num_others_exhaling) {
                     last_server_event = "inhale"
                 }
-                if (num_exhaling > num_inhaling) {
+                if (num_others_exhaling > num_others_inhaling) {
                     last_server_event = "exhale"
                 }
                 console.log(last_server_event)
-            });
-
-            // loop through and update count divs
-            socket.on('user_connection', function (msg) {
-                console.log(JSON.stringify(msg));
-                const divElement = document.getElementById("num_online"); 
-                divElement.textContent = (msg.length-1).toString(); 
+                
             });
 
 
@@ -341,7 +342,7 @@
 </style> 
 <body>
     <font color="green">
-    <div class="noselect" id="num_online"></div>
+        <p class="noselect" id="num_online" style=" position: absolute; bottom: 0; left: 0; width: 100%; text-align: left; text-indent: 2em"></p>
     </font>
 </body>
 
