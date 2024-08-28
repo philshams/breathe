@@ -61,13 +61,13 @@
             const alpha_change = 0.001;
             const redness_change = 0.45;
             const radius_change = 0.6;
-            const speed_factor = 1.4; //0.75;
-            const inhale_speed_boost = 1.25; //1.5;
+            const speed_factor = 1.4;
+            const inhale_speed_boost = 1.25;
             const out_of_bounds_slowdown = 3;
-            const catchup_factor = 1.75;
+            const catchup_factor = 1.66;
 
-            var speed_multiplier_server = 0
-            var speed_multiplier_client = 0
+            var speed_multiplier_server = 0;
+            var speed_multiplier_client = 0;
 
             var circle_server = {
                 x: meditationCanvas.width / 2,
@@ -91,10 +91,12 @@
                 ring_offset: max_ring_offset,
             };
 
-            var num_breaths = 0
-            const timeout_counter = 25000
-            var last_client_event = 'n/a'
-            var last_server_event = 'unknown'
+            var num_breaths = 0;
+            const timeout_counter = 25000;
+            var last_client_event = 'none';
+            var last_server_event = 'exhale';
+            var num_others_inhaling = 0;
+            var num_others_exhaling = 0;
 
             function getRandomInt(max) {
                 return Math.floor(Math.random() * max);
@@ -233,13 +235,14 @@
                 num_others_inhaling = inhaling_users.length
                 num_others_exhaling = exhaling_users.length
 
-                last_server_event = "none"
-
                 if (num_others_inhaling > num_others_exhaling) {
                     last_server_event = "inhale"
                 }
                 if (num_others_exhaling > num_others_inhaling) {
                     last_server_event = "exhale"
+                }
+                if (num_others_inhaling == num_others_exhaling && (num_others_inhaling + num_others_exhaling) > 0) {
+                    last_server_event = "tie"
                 }
                 console.log(last_server_event)
                 
@@ -269,6 +272,7 @@
                 circle.outer_radius = circle.radius + circle.ring_offset + circle.ring_width
             }
 
+
             function calculate_speed(last_event, circle) {
                 if (last_event == "inhale") {
                     if (circle.radius > fast_radius_end) {
@@ -281,40 +285,56 @@
                     }
                 if (last_event == "exhale") {
                     if (circle.radius < fast_radius_start) {
-                        return -speed_factor / (out_of_bounds_slowdown * 2)
+                        return -speed_factor / (out_of_bounds_slowdown * 1.5)
                     }
                     else {
                         return -speed_factor
                     }
                 }
-                return 0
-            }
-
-            function facilitate_catch_up() {
-                if (last_client_event == "inhale" && last_server_event == "inhale") {
-                    if ((circle_server.radius - circle_client.radius) > 3) {
-                        speed_multiplier_client = speed_multiplier_client * catchup_factor
-                    }
-                    if ((circle_client.radius - circle_server.radius) > 3) {
-                        speed_multiplier_server = speed_multiplier_server * catchup_factor
-                    }
-                }
-                if (last_client_event == "exhale" && last_server_event == "exhale") {
-                    if ((circle_client.radius - circle_server.radius) > 3) {
-                        speed_multiplier_client = speed_multiplier_client * catchup_factor
-                    }
-                    if ((circle_server.radius - circle_client.radius) > 3) {
-                        speed_multiplier_server = speed_multiplier_server * catchup_factor
-                    }
+                if (last_event == "tie" || last_event == "none") {
+                    return 0
                 }
                 
             }
 
+            function facilitate_catch_up() {
+                if (last_client_event == "inhale" && last_server_event == "inhale") {
+                    if ((circle_server.radius - circle_client.radius) > 4) {
+                        speed_multiplier_client = speed_multiplier_client * catchup_factor
+                    }
+                    if ((circle_client.radius - circle_server.radius) > 4) {
+                        speed_multiplier_server = speed_multiplier_server * catchup_factor
+                    }
+                }
+            }
+
+            function get_robot_action(last_server_event, circle_server) {
+                if (circle_server.radius < (fast_radius_start * 0.9)) {
+                    return "inhale"
+                }
+                if (circle_server.radius > (fast_radius_end * 1.1)) {
+                    return "exhale"
+                }
+                return last_server_event
+            }
+
+            function calculate_server_speed() {
+                if (num_others_inhaling == 0 && num_others_exhaling == 0) {
+                    last_server_event = get_robot_action(last_server_event, circle_server)
+                    speed_multiplier_server = calculate_speed(last_server_event, circle_server)
+                }
+                else {
+                    speed_multiplier_server = calculate_speed(last_server_event, circle_server)
+                    facilitate_catch_up()
+                }
+            }
+
             // Update the circle color on each frame
             function update() {
-                speed_multiplier_server = calculate_speed(last_server_event, circle_server)
-                speed_multiplier_client = calculate_speed(last_client_event, circle_client)
-                facilitate_catch_up()
+
+                speed_multiplier_client = calculate_speed(last_client_event, circle_client, "client")
+                calculate_server_speed()
+               
 
                 update_inner_circle(circle_server, speed_multiplier_server)
                 update_inner_circle(circle_client, speed_multiplier_client)
