@@ -43,7 +43,7 @@
             const ctx = meditationCanvas.getContext('2d');
 
             const start_radius = 100;
-            const min_radius = 20;
+            const min_radius = 40;
             const fast_radius_start = start_radius
             const min_alpha = 0.3;
             const min_redness = 0;
@@ -63,7 +63,7 @@
             const radius_change = 0.6;
             const speed_factor = 0.75;
             const inhale_speed_boost = 1.25;
-            const out_of_bounds_slowdown = 5;
+            const out_of_bounds_slowdown = 3;
             const catchup_factor = 1.75;
 
             var speed_multiplier_server = 0
@@ -314,7 +314,6 @@
                 speed_multiplier_server = calculate_speed(last_server_event, circle_server)
                 speed_multiplier_client = calculate_speed(last_client_event, circle_client)
                 facilitate_catch_up()
-                console.log(speed_multiplier_client)
 
                 update_inner_circle(circle_server, speed_multiplier_server)
                 update_inner_circle(circle_client, speed_multiplier_client)
