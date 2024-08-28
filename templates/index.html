@@ -42,9 +42,9 @@
             meditationCanvas.height = window.innerHeight;
             const ctx = meditationCanvas.getContext('2d');
 
-            const start_radius = 100;
+            const start_radius = 130;
             const min_radius = 40;
-            const fast_radius_start = start_radius
+            const fast_radius_start = start_radius;
             const min_alpha = 0.3;
             const min_redness = 0;
             const fast_radius_end = 240;
@@ -61,8 +61,8 @@
             const alpha_change = 0.001;
             const redness_change = 0.45;
             const radius_change = 0.6;
-            const speed_factor = 0.75;
-            const inhale_speed_boost = 1.5;
+            const speed_factor = 1.4; //0.75;
+            const inhale_speed_boost = 1.25; //1.5;
             const out_of_bounds_slowdown = 3;
             const catchup_factor = 1.75;
 
@@ -281,7 +281,7 @@
                     }
                 if (last_event == "exhale") {
                     if (circle.radius < fast_radius_start) {
-                        return -speed_factor / out_of_bounds_slowdown
+                        return -speed_factor / (out_of_bounds_slowdown * 2)
                     }
                     else {
                         return -speed_factor
