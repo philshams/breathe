@@ -43,7 +43,7 @@
             const ctx = meditationCanvas.getContext('2d');
 
             const start_radius = 130;
-            const min_radius = 60;
+            const min_radius = 100;
             const fast_radius_start = start_radius;
             const min_alpha = 0.3;
             const min_redness = 0;
@@ -69,7 +69,7 @@
             var speed_multiplier_server = 0;
             var speed_multiplier_client = 0;
 
-            const ring_color_off = [100, 100, 100];
+            const ring_color_off = [80, 80, 80];
             const ring_color_on = [255, 255, 190];
 
             var circle_server = {
@@ -99,11 +99,11 @@
             const timeout_counter = 25000;
             var num_active;
             var last_client_event = 'none';
-            var last_server_event = 'exhale';
+            var last_server_event = 'none';
             var num_others_inhaling = 0;
             var num_others_exhaling = 0;
             var longest_lockon = 0;
-            var current_lockon_duration = -1;
+            var current_lockon_duration = 0;
             var locked_on = false;
 
             function getRandomInt(max) {
@@ -228,7 +228,7 @@
 
             function display_num_active_users() {
                 const divElement = document.getElementById("num_online"); 
-                divElement.textContent = "active: " + num_active.toString() + ". longest synchrony streak: " + longest_lockon.toString() + " breaths"; 
+                divElement.textContent = "active: " + num_active.toString(); 
             }
             // loop through and update count divs
             socket.on('update_state', function (msg) {
@@ -277,14 +277,14 @@
             }
 
             function lock_on() {
-                if ((circle_client.radius - circle_server.radius) < 20 && (circle_client.radius - circle_server.radius) > -10) {
+                if ((last_server_event=="inhale" && (circle_client.radius - circle_server.radius) < 30 && (circle_client.radius - circle_server.radius) > -20) || (last_server_event=="exhale" && (circle_client.radius - circle_server.radius) < 20 && (circle_client.radius - circle_server.radius) > -30)) {
                     circle_client.ring_color = ring_color_on;
                     locked_on = true;
                 }
                 else {
                     circle_client.ring_color = ring_color_off;
                     locked_on = false;
-                    current_lockon_duration = -1;
+                    current_lockon_duration = 0;
                 }
             }
 
@@ -320,42 +320,8 @@
                 
             }
 
-            function facilitate_catch_up() {
-                if (last_client_event == "inhale" && last_server_event == "inhale") {
-                    if ((circle_server.radius - circle_client.radius) > 4) {
-                        speed_multiplier_client = speed_multiplier_client * catchup_factor
-                    }
-                    if ((circle_client.radius - circle_server.radius) > 4) {
-                        speed_multiplier_server = speed_multiplier_server * catchup_factor
-                    }
-                }
-            }
-
-            function get_robot_action(last_server_event, circle_server) {
-                if (circle_server.radius < (fast_radius_start * 0.9)) {
-                    if (locked_on && last_server_event == "exhale") {
-                        current_lockon_duration = current_lockon_duration + 1
-                        longest_lockon = Math.max(longest_lockon, current_lockon_duration - 1)
-                        display_num_active_users()
-                    }
-                
-                    return "inhale"
-                }
-                if (circle_server.radius > (fast_radius_end * 1.1)) {
-                    return "exhale"
-                }
-                return last_server_event
-            }
-
             function calculate_server_speed() {
-                if (num_others_inhaling == 0 && num_others_exhaling == 0) {
-                    last_server_event = get_robot_action(last_server_event, circle_server)
                     speed_multiplier_server = calculate_speed(last_server_event, circle_server)
-                }
-                else {
-                    speed_multiplier_server = calculate_speed(last_server_event, circle_server)
-                    facilitate_catch_up()
-                }
             }
 
             // Update the circle color on each frame
@@ -363,7 +329,6 @@
 
                 speed_multiplier_client = calculate_speed(last_client_event, circle_client, "client")
                 calculate_server_speed()
-               
 
                 update_inner_circle(circle_server, speed_multiplier_server)
                 update_inner_circle(circle_client, speed_multiplier_client)
@@ -392,6 +357,7 @@
 <body>
     <font color="green">
         <p class="noselect" id="num_online" style=" position: absolute; bottom: 0; left: 0; width: 100%; text-align: left; text-indent: 2em"></p>
+        <a href="../">link</a>
     </font>
 </body>
 

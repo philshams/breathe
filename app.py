@@ -20,8 +20,12 @@ users_exhaling = set()
 
 
 @app.route('/')
-def index():
-    return render_template('index.html', async_mode=socketio.async_mode)
+def breathe():
+    return render_template('breathe.html', async_mode=socketio.async_mode)
+
+@app.route('/together/')
+def together():
+    return render_template('together.html')
 
 # when a client connects
 @socketio.on('connect')

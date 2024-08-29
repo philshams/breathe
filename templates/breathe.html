@@ -1,0 +1,363 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title>Synchrony</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000000;
+        }
+
+        #container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #meditationCanvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+        integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
+        crossorigin="anonymous">
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"
+        integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ=="
+        crossorigin="anonymous">
+</script>
+<canvas id="meditationCanvas"></canvas>
+<script type="text/javascript" charset="utf-8">
+        $(document).ready(function () {
+
+            const meditationCanvas = document.getElementById('meditationCanvas');
+            meditationCanvas.width = window.innerWidth;
+            meditationCanvas.height = window.innerHeight;
+            const ctx = meditationCanvas.getContext('2d');
+
+            const start_radius = 130;
+            const min_radius = 100;
+            const fast_radius_start = start_radius;
+            const min_alpha = 0.3;
+            const min_redness = 0;
+            const fast_radius_end = 240;
+            const max_radius = 350;
+            const max_alpha = 1.0;
+            const max_redness = 180;
+
+            const max_ring_width = 10
+            const max_ring_offset = 10
+
+            const start_alpha = 0.4
+            const start_redness = 100
+
+            const alpha_change = 0.001;
+            const redness_change = 0.45;
+            const radius_change = 0.6;
+            const speed_factor = 1.4;
+            const inhale_speed_boost = 1.25;
+            const out_of_bounds_slowdown = 3;
+            const catchup_factor = 1.66;
+
+            var speed_multiplier_server = 0;
+            var speed_multiplier_client = 0;
+
+            const ring_color_off = [80, 80, 80];
+            const ring_color_on = [255, 255, 190];
+
+            var circle_server = {
+                x: meditationCanvas.width / 2,
+                y: meditationCanvas.height / 2,
+                radius: start_radius,
+                alpha: start_alpha,
+                redness: start_redness,
+                outer_radius: start_radius + max_ring_width,
+                ring_width: max_ring_width,
+                ring_offset: max_ring_offset,
+            };
+
+            var circle_client = {
+                x: meditationCanvas.width / 2,
+                y: meditationCanvas.height / 2,
+                radius: start_radius,
+                alpha: start_alpha,
+                redness: start_redness,
+                outer_radius: start_radius + max_ring_width,
+                ring_width: max_ring_width,
+                ring_offset: max_ring_offset,
+                ring_color: ring_color_off,
+            };
+
+            var num_breaths = 0;
+            const timeout_counter = 25000;
+            var last_client_event = 'none';
+            var last_server_event = 'exhale';
+
+            var longest_lockon = 0;
+            var current_lockon_duration = 0;
+            var locked_on = false;
+
+            function getRandomInt(max) {
+                return Math.floor(Math.random() * max);
+            }
+            var user_id = getRandomInt(100000000000);
+            $('#user_id').append(user_id)
+
+
+            // Connect to the Socket.IO server.
+            // The connection URL has the following format, relative to the current page:
+            //     http[s]://<domain>:<port>[/<namespace>]
+            var socket = io("/", 
+            {
+                reconnectionDelayMax: 10000, 
+                // this is used to keep track of which user has joined
+                auth: { id: user_id }
+            });
+            console.log(socket)
+
+
+            function timeout(prev_num_breaths) {
+                if (prev_num_breaths == num_breaths) {
+                    socket.emit('timeout', { data: user_id });
+                }
+            }
+
+            function createInnerCircle(circle) {
+                const gradient = ctx.createRadialGradient(circle.x, circle.y, 0, circle.x, circle.y, circle.radius);
+                gradient.addColorStop(0, `rgba(${circle.redness}, 200, 255, ${circle.alpha})`);
+                gradient.addColorStop(1, `rgba(${circle.redness}, 200, 255, 0)`);
+                return gradient;
+            }
+
+            function createOuterCircle(circle){
+                const gradient = ctx.createRadialGradient(circle.x, circle.y, 0, circle.x, circle.y, circle.outer_radius);
+                ring_color = 'rgba(' + circle.ring_color[0].toString() + ', ' + circle.ring_color[1].toString() + ', ' + circle.ring_color[2].toString();
+                gradient.addColorStop(0, ring_color + ', 0)');
+                gradient.addColorStop( (circle.radius + circle.ring_offset) / circle.outer_radius, ring_color + ', 0)');
+                gradient.addColorStop((1 + (circle.radius + circle.ring_offset) / circle.outer_radius) / 2, ring_color + ', 1)');
+                gradient.addColorStop(1, ring_color + ', 0)');
+                return gradient;
+            }
+
+            function drawInnerCircle(circle) {
+                const gradient = createInnerCircle(circle);
+                ctx.beginPath();
+                ctx.arc(circle.x, circle.y, circle.radius, 0, 2 * Math.PI);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+            }
+
+            function drawOuterCircle(circle) {
+                const gradient = createOuterCircle(circle);
+                ctx.beginPath();
+                ctx.arc(circle.x, circle.y, circle.outer_radius, 0, 2 * Math.PI);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, meditationCanvas.width, meditationCanvas.height);
+                drawInnerCircle(circle_server);
+                drawOuterCircle(circle_client);
+                requestAnimationFrame(animate);
+            }
+
+            function key_down_response(event) {
+                if (last_client_event != 'inhale') {
+                    socket.emit('client_keydown', { data: user_id });
+                    num_breaths = num_breaths + 1
+                    setTimeout(timeout, timeout_counter, num_breaths);
+                    last_client_event = 'inhale'
+                }
+            }
+
+            function key_up_response(event) {
+                if (last_client_event != 'exhale') {
+                    socket.emit('client_keyup', { data: user_id });
+                    last_client_event = 'exhale'
+                    }
+
+            }
+
+            // Add event listener for the "keydown" event on the document object
+            document.addEventListener('keydown', (event) => {
+                if (event.code === 'Space') {
+                    // Prevent default behavior of the spacebar key
+                    event.preventDefault();
+                    key_down_response(event)
+                }
+            });
+
+            // Add event listener for the "keyup" event on the document object
+            document.addEventListener('keyup', (event) => {
+                key_up_response(event)
+            });
+
+            // Add event listener for the "keydown" event on the document object
+            document.addEventListener('mousedown', (event) => {
+                key_down_response(event)
+            });
+
+            // Add event listener for the "keyup" event on the document object
+            document.addEventListener('mouseup', (event) => {
+                key_up_response(event)
+            });
+
+            // Add event listener for the "keydown" event on the document object
+            document.addEventListener('touchstart', (event) => {
+                key_down_response(event)
+            });
+
+            // Add event listener for the "keyup" event on the document object
+            document.addEventListener('touchend', (event) => {
+                key_up_response(event)
+            });
+
+            window.onbeforeunload = function () {
+                socket.emit('leave', { data: user_id });
+            }
+
+            function display_streak() {
+                const divElement = document.getElementById("streak"); 
+                divElement.textContent = "longest streak: " + longest_lockon.toString(); 
+            }
+
+            function check_value_limits(circle) {
+                circle.alpha = Math.min(circle.alpha, max_alpha)
+                circle.alpha = Math.max(circle.alpha, min_alpha)
+                circle.redness = Math.min(circle.redness, max_redness)
+                circle.redness = Math.max(circle.redness, min_redness)
+                circle.radius = Math.min(circle.radius, max_radius)
+                circle.radius = Math.max(circle.radius, min_radius)
+            }
+
+            function update_inner_circle(circle, speed_multiplier) {
+                circle.alpha += alpha_change * speed_multiplier;
+                circle.redness += redness_change * speed_multiplier;
+                circle.radius += radius_change * speed_multiplier;
+
+                check_value_limits(circle)
+            }
+
+            function lock_on() {
+                if ((last_server_event=="inhale" && (circle_client.radius - circle_server.radius) < 30 && (circle_client.radius - circle_server.radius) > -20) || (last_server_event=="exhale" && (circle_client.radius - circle_server.radius) < 20 && (circle_client.radius - circle_server.radius) > -30)) {
+                    circle_client.ring_color = ring_color_on;
+                    locked_on = true;
+                }
+                else {
+                    circle_client.ring_color = ring_color_off;
+                    locked_on = false;
+                    current_lockon_duration = 0;
+                }
+            }
+
+            function update_outer_circle(circle) {
+                circle.ring_width = max_ring_width * Math.min(0.75, Math.max(0.25, (1 - circle.radius / max_radius)))
+                circle.ring_offset = max_ring_offset * (1 - 5 * circle.radius / max_radius)
+                circle.outer_radius = circle.radius + circle.ring_offset + circle.ring_width
+                lock_on()
+            }
+
+
+            function calculate_speed(last_event, circle) {
+                if (last_event == "inhale") {
+                    if (circle.radius > fast_radius_end) {
+                        return speed_factor * inhale_speed_boost / out_of_bounds_slowdown;
+                }
+                    else {
+                        return speed_factor * inhale_speed_boost
+                    }
+                        
+                    }
+                if (last_event == "exhale") {
+                    if (circle.radius < fast_radius_start) {
+                        return -speed_factor / (out_of_bounds_slowdown * 1.5)
+                    }
+                    else {
+                        return -speed_factor
+                    }
+                }
+                if (last_event == "tie" || last_event == "none") {
+                    return 0
+                }
+                
+            }
+
+            function facilitate_catch_up() {
+                if (last_client_event == "inhale" && last_server_event == "inhale") {
+                    if ((circle_server.radius - circle_client.radius) > 4) {
+                        speed_multiplier_client = speed_multiplier_client * catchup_factor
+                    }
+                    if ((circle_client.radius - circle_server.radius) > 4) {
+                        speed_multiplier_server = speed_multiplier_server * catchup_factor
+                    }
+                }
+            }
+
+            function get_robot_action(last_server_event, circle_server) {
+                if (circle_server.radius < (fast_radius_start * 0.9)) {
+                    if (locked_on && last_server_event == "exhale") {
+                        current_lockon_duration = current_lockon_duration + 1
+                        longest_lockon = Math.max(longest_lockon, current_lockon_duration - 1)
+                        display_streak()
+                    }
+                
+                    return "inhale"
+                }
+                if (circle_server.radius > (fast_radius_end * 1.1)) {
+                    return "exhale"
+                }
+                return last_server_event
+            }
+
+            function calculate_server_speed() {
+                last_server_event = get_robot_action(last_server_event, circle_server)
+                speed_multiplier_server = calculate_speed(last_server_event, circle_server)
+            }
+
+            // Update the circle color on each frame
+            function update() {
+
+                speed_multiplier_client = calculate_speed(last_client_event, circle_client, "client")
+                calculate_server_speed()
+               
+
+                update_inner_circle(circle_server, speed_multiplier_server)
+                update_inner_circle(circle_client, speed_multiplier_client)
+                update_outer_circle(circle_client) 
+
+            }
+
+            setInterval(update, 16);
+
+            animate();
+           
+
+        });
+</script>
+<style> 
+.noselect {
+    cursor: default;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+</style> 
+<body>
+    <font color="green">
+        <p class="noselect" id="streak" style=" position: absolute; bottom: 0; left: 0; width: 100%; text-align: left; text-indent: 2em"></p>
+    </font>
+    <a href="together">link</a>
+</body>
+
+</html>
