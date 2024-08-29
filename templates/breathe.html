@@ -45,38 +45,36 @@
             const start_radius = 130;
             const min_radius = 100;
             const fast_radius_start = start_radius;
-            const min_alpha = 0.3;
             const min_redness = 0;
             const fast_radius_end = 240;
             const max_radius = 350;
-            const max_alpha = 1.0;
             const max_redness = 180;
 
             const max_ring_width = 10
             const max_ring_offset = 10
 
-            const start_alpha = 0.4
-            const start_redness = 100
+            const start_redness = 100;
 
-            const alpha_change = 0.001;
             const redness_change = 0.45;
             const radius_change = 0.6;
             const speed_factor = 1.4;
             const inhale_speed_boost = 1.25;
             const out_of_bounds_slowdown = 3;
-            const catchup_factor = 1.66;
+
+            const robot_start = fast_radius_start * 0.9
+            const robot_end = fast_radius_end * 1.1
 
             var speed_multiplier_server = 0;
             var speed_multiplier_client = 0;
 
             const ring_color_off = [80, 80, 80];
             const ring_color_on = [255, 255, 190];
+            const ring_color_perfect = ring_color_on; // [160, 255, 160]
 
             var circle_server = {
                 x: meditationCanvas.width / 2,
                 y: meditationCanvas.height / 2,
                 radius: start_radius,
-                alpha: start_alpha,
                 redness: start_redness,
                 outer_radius: start_radius + max_ring_width,
                 ring_width: max_ring_width,
@@ -87,7 +85,6 @@
                 x: meditationCanvas.width / 2,
                 y: meditationCanvas.height / 2,
                 radius: start_radius,
-                alpha: start_alpha,
                 redness: start_redness,
                 outer_radius: start_radius + max_ring_width,
                 ring_width: max_ring_width,
@@ -104,6 +101,10 @@
             var longest_lockon = 0;
             var current_lockon_duration = 0;
             var locked_on = false;
+            var perfect_lock_on = false;
+            var perfect_count = 0;
+            var longest_perfect = 0;
+
             display_streak()
 
             function getRandomInt(max) {
@@ -132,7 +133,7 @@
 
             function createInnerCircle(circle) {
                 const gradient = ctx.createRadialGradient(circle.x, circle.y, 0, circle.x, circle.y, circle.radius);
-                gradient.addColorStop(0, `rgba(${circle.redness}, 200, 255, ${circle.alpha})`);
+                gradient.addColorStop(0, `rgba(${circle.redness}, 200, 255, 1)`);
                 gradient.addColorStop(1, `rgba(${circle.redness}, 200, 255, 0)`);
                 return gradient;
             }
@@ -173,9 +174,19 @@
             function key_down_response(event) {
                 if (last_client_event != 'inhale') {
                     socket.emit('client_keydown', { data: user_id });
-                    num_breaths = num_breaths + 1
+                    num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter, num_breaths);
                     last_client_event = 'inhale'
+                    if (circle_server.radius < (robot_start + 5) && (circle_client.radius - circle_server.radius) < 5 && (circle_client.radius - circle_server.radius) > -5) {
+                        perfect_lock_on = true;
+                        perfect_count = perfect_count + 1;
+                        longest_perfect = Math.max(longest_perfect, perfect_count);
+                        display_streak()
+                    }
+                    else {
+                        perfect_lock_on = false;
+                        perfect_count = 0;
+                    }
                 }
             }
 
@@ -183,6 +194,13 @@
                 if (last_client_event != 'exhale') {
                     socket.emit('client_keyup', { data: user_id });
                     last_client_event = 'exhale'
+                    if (circle_server.radius > (robot_end - 5) && (circle_client.radius - circle_server.radius) < 5 && (circle_client.radius - circle_server.radius) > -5) {
+                        perfect_lock_on = true
+                    }
+                    else {
+                        perfect_lock_on = false
+                        perfect_count = 0;
+                    }
                     }
 
             }
@@ -227,7 +245,7 @@
 
             function display_streak() {
                 const divElement = document.getElementById("streak"); 
-                divElement.textContent = "longest streak: " + longest_lockon.toString(); 
+                divElement.textContent = "longest streak: " + longest_lockon.toString() + ". longest perfect streak: " + longest_perfect.toString(); 
             }
 
             function display_num_active_users() {
@@ -254,8 +272,6 @@
             });
 
             function check_value_limits(circle) {
-                circle.alpha = Math.min(circle.alpha, max_alpha)
-                circle.alpha = Math.max(circle.alpha, min_alpha)
                 circle.redness = Math.min(circle.redness, max_redness)
                 circle.redness = Math.max(circle.redness, min_redness)
                 circle.radius = Math.min(circle.radius, max_radius)
@@ -263,7 +279,6 @@
             }
 
             function update_inner_circle(circle, speed_multiplier) {
-                circle.alpha += alpha_change * speed_multiplier;
                 circle.redness += redness_change * speed_multiplier;
                 circle.radius += radius_change * speed_multiplier;
 
@@ -271,7 +286,7 @@
             }
 
             function lock_on() {
-                if ((last_server_event=="inhale" && (circle_client.radius - circle_server.radius) < 30 && (circle_client.radius - circle_server.radius) > -20) || (last_server_event=="exhale" && (circle_client.radius - circle_server.radius) < 20 && (circle_client.radius - circle_server.radius) > -30)) {
+                if (Math.abs(circle_client.radius - circle_server.radius) < 30) {
                     circle_client.ring_color = ring_color_on;
                     locked_on = true;
                 }
@@ -280,12 +295,18 @@
                     locked_on = false;
                     current_lockon_duration = 0;
                 }
+                if (perfect_lock_on) {
+                    circle_client.ring_color = ring_color_perfect;
+                }
             }
 
             function update_outer_circle(circle) {
                 circle.ring_width = max_ring_width * Math.min(0.75, Math.max(0.25, (1 - circle.radius / max_radius)))
                 circle.ring_offset = max_ring_offset * (1 - 5 * circle.radius / max_radius)
                 circle.outer_radius = circle.radius + circle.ring_offset + circle.ring_width
+                if (perfect_lock_on) {
+                    circle.outer_radius = circle.outer_radius * 1.05;
+                }
                 lock_on()
             }
 
@@ -312,17 +333,6 @@
                     return 0
                 }
                 
-            }
-
-            function facilitate_catch_up() {
-                if (last_client_event == "inhale" && last_server_event == "inhale") {
-                    if ((circle_server.radius - circle_client.radius) > 4) {
-                        speed_multiplier_client = speed_multiplier_client * catchup_factor
-                    }
-                    if ((circle_client.radius - circle_server.radius) > 4) {
-                        speed_multiplier_server = speed_multiplier_server * catchup_factor
-                    }
-                }
             }
 
             function get_robot_action(last_server_event, circle_server) {
