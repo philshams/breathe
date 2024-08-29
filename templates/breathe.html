@@ -92,7 +92,7 @@
             };
 
             var num_breaths = 0;
-            const timeout_counter = 25000;
+            const timeout_counter = 15000;
             var num_active;
             var last_client_event = 'none';
             var last_server_event = 'exhale';
@@ -237,7 +237,7 @@
                     divElement.textContent = "you are breathing with Orbie. there is one other person online <3 click here to breathe with them.";
                 }
                 if (num_active > 1) {
-                divElement.textContent = "you are breathing with Orbie. " + num_active.toString() + " people are breathing together <3 click here to join them.";
+                divElement.textContent = "you are breathing with Orbie. " + num_active.toString() + " people are breathing together - click here to join them.";
                 }
             }
 
@@ -325,16 +325,12 @@
                 return last_server_event
             }
 
-            function calculate_server_speed() {
-                last_server_event = get_robot_action(last_server_event, circle_server)
-                speed_multiplier_server = calculate_speed(last_server_event, circle_server)
-            }
-
             // Update the circle color on each frame
             function update() {
 
                 speed_multiplier_client = calculate_speed(last_client_event, circle_client, "client")
-                calculate_server_speed()
+                last_server_event = get_robot_action(last_server_event, circle_server)
+                speed_multiplier_server = calculate_speed(last_server_event, circle_server)
                
 
                 update_inner_circle(circle_server, speed_multiplier_server)
@@ -363,8 +359,8 @@
 </style> 
 <body>
     <font color="green">
-        <p class="noselect" id="streak" style=" position: absolute; bottom: 0; left: 0; width: 100%; text-align: left; text-indent: 2em"></p>
-    <a href="together" class="noselect" id="link" style=" position: absolute; bottom: 0; left: 0; width: 100%; text-align: left; text-indent: 2em; color: green"></a>
+        <p class="noselect" id="streak" style=" position: absolute; bottom: 2em; left: 0; width: 100%; text-align: left; text-indent: 2em"></p>
+    <a href="together" class="noselect" id="link" style=" position: absolute; bottom: 1em; left: 0; width: 100%; text-align: left; text-indent: 2em; color: green"></a>
     </font>
 </body>
 

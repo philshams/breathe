@@ -45,20 +45,16 @@
             const start_radius = 130;
             const min_radius = 100;
             const fast_radius_start = start_radius;
-            const min_alpha = 0.3;
             const min_redness = 0;
             const fast_radius_end = 240;
             const max_radius = 350;
-            const max_alpha = 1.0;
             const max_redness = 180;
 
             const max_ring_width = 10
             const max_ring_offset = 10
 
-            const start_alpha = 0.4
             const start_redness = 100
 
-            const alpha_change = 0.001;
             const redness_change = 0.45;
             const radius_change = 0.6;
             const speed_factor = 1.4;
@@ -75,7 +71,6 @@
                 x: meditationCanvas.width / 2,
                 y: meditationCanvas.height / 2,
                 radius: start_radius,
-                alpha: start_alpha,
                 redness: start_redness,
                 outer_radius: start_radius + max_ring_width,
                 ring_width: max_ring_width,
@@ -86,7 +81,6 @@
                 x: meditationCanvas.width / 2,
                 y: meditationCanvas.height / 2,
                 radius: start_radius,
-                alpha: start_alpha,
                 redness: start_redness,
                 outer_radius: start_radius + max_ring_width,
                 ring_width: max_ring_width,
@@ -95,7 +89,7 @@
             };
 
             var num_breaths = 0;
-            const timeout_counter = 25000;
+            const timeout_counter = 20000;
             var num_active;
             var last_client_event = 'none';
             var last_server_event = 'none';
@@ -104,6 +98,8 @@
             var longest_lockon = 0;
             var current_lockon_duration = 0;
             var locked_on = false;
+
+            var partner_id = 0
 
             function getRandomInt(max) {
                 return Math.floor(Math.random() * max);
@@ -121,8 +117,6 @@
                 // this is used to keep track of which user has joined
                 auth: { id: user_id }
             });
-            console.log(socket)
-
 
             function timeout(prev_num_breaths) {
                 if (prev_num_breaths == num_breaths) {
@@ -132,7 +126,7 @@
 
             function createInnerCircle(circle) {
                 const gradient = ctx.createRadialGradient(circle.x, circle.y, 0, circle.x, circle.y, circle.radius);
-                gradient.addColorStop(0, `rgba(${circle.redness}, 200, 255, ${circle.alpha})`);
+                gradient.addColorStop(0, `rgba(${circle.redness}, 200, 255, 1)`);
                 gradient.addColorStop(1, `rgba(${circle.redness}, 200, 255, 0)`);
                 return gradient;
             }
@@ -234,7 +228,7 @@
                     divElement.textContent = "there is one other person online <3 you are breathing with them.";
                 }
                 if (num_active > 1) {
-                divElement.textContent = "there are " + num_active.toString() + " other people online <3 you are breathing with them";
+                divElement.textContent = "there are " + num_active.toString() + " other people online - you are breathing with them";
                 }
             }
 
@@ -246,29 +240,31 @@
                 inhaling_users = inhaling_users.filter(inhaling_users => inhaling_users !== user_id);
                 exhaling_users = exhaling_users.filter(exhaling_users => exhaling_users !== user_id);
 
-                num_active = inhaling_users.length + exhaling_users.length
+                active_users = inhaling_users.concat(exhaling_users)
+                num_active = active_users.length
                 display_num_active_users()
 
-                num_others_inhaling = inhaling_users.length
-                num_others_exhaling = exhaling_users.length
+                if (num_active > 0) {
+                    if (!active_users.includes(partner_id)) {
+                        randomIndex = Math.floor(Math.random() * num_active);
+                        partner_id = active_users[randomIndex];
+                        console.log(partner_id)
+                        console.log(active_users)
+                    }
 
-                if (num_others_inhaling > num_others_exhaling) {
-                    last_server_event = "inhale"
-                }
-                if (num_others_exhaling > num_others_inhaling) {
-                    last_server_event = "exhale"
-                }
-                if (num_others_inhaling == num_others_exhaling && (num_others_inhaling + num_others_exhaling) > 0) {
-                    last_server_event = "tie"
+                    if (inhaling_users.includes(partner_id)) {
+                        last_server_event = "inhale"
+                    }
+                    
+                    if (exhaling_users.includes(partner_id)) {
+                        last_server_event = "exhale"
+                    }
                 }
                 console.log(last_server_event)
                 
             });
 
-
             function check_value_limits(circle) {
-                circle.alpha = Math.min(circle.alpha, max_alpha)
-                circle.alpha = Math.max(circle.alpha, min_alpha)
                 circle.redness = Math.min(circle.redness, max_redness)
                 circle.redness = Math.max(circle.redness, min_redness)
                 circle.radius = Math.min(circle.radius, max_radius)
@@ -276,7 +272,6 @@
             }
 
             function update_inner_circle(circle, speed_multiplier) {
-                circle.alpha += alpha_change * speed_multiplier;
                 circle.redness += redness_change * speed_multiplier;
                 circle.radius += radius_change * speed_multiplier;
 
@@ -321,26 +316,22 @@
                         return -speed_factor
                     }
                 }
-                if (last_event == "tie" || last_event == "none") {
+                if (last_event == "none") {
                     return 0
                 }
                 
-            }
-
-            function calculate_server_speed() {
-                    speed_multiplier_server = calculate_speed(last_server_event, circle_server)
             }
 
             // Update the circle color on each frame
             function update() {
 
                 speed_multiplier_client = calculate_speed(last_client_event, circle_client, "client")
-                calculate_server_speed()
+                console.log(last_server_event)
+                speed_multiplier_server = calculate_speed(last_server_event, circle_server)
 
                 update_inner_circle(circle_server, speed_multiplier_server)
                 update_inner_circle(circle_client, speed_multiplier_client)
                 update_outer_circle(circle_client) 
-
             }
 
             setInterval(update, 16);
@@ -363,8 +354,8 @@
 </style> 
 <body>
     <font color="green">
-        <p class="noselect" id="num_online" style=" position: absolute; bottom: 0; left: 0; width: 100%; text-align: left; text-indent: 2em"></p>
-        <a href="../" class="noselect" id="link" style=" position: absolute; bottom: 0; left: 0; width: 100%; text-align: left; text-indent: 2em; color: green">click here to breathe with Orbie instead</a>
+        <p class="noselect" id="num_online" style=" position: absolute; bottom: 2em; left: 0; width: 100%; text-align: left; text-indent: 2em"></p>
+        <a href="../" class="noselect" id="link" style=" position: absolute; bottom: 1em; left: 0; width: 100%; text-align: left; text-indent: 2em; color: green">click here to breathe with Orbie instead</a>
     </font>
 </body>
 
