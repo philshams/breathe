@@ -50,7 +50,7 @@
             const max_radius = 350;
             const max_redness = 180;
 
-            const max_ring_width = 10
+            const max_ring_width = 11
             const max_ring_offset = 10
 
             const start_redness = 100;
@@ -137,6 +137,7 @@
             function createOuterCircle(circle){
                 const gradient = ctx.createRadialGradient(circle.x, circle.y, 0, circle.x, circle.y, circle.outer_radius);
                 ring_color = 'rgba(' + circle.ring_color[0].toString() + ', ' + circle.ring_color[1].toString() + ', ' + circle.ring_color[2].toString();
+
                 gradient.addColorStop(0, ring_color + ', 0)');
                 gradient.addColorStop( (circle.radius + circle.ring_offset) / circle.outer_radius, ring_color + ', 0)');
                 gradient.addColorStop((1 + (circle.radius + circle.ring_offset) / circle.outer_radius) / 2, ring_color + ', 1)');
@@ -230,13 +231,13 @@
             function display_num_active_users() {
                 const divElement = document.getElementById("link");
                 if (num_active<=0){
-                    divElement.textContent = "you are breathing with Lungberta (the breathing room for humans is empty right now)";
+                    divElement.textContent = "you are breathing with Orbie. the breathing room for humans is empty right now.";
                 }
                 if (num_active==1){
-                    divElement.textContent = "you are breathing with Lungberta. there is one other person online <3 click here to breathe with them.";
+                    divElement.textContent = "you are breathing with Orbie. there is one other person online <3 click here to breathe with them.";
                 }
                 if (num_active > 1) {
-                divElement.textContent = "you are breathing with Lungberta. " + num_active.toString() + " people are breathing together <3 click here to join them.";
+                divElement.textContent = "you are breathing with Orbie. " + num_active.toString() + " people are breathing together <3 click here to join them.";
                 }
             }
 
@@ -265,7 +266,7 @@
             }
 
             function lock_on() {
-                if (Math.abs(circle_client.radius - circle_server.radius) < 30) {
+                if (Math.abs(circle_client.radius - circle_server.radius) < 20) {
                     circle_client.ring_color = ring_color_on;
                     locked_on = true;
                 }
