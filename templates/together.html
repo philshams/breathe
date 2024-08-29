@@ -227,20 +227,28 @@
             }
 
             function display_num_active_users() {
-                const divElement = document.getElementById("num_online"); 
-                divElement.textContent = "active: " + num_active.toString(); 
+                const divElement = document.getElementById("num_online");
+                if (num_active<=0){
+                    divElement.textContent = "the breathing room is empty right now.";
+                }
+                if (num_active==1){
+                    divElement.textContent = "there is one other person online <3 you are breathing with them.";
+                }
+                if (num_active > 1) {
+                divElement.textContent = "there are " + num_active.toString() + " other people online <3 you are breathing with them";
+                }
             }
-            // loop through and update count divs
+
             socket.on('update_state', function (msg) {
                 console.log(JSON.stringify(msg));
                 inhaling_users = msg["inhaling"]
                 exhaling_users = msg["exhaling"]
-                num_active = inhaling_users.length + exhaling_users.length
-                display_num_active_users()
                 
                 inhaling_users = inhaling_users.filter(inhaling_users => inhaling_users !== user_id);
-                
                 exhaling_users = exhaling_users.filter(exhaling_users => exhaling_users !== user_id);
+
+                num_active = inhaling_users.length + exhaling_users.length
+                display_num_active_users()
 
                 num_others_inhaling = inhaling_users.length
                 num_others_exhaling = exhaling_users.length
@@ -357,7 +365,7 @@
 <body>
     <font color="green">
         <p class="noselect" id="num_online" style=" position: absolute; bottom: 0; left: 0; width: 100%; text-align: left; text-indent: 2em"></p>
-        <a href="../">link</a>
+        <a href="../" class="noselect" id="link" style=" position: absolute; bottom: 0; left: 0; width: 100%; text-align: left; text-indent: 2em; color: green">click here to breathe with Lungberta instead</a>
     </font>
 </body>
 
