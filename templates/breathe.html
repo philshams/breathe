@@ -347,8 +347,8 @@
 <style>
         #fullscreen-button {
 			position: absolute;
-			bottom:  3em;
-			right:  3em;
+			bottom:  50px;
+			right:  50px;
 			background: rgb(100, 100, 100);
             opacity: 0.7;
 			border:  0;
@@ -358,10 +358,23 @@
 			cursor:  pointer;
 		}
 
+        #fullscreen-button2 {
+			position: absolute;
+			bottom:  57px;
+			right:  57px;
+			background: rgb(0, 0, 0);
+            opacity: 1.0;
+			border:  0;
+			width:  36px;
+			height:  36px;
+			box-sizing: border-box;
+			cursor:  pointer;
+		}
+
         #alone-button {
 			position: absolute;
-			bottom:  3em;
-			right:  10em;
+			bottom:  9em;
+			right:  50px;
 			background: rgb(0, 50, 200);
             opacity: 1.0;
 			border:  0;
@@ -374,8 +387,8 @@
 
         #together-button {
 			position: absolute;
-			bottom:  3em;
-			right:  15em;
+			bottom:  14em;
+			right:  50px;
 			background: rgb(0, 100, 225);
             opacity: 0.7;
 			border:  0;
@@ -388,8 +401,8 @@
 
         #orbie-button {
 			position: absolute;
-			bottom:  3em;
-			right:  20em;
+			bottom:  19em;
+			right:  50px;
 			background: rgb(0, 200, 250);
             opacity: 0.5;
 			border:  0;
@@ -407,6 +420,11 @@
     fullscreen_button.setAttribute('id','fullscreen-button');
     fullscreen_button.addEventListener("click", toggle_fullscreen);
     document.body.appendChild(fullscreen_button);
+
+    const fullscreen_button2 = document.createElement("button");
+    fullscreen_button2.setAttribute('id','fullscreen-button2');
+    fullscreen_button2.addEventListener("click", toggle_fullscreen);
+    document.body.appendChild(fullscreen_button2);
     }
 
     function toggle_fullscreen() {
