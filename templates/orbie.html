@@ -34,7 +34,7 @@
         crossorigin="anonymous">
 </script>
 <canvas id="meditationCanvas"></canvas>
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript" charset="utf-8" > // 
         $(document).ready(function () {
 
             const meditationCanvas = document.getElementById('meditationCanvas');
@@ -50,10 +50,10 @@
             const max_radius = 350;
             const max_redness = 180;
 
-            const max_ring_width = 10
+            const max_ring_width = 11
             const max_ring_offset = 10
 
-            const start_redness = 100
+            const start_redness = 100;
 
             const redness_change = 0.45;
             const radius_change = 0.6;
@@ -61,11 +61,16 @@
             const inhale_speed_boost = 1.25;
             const out_of_bounds_slowdown = 3;
 
+            const robot_start = fast_radius_start * 0.9
+            const robot_end = fast_radius_end * 1.1
+
             var speed_multiplier_server = 0;
             var speed_multiplier_client = 0;
 
             const ring_color_off = [80, 80, 80];
             const ring_color_on = [255, 255, 190];
+
+            user_id = 0;
 
             var circle_server = {
                 x: meditationCanvas.width / 2,
@@ -89,32 +94,20 @@
             };
 
             var num_breaths = 0;
-            const timeout_counter = 12000;
+            const timeout_counter = 8000;
             var num_active;
             var last_client_event = 'none';
-            var last_server_event = 'none';
-            var num_others_inhaling = 0;
-            var num_others_exhaling = 0;
+            var last_server_event = 'exhale';
+
             var longest_lockon = 0;
             var current_lockon_duration = 0;
             var locked_on = false;
 
-            var partner_id = 0
-
-            function getRandomInt(max) {
-                return Math.floor(Math.random() * max);
-            }
-            var user_id = 0
+            display_streak()
 
             // Connect to the Socket.IO server.
-            // The connection URL has the following format, relative to the current page:
-            //     http[s]://<domain>:<port>[/<namespace>]
-            var socket = io("/", 
-            {
-                reconnectionDelayMax: 10000, 
-                // this is used to keep track of which user has joined
-                auth: { id: user_id }
-            });
+            var socket = io("/");
+            console.log(socket)
 
             function timeout(prev_num_breaths) {
                 if (prev_num_breaths == num_breaths) {
@@ -132,6 +125,7 @@
             function createOuterCircle(circle){
                 const gradient = ctx.createRadialGradient(circle.x, circle.y, 0, circle.x, circle.y, circle.outer_radius);
                 ring_color = 'rgba(' + circle.ring_color[0].toString() + ', ' + circle.ring_color[1].toString() + ', ' + circle.ring_color[2].toString();
+
                 gradient.addColorStop(0, ring_color + ', 0)');
                 gradient.addColorStop( (circle.radius + circle.ring_offset) / circle.outer_radius, ring_color + ', 0)');
                 gradient.addColorStop((1 + (circle.radius + circle.ring_offset) / circle.outer_radius) / 2, ring_color + ', 1)');
@@ -165,7 +159,7 @@
             function key_down_response(event) {
                 if (last_client_event != 'inhale') {
                     socket.emit('client_keydown');
-                    num_breaths = num_breaths + 1
+                    num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter, num_breaths);
                     last_client_event = 'inhale'
                 }
@@ -174,10 +168,10 @@
             function key_up_response(event) {
                 if (last_client_event != 'exhale') {
                     socket.emit('client_keyup');
-                    num_breaths = num_breaths + 1
+                    num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter, num_breaths);
                     last_client_event = 'exhale'
-                    }
+                }
 
             }
 
@@ -219,14 +213,9 @@
                 socket.emit('leave');
             }
 
-            function display_num_active_users() {
-                const divElement = document.getElementById("others");
-                if (num_active<=0){
-                    divElement.textContent = "It's just you in here.";
-                }
-                if (num_active>0){
-                    divElement.textContent = "Someone else is breathing.";
-                }
+            function display_streak() {
+                const divElement = document.getElementById("streak"); 
+                divElement.textContent = "high score: " + longest_lockon.toString()
             }
 
             socket.on('assign_user_id', function (msg) {
@@ -237,34 +226,9 @@
                 console.log(JSON.stringify(msg));
                 inhaling_users = msg["inhaling"]
                 exhaling_users = msg["exhaling"]
-                
                 inhaling_users = inhaling_users.filter(inhaling_users => inhaling_users !== user_id);
                 exhaling_users = exhaling_users.filter(exhaling_users => exhaling_users !== user_id);
-
-                active_users = inhaling_users.concat(exhaling_users)
-                console.log(JSON.stringify(active_users));
-                console.log(user_id)
-                num_active = active_users.length
-                display_num_active_users()
-
-                if (num_active > 0) {
-                    if (!active_users.includes(partner_id)) {
-                        randomIndex = Math.floor(Math.random() * num_active);
-                        partner_id = active_users[randomIndex];
-                        console.log(partner_id)
-                        console.log(active_users)
-                    }
-
-                    if (inhaling_users.includes(partner_id)) {
-                        last_server_event = "inhale"
-                    }
-                    
-                    if (exhaling_users.includes(partner_id)) {
-                        last_server_event = "exhale"
-                    }
-                }
-                console.log(last_server_event)
-                
+                num_active = inhaling_users.length + exhaling_users.length
             });
 
             function check_value_limits(circle) {
@@ -282,7 +246,7 @@
             }
 
             function lock_on() {
-                if ((last_server_event=="inhale" && (circle_client.radius - circle_server.radius) < 30 && (circle_client.radius - circle_server.radius) > -20) || (last_server_event=="exhale" && (circle_client.radius - circle_server.radius) < 20 && (circle_client.radius - circle_server.radius) > -30)) {
+                if (Math.abs(circle_client.radius - circle_server.radius) < 20) {
                     circle_client.ring_color = ring_color_on;
                     locked_on = true;
                 }
@@ -319,22 +283,40 @@
                         return -speed_factor
                     }
                 }
-                if (last_event == "none") {
+                if (last_event == "tie" || last_event == "none") {
                     return 0
                 }
                 
+            }
+
+            function get_robot_action(last_server_event, circle_server) {
+                if (circle_server.radius < (fast_radius_start * 0.9)) {
+                    if (locked_on && last_server_event == "exhale") {
+                        current_lockon_duration = current_lockon_duration + 1
+                        longest_lockon = Math.max(longest_lockon, current_lockon_duration - 1)
+                        display_streak()
+                    }
+                
+                    return "inhale"
+                }
+                if (circle_server.radius > (fast_radius_end * 1.1)) {
+                    return "exhale"
+                }
+                return last_server_event
             }
 
             // Update the circle color on each frame
             function update() {
 
                 speed_multiplier_client = calculate_speed(last_client_event, circle_client, "client")
-                console.log(last_server_event)
+                last_server_event = get_robot_action(last_server_event, circle_server)
                 speed_multiplier_server = calculate_speed(last_server_event, circle_server)
+               
 
                 update_inner_circle(circle_server, speed_multiplier_server)
                 update_inner_circle(circle_client, speed_multiplier_client)
                 update_outer_circle(circle_client) 
+
             }
 
             setInterval(update, 16);
@@ -345,117 +327,117 @@
         });
 </script>
 <style>
-    #fullscreen-button {
-        position: absolute;
-        bottom:  30px;
-        right:  30px;
-        background: rgb(100, 100, 100);
-        opacity: 0.7;
-        border:  0;
-        width:  40px;
-        height:  40px;
-        box-sizing: border-box;
-        cursor:  pointer;
-    }
+        #fullscreen-button {
+			position: absolute;
+			bottom:  50px;
+			right:  50px;
+			background: rgb(100, 100, 100);
+            opacity: 0.7;
+			border:  0;
+			width:  50px;
+			height:  50px;
+			box-sizing: border-box;
+			cursor:  pointer;
+		}
 
-    #fullscreen-button2 {
-        position: absolute;
-        bottom:  34px;
-        right:  34px;
-        background: rgb(0, 0, 0);
-        opacity: 1.0;
-        border:  0;
-        width:  32px;
-        height:  32px;
-        box-sizing: border-box;
-        cursor:  pointer;
-    }
+        #fullscreen-button2 {
+			position: absolute;
+			bottom:  57px;
+			right:  57px;
+			background: rgb(0, 0, 0);
+            opacity: 1.0;
+			border:  0;
+			width:  36px;
+			height:  36px;
+			box-sizing: border-box;
+			cursor:  pointer;
+		}
 
-    .together-button {
-        position: absolute;
-        bottom:  85px;
-        right:  31px;
-        background: rgb(0, 50, 200);
-        opacity: 1.0;
-        border:  0;
-        width:  40px;
-        height:  40px;
-        border-radius: 50%;
-        box-sizing: border-box;
-        cursor:  pointer;
-    }
+        .together-button {
+			position: absolute;
+			bottom:  125px;
+			right:  50px;
+			background: rgb(0, 50, 200);
+            opacity: 1.0;
+			border:  0;
+			width:  50px;
+			height:  50px;
+			border-radius: 50%;
+			box-sizing: border-box;
+			cursor:  pointer;
+		}
 
-    .alone-button {
-        position: absolute;
-        bottom:  140px;
-        right:  31px;
-        background: rgb(0, 100, 225);
-        opacity: 0.7;
-        border:  0;
-        width:  40px;
-        height:  40px;
-        border-radius: 50%;
-        box-sizing: border-box;
-        cursor:  pointer;
-    }
+        .alone-button {
+			position: absolute;
+			bottom:  190px;
+			right:  50px;
+			background: rgb(0, 100, 225);
+            opacity: 0.7;
+			border:  0;
+			width:  50px;
+			height:  50px;
+			border-radius: 50%;
+			box-sizing: border-box;
+			cursor:  pointer;
+		}
 
-    .orbie-button {
-        position: absolute;
-        bottom:  195px;
-        right:  31px;
-        background: rgb(0, 200, 250);
-        opacity: 0.5;
-        border:  0;
-        width:  40px;
-        height:  40px;
-        border-radius: 50%;
-        box-sizing: border-box;
-        cursor:  pointer;
-    }
+        .orbie-button {
+			position: absolute;
+			bottom:  255px;
+			right:  50px;
+			background: rgb(0, 200, 250);
+            opacity: 0.5;
+			border:  0;
+			width:  50px;
+			height:  50px;
+			border-radius: 50%;
+			box-sizing: border-box;
+			cursor:  pointer;
+		}
 
 </style>
 <script>
-if (document.fullscreenEnabled) {
-const fullscreen_button = document.createElement("button");
-fullscreen_button.setAttribute('id','fullscreen-button');
-fullscreen_button.addEventListener("click", toggle_fullscreen);
-document.body.appendChild(fullscreen_button);
+    if (document.fullscreenEnabled) {
+    const fullscreen_button = document.createElement("button");
+    fullscreen_button.setAttribute('id','fullscreen-button');
+    fullscreen_button.addEventListener("click", toggle_fullscreen);
+    document.body.appendChild(fullscreen_button);
 
-const fullscreen_button2 = document.createElement("button");
-fullscreen_button2.setAttribute('id','fullscreen-button2');
-fullscreen_button2.addEventListener("click", toggle_fullscreen);
-document.body.appendChild(fullscreen_button2);
-}
-
-function toggle_fullscreen() {
-    if (!document.fullscreenElement) {
-        document.body.requestFullscreen();
-        document.body.setAttribute("fullscreen",""); 
-    } else {
-        document.exitFullscreen();
-        document.body.removeAttribute("fullscreen"); 
+    const fullscreen_button2 = document.createElement("button");
+    fullscreen_button2.setAttribute('id','fullscreen-button2');
+    fullscreen_button2.addEventListener("click", toggle_fullscreen);
+    document.body.appendChild(fullscreen_button2);
     }
-}
+
+    function toggle_fullscreen() {
+        if (!document.fullscreenElement) {
+            document.body.requestFullscreen();
+            document.body.setAttribute("fullscreen",""); 
+        } else {
+            document.exitFullscreen();
+            document.body.removeAttribute("fullscreen"); 
+        }
+    }
 
 </script>
 <style> 
 .noselect {
-cursor: default;
--webkit-touch-callout: none;
--webkit-user-select: none;
--khtml-user-select: none;
--moz-user-select: none;
--ms-user-select: none;
-user-select: none;
+    cursor: default;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 </style> 
 <body>
-<font color="green">
-    <p class="noselect" id="others" style=" position: absolute; bottom: 5px; left: 0; width: 80%; text-align: left; text-indent: 1em; font-size: 26px"></p>
-</font>
-<a href="" class='together-button'></a>
-<a href="../alone" class='alone-button'></a>
-<a href="../" class='orbie-button'></a>
+    <font color="green">
+        <p class="noselect" id="streak" style=" position: absolute; bottom: 5px; left: 0; width: 40%; text-align: left; text-indent: 1em; font-size: 30px"></p>
+    </font>
+    <a href="together" class='together-button'></a>
+    <a href="alone" class='alone-button'></a>
+    <a href="" class='orbie-button'></a>
 </body>
 
 </html>

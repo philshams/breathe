@@ -20,12 +20,16 @@ users_inhaling = set()
 users_exhaling = set()
 
 @app.route('/')
-def breathe():
-    return render_template('breathe.html', async_mode=socketio.async_mode)
+def orbie():
+    return render_template('orbie.html', async_mode=socketio.async_mode)
 
 @app.route('/together/')
 def together():
     return render_template('together.html')
+
+@app.route('/alone/')
+def alone():
+    return render_template('alone.html')
 
 # when a client connects
 @socketio.on('connect')

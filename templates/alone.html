@@ -51,7 +51,7 @@
             const max_redness = 180;
 
             const max_ring_width = 11
-            const max_ring_offset = 10
+            const max_ring_offset = -15
 
             const start_redness = 100;
 
@@ -72,16 +72,6 @@
 
             user_id = 0;
 
-            var circle_server = {
-                x: meditationCanvas.width / 2,
-                y: meditationCanvas.height / 2,
-                radius: start_radius,
-                redness: start_redness,
-                outer_radius: start_radius + max_ring_width,
-                ring_width: max_ring_width,
-                ring_offset: max_ring_offset,
-            };
-
             var circle_client = {
                 x: meditationCanvas.width / 2,
                 y: meditationCanvas.height / 2,
@@ -94,7 +84,7 @@
             };
 
             var num_breaths = 0;
-            const timeout_counter = 8000;
+            const timeout_counter = 12000;
             var num_active;
             var last_client_event = 'none';
             var last_server_event = 'exhale';
@@ -103,7 +93,8 @@
             var current_lockon_duration = 0;
             var locked_on = false;
 
-            display_streak()
+            const start_time = (new Date).getTime();
+            var time_in_session = -1;
 
             function getRandomInt(max) {
                 return Math.floor(Math.random() * max);
@@ -116,6 +107,7 @@
             function timeout(prev_num_breaths) {
                 if (prev_num_breaths == num_breaths) {
                     socket.emit('timeout');
+                    time_in_session = 0;
                 }
             }
 
@@ -155,7 +147,7 @@
 
             function animate() {
                 ctx.clearRect(0, 0, meditationCanvas.width, meditationCanvas.height);
-                drawInnerCircle(circle_server);
+                drawInnerCircle(circle_client);
                 drawOuterCircle(circle_client);
                 requestAnimationFrame(animate);
             }
@@ -217,21 +209,15 @@
                 socket.emit('leave');
             }
 
-            function display_streak() {
-                const divElement = document.getElementById("streak"); 
-                divElement.textContent = "high score: " + longest_lockon.toString()
-            }
-
-            function display_num_active_users() {
-                const divElement = document.getElementById("link");
-                if (num_active<=0){
-                    divElement.textContent = "you are breathing with Orbie. the breathing room for humans is empty right now.";
-                }
-                if (num_active==1){
-                    divElement.textContent = "you are breathing with Orbie. there is one other person online <3 click here to breathe with them.";
-                }
-                if (num_active > 1) {
-                divElement.textContent = "you are breathing with Orbie. " + num_active.toString() + " people are breathing together - click here to join them.";
+            function display_timer() {
+                const divElement = document.getElementById("timer"); 
+                new_time_in_session = Math.floor(((new Date).getTime() - start_time) / 1000 / 60)
+                if (new_time_in_session != time_in_session) {
+                    plural = "s"
+                    if (new_time_in_session == 1) {
+                        plural = ""
+                    }
+                    divElement.textContent = new_time_in_session.toString() + " minute" + plural + " complete"
                 }
             }
 
@@ -246,7 +232,6 @@
                 inhaling_users = inhaling_users.filter(inhaling_users => inhaling_users !== user_id);
                 exhaling_users = exhaling_users.filter(exhaling_users => exhaling_users !== user_id);
                 num_active = inhaling_users.length + exhaling_users.length
-                display_num_active_users()
             });
 
             function check_value_limits(circle) {
@@ -264,20 +249,12 @@
             }
 
             function lock_on() {
-                if (Math.abs(circle_client.radius - circle_server.radius) < 20) {
-                    circle_client.ring_color = ring_color_on;
-                    locked_on = true;
-                }
-                else {
-                    circle_client.ring_color = ring_color_off;
-                    locked_on = false;
-                    current_lockon_duration = 0;
-                }
+                circle_client.ring_color = ring_color_on;
+                locked_on = true;
             }
 
             function update_outer_circle(circle) {
                 circle.ring_width = max_ring_width * Math.min(0.75, Math.max(0.25, (1 - circle.radius / max_radius)))
-                circle.ring_offset = max_ring_offset * (1 - 5 * circle.radius / max_radius)
                 circle.outer_radius = circle.radius + circle.ring_offset + circle.ring_width
                 lock_on()
             }
@@ -307,33 +284,13 @@
                 
             }
 
-            function get_robot_action(last_server_event, circle_server) {
-                if (circle_server.radius < (fast_radius_start * 0.9)) {
-                    if (locked_on && last_server_event == "exhale") {
-                        current_lockon_duration = current_lockon_duration + 1
-                        longest_lockon = Math.max(longest_lockon, current_lockon_duration - 1)
-                        display_streak()
-                    }
-                
-                    return "inhale"
-                }
-                if (circle_server.radius > (fast_radius_end * 1.1)) {
-                    return "exhale"
-                }
-                return last_server_event
-            }
-
             // Update the circle color on each frame
             function update() {
 
                 speed_multiplier_client = calculate_speed(last_client_event, circle_client, "client")
-                last_server_event = get_robot_action(last_server_event, circle_server)
-                speed_multiplier_server = calculate_speed(last_server_event, circle_server)
-               
-
-                update_inner_circle(circle_server, speed_multiplier_server)
                 update_inner_circle(circle_client, speed_multiplier_client)
                 update_outer_circle(circle_client) 
+                display_timer()
 
             }
 
@@ -345,129 +302,117 @@
         });
 </script>
 <style>
-        #fullscreen-button {
-			position: absolute;
-			bottom:  50px;
-			right:  50px;
-			background: rgb(100, 100, 100);
-            opacity: 0.7;
-			border:  0;
-			width:  50px;
-			height:  50px;
-			box-sizing: border-box;
-			cursor:  pointer;
-		}
+    #fullscreen-button {
+        position: absolute;
+        bottom:  50px;
+        right:  50px;
+        background: rgb(100, 100, 100);
+        opacity: 0.7;
+        border:  0;
+        width:  50px;
+        height:  50px;
+        box-sizing: border-box;
+        cursor:  pointer;
+    }
 
-        #fullscreen-button2 {
-			position: absolute;
-			bottom:  57px;
-			right:  57px;
-			background: rgb(0, 0, 0);
-            opacity: 1.0;
-			border:  0;
-			width:  36px;
-			height:  36px;
-			box-sizing: border-box;
-			cursor:  pointer;
-		}
+    #fullscreen-button2 {
+        position: absolute;
+        bottom:  57px;
+        right:  57px;
+        background: rgb(0, 0, 0);
+        opacity: 1.0;
+        border:  0;
+        width:  36px;
+        height:  36px;
+        box-sizing: border-box;
+        cursor:  pointer;
+    }
 
-        #alone-button {
-			position: absolute;
-			bottom:  9em;
-			right:  50px;
-			background: rgb(0, 50, 200);
-            opacity: 1.0;
-			border:  0;
-			width:  50px;
-			height:  50px;
-			border-radius: 50%;
-			box-sizing: border-box;
-			cursor:  pointer;
-		}
+    .together-button {
+        position: absolute;
+        bottom:  125px;
+        right:  50px;
+        background: rgb(0, 50, 200);
+        opacity: 1.0;
+        border:  0;
+        width:  50px;
+        height:  50px;
+        border-radius: 50%;
+        box-sizing: border-box;
+        cursor:  pointer;
+    }
 
-        #together-button {
-			position: absolute;
-			bottom:  14em;
-			right:  50px;
-			background: rgb(0, 100, 225);
-            opacity: 0.7;
-			border:  0;
-			width:  50px;
-			height:  50px;
-			border-radius: 50%;
-			box-sizing: border-box;
-			cursor:  pointer;
-		}
+    .alone-button {
+        position: absolute;
+        bottom:  190px;
+        right:  50px;
+        background: rgb(0, 100, 225);
+        opacity: 0.7;
+        border:  0;
+        width:  50px;
+        height:  50px;
+        border-radius: 50%;
+        box-sizing: border-box;
+        cursor:  pointer;
+    }
 
-        #orbie-button {
-			position: absolute;
-			bottom:  19em;
-			right:  50px;
-			background: rgb(0, 200, 250);
-            opacity: 0.5;
-			border:  0;
-			width:  50px;
-			height:  50px;
-			border-radius: 50%;
-			box-sizing: border-box;
-			cursor:  pointer;
-		}
+    .orbie-button {
+        position: absolute;
+        bottom:  255px;
+        right:  50px;
+        background: rgb(0, 200, 250);
+        opacity: 0.5;
+        border:  0;
+        width:  50px;
+        height:  50px;
+        border-radius: 50%;
+        box-sizing: border-box;
+        cursor:  pointer;
+    }
 
 </style>
 <script>
-    if (document.fullscreenEnabled) {
-    const fullscreen_button = document.createElement("button");
-    fullscreen_button.setAttribute('id','fullscreen-button');
-    fullscreen_button.addEventListener("click", toggle_fullscreen);
-    document.body.appendChild(fullscreen_button);
+if (document.fullscreenEnabled) {
+const fullscreen_button = document.createElement("button");
+fullscreen_button.setAttribute('id','fullscreen-button');
+fullscreen_button.addEventListener("click", toggle_fullscreen);
+document.body.appendChild(fullscreen_button);
 
-    const fullscreen_button2 = document.createElement("button");
-    fullscreen_button2.setAttribute('id','fullscreen-button2');
-    fullscreen_button2.addEventListener("click", toggle_fullscreen);
-    document.body.appendChild(fullscreen_button2);
+const fullscreen_button2 = document.createElement("button");
+fullscreen_button2.setAttribute('id','fullscreen-button2');
+fullscreen_button2.addEventListener("click", toggle_fullscreen);
+document.body.appendChild(fullscreen_button2);
+}
+
+function toggle_fullscreen() {
+    if (!document.fullscreenElement) {
+        document.body.requestFullscreen();
+        document.body.setAttribute("fullscreen",""); 
+    } else {
+        document.exitFullscreen();
+        document.body.removeAttribute("fullscreen"); 
     }
-
-    function toggle_fullscreen() {
-        if (!document.fullscreenElement) {
-            document.body.requestFullscreen();
-            document.body.setAttribute("fullscreen",""); 
-        } else {
-            document.exitFullscreen();
-            document.body.removeAttribute("fullscreen"); 
-        }
-    }
-
-    const alone_button = document.createElement("button");
-    alone_button.setAttribute('id','alone-button');
-    // alone_button.addEventListener("click", toggle_fullscreen);
-    document.body.appendChild(alone_button);
-
-    const together_button = document.createElement("button");
-    together_button.setAttribute('id','together-button');
-    // together_button.addEventListener("click", toggle_fullscreen);
-    document.body.appendChild(together_button);
-
-    const orbie_button = document.createElement("button");
-    orbie_button.setAttribute('id','orbie-button');
-    // together_button.addEventListener("click", toggle_fullscreen);
-    document.body.appendChild(orbie_button);
+}
 
 </script>
 <style> 
 .noselect {
-    cursor: default;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+cursor: default;
+-webkit-touch-callout: none;
+-webkit-user-select: none;
+-khtml-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+user-select: none;
 }
 </style> 
 <body>
-    <font color="green">
-        <p class="noselect" id="streak" style=" position: absolute; bottom: 5px; left: 0; width: 40%; text-align: left; text-indent: 1em; font-size: 30px"></p>
-    </font>
+<font color="green">
+    <p class="noselect" id="timer" style=" position: absolute; bottom: 5px; left: 0; width: 40%; text-align: left; text-indent: 1em; font-size: 30px"></p>
+</font>
+<a href="../together" class='together-button'></a>
+<a href="" class='alone-button'></a>
+<a href="../" class='orbie-button'></a>
 </body>
 
 </html>
