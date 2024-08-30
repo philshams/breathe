@@ -227,6 +227,14 @@
                 if (num_active>0){
                     divElement.textContent = "Someone else is breathing.";
                 }
+                if (num_active > 0) {
+                    var element = document.getElementById("together");
+                    element.setAttribute('class', "together-button");
+                }
+                if (num_active <= 0) {
+                    var element = document.getElementById("together");
+                    element.setAttribute('class', "together-button-empty");
+                }
             }
 
             socket.on('assign_user_id', function (msg) {
@@ -371,7 +379,7 @@
         cursor:  pointer;
     }
 
-    .together-button {
+    .orbie-button {
         position: absolute;
         bottom:  85px;
         right:  31px;
@@ -399,12 +407,26 @@
         cursor:  pointer;
     }
 
-    .orbie-button {
+    .together-button {
         position: absolute;
         bottom:  195px;
         right:  31px;
         background: rgb(0, 200, 250);
         opacity: 0.5;
+        border:  0;
+        width:  40px;
+        height:  40px;
+        border-radius: 50%;
+        box-sizing: border-box;
+        cursor:  pointer;
+    }
+
+    .together-button-empty {
+        position: absolute;
+        bottom:  195px;
+        right:  31px;
+        background: rgb(100, 100, 100);
+        opacity: 0.4;
         border:  0;
         width:  40px;
         height:  40px;
