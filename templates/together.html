@@ -221,19 +221,14 @@
 
             function display_num_active_users() {
                 const divElement = document.getElementById("others");
+                var buttonElement = document.getElementById("together");
                 if (num_active<=0){
                     divElement.textContent = "It's just you in here.";
+                    buttonElement.setAttribute('class', "together-button-empty");
                 }
                 if (num_active>0){
                     divElement.textContent = "Someone else is breathing.";
-                }
-                if (num_active > 0) {
-                    var element = document.getElementById("together");
-                    element.setAttribute('class', "together-button");
-                }
-                if (num_active <= 0) {
-                    var element = document.getElementById("together");
-                    element.setAttribute('class', "together-button-empty");
+                    buttonElement.setAttribute('class', "together-button");
                 }
             }
 
@@ -250,8 +245,6 @@
                 exhaling_users = exhaling_users.filter(exhaling_users => exhaling_users !== user_id);
 
                 active_users = inhaling_users.concat(exhaling_users)
-                console.log(JSON.stringify(active_users));
-                console.log(user_id)
                 num_active = active_users.length
                 display_num_active_users()
 
@@ -259,8 +252,6 @@
                     if (!active_users.includes(partner_id)) {
                         randomIndex = Math.floor(Math.random() * num_active);
                         partner_id = active_users[randomIndex];
-                        console.log(partner_id)
-                        console.log(active_users)
                     }
 
                     if (inhaling_users.includes(partner_id)) {
@@ -271,7 +262,6 @@
                         last_server_event = "exhale"
                     }
                 }
-                console.log(last_server_event)
                 
             });
 
@@ -379,7 +369,7 @@
         cursor:  pointer;
     }
 
-    .orbie-button {
+    .orby-button {
         position: absolute;
         bottom:  85px;
         right:  31px;
@@ -474,10 +464,11 @@ user-select: none;
 <body>
 <font color="green">
     <p class="noselect" id="others" style=" position: absolute; bottom: 5px; left: 0; width: 80%; text-align: left; text-indent: 1em; font-size: 26px"></p>
+    <p class="noselect" style=" position: absolute; bottom: 40px; left: 0; width: 80%; text-align: left; text-indent: 1em; font-size: 26px">Breathe together.</p>
 </font>
-<a href="" class='together-button'></a>
+<a href="", id = "together"></a>
 <a href="../alone" class='alone-button'></a>
-<a href="../" class='orbie-button'></a>
+<a href="../" class='orby-button'></a>
 </body>
 
 </html>

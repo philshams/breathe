@@ -226,12 +226,11 @@
             });
 
             function display_num_active_users() {
+                var element = document.getElementById("together");
                 if (num_active > 0) {
-                    var element = document.getElementById("together");
                     element.setAttribute('class', "together-button");
                 }
                 if (num_active <= 0) {
-                    var element = document.getElementById("together");
                     element.setAttribute('class', "together-button-empty");
                 }
             }
@@ -340,7 +339,7 @@
         cursor:  pointer;
     }
 
-    .orbie-button {
+    .orby-button {
         position: absolute;
         bottom:  85px;
         right:  31px;
@@ -434,10 +433,11 @@ user-select: none;
 <body>
 <font color="green">
     <p class="noselect" id="timer" style=" position: absolute; bottom: 5px; left: 0; width: 40%; text-align: left; text-indent: 1em; font-size: 26px"></p>
+    <p class="noselect" style=" position: absolute; bottom: 40px; left: 0; width: 80%; text-align: left; text-indent: 1em; font-size: 26px">Breathe alone.</p>
 </font>
-<a href="../together" class='together-button'></a>
+<a href="../together", id = "together"></a>
 <a href="" class='alone-button'></a>
-<a href="../" class='orbie-button'></a>
+<a href="../" class='orby-button'></a>
 </body>
 
 </html>

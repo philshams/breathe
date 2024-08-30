@@ -20,8 +20,8 @@ users_inhaling = set()
 users_exhaling = set()
 
 @app.route('/')
-def orbie():
-    return render_template('orbie.html', async_mode=socketio.async_mode)
+def orby():
+    return render_template('orby.html', async_mode=socketio.async_mode)
 
 @app.route('/together/')
 def together():
