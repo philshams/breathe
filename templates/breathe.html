@@ -70,6 +70,8 @@
             const ring_color_off = [80, 80, 80];
             const ring_color_on = [255, 255, 190];
 
+            user_id = 0;
+
             var circle_server = {
                 x: meditationCanvas.width / 2,
                 y: meditationCanvas.height / 2,
@@ -92,7 +94,7 @@
             };
 
             var num_breaths = 0;
-            const timeout_counter = 12000;
+            const timeout_counter = 8000;
             var num_active;
             var last_client_event = 'none';
             var last_server_event = 'exhale';
@@ -106,24 +108,14 @@
             function getRandomInt(max) {
                 return Math.floor(Math.random() * max);
             }
-            var user_id = getRandomInt(100000000000);
-            $('#user_id').append(user_id)
-
 
             // Connect to the Socket.IO server.
-            // The connection URL has the following format, relative to the current page:
-            //     http[s]://<domain>:<port>[/<namespace>]
-            var socket = io("/", 
-            {
-                reconnectionDelayMax: 10000, 
-                // this is used to keep track of which user has joined
-                auth: { id: user_id }
-            });
+            var socket = io("/");
             console.log(socket)
 
             function timeout(prev_num_breaths) {
                 if (prev_num_breaths == num_breaths) {
-                    socket.emit('timeout', { data: user_id });
+                    socket.emit('timeout');
                 }
             }
 
@@ -170,7 +162,7 @@
 
             function key_down_response(event) {
                 if (last_client_event != 'inhale') {
-                    socket.emit('client_keydown', { data: user_id });
+                    socket.emit('client_keydown');
                     num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter, num_breaths);
                     last_client_event = 'inhale'
@@ -179,7 +171,9 @@
 
             function key_up_response(event) {
                 if (last_client_event != 'exhale') {
-                    socket.emit('client_keyup', { data: user_id });
+                    socket.emit('client_keyup');
+                    num_breaths = num_breaths + 1;
+                    setTimeout(timeout, timeout_counter, num_breaths);
                     last_client_event = 'exhale'
                 }
 
@@ -220,12 +214,12 @@
             });
 
             window.onbeforeunload = function () {
-                socket.emit('leave', { data: user_id });
+                socket.emit('leave');
             }
 
             function display_streak() {
                 const divElement = document.getElementById("streak"); 
-                divElement.textContent = "longest streak: " + longest_lockon.toString()
+                divElement.textContent = "high score: " + longest_lockon.toString()
             }
 
             function display_num_active_users() {
@@ -240,6 +234,10 @@
                 divElement.textContent = "you are breathing with Orbie. " + num_active.toString() + " people are breathing together - click here to join them.";
                 }
             }
+
+            socket.on('assign_user_id', function (msg) {
+                user_id = msg;
+            });
 
             socket.on('update_state', function (msg) {
                 console.log(JSON.stringify(msg));
@@ -346,6 +344,97 @@
 
         });
 </script>
+<style>
+        #fullscreen-button {
+			position: absolute;
+			bottom:  3em;
+			right:  3em;
+			background: rgb(100, 100, 100);
+            opacity: 0.7;
+			border:  0;
+			width:  50px;
+			height:  50px;
+			box-sizing: border-box;
+			cursor:  pointer;
+		}
+
+        #alone-button {
+			position: absolute;
+			bottom:  3em;
+			right:  10em;
+			background: rgb(0, 50, 200);
+            opacity: 1.0;
+			border:  0;
+			width:  50px;
+			height:  50px;
+			border-radius: 50%;
+			box-sizing: border-box;
+			cursor:  pointer;
+		}
+
+        #together-button {
+			position: absolute;
+			bottom:  3em;
+			right:  15em;
+			background: rgb(0, 100, 225);
+            opacity: 0.7;
+			border:  0;
+			width:  50px;
+			height:  50px;
+			border-radius: 50%;
+			box-sizing: border-box;
+			cursor:  pointer;
+		}
+
+        #orbie-button {
+			position: absolute;
+			bottom:  3em;
+			right:  20em;
+			background: rgb(0, 200, 250);
+            opacity: 0.5;
+			border:  0;
+			width:  50px;
+			height:  50px;
+			border-radius: 50%;
+			box-sizing: border-box;
+			cursor:  pointer;
+		}
+
+</style>
+<script>
+    if (document.fullscreenEnabled) {
+    const fullscreen_button = document.createElement("button");
+    fullscreen_button.setAttribute('id','fullscreen-button');
+    fullscreen_button.addEventListener("click", toggle_fullscreen);
+    document.body.appendChild(fullscreen_button);
+    }
+
+    function toggle_fullscreen() {
+        if (!document.fullscreenElement) {
+            document.body.requestFullscreen();
+            document.body.setAttribute("fullscreen",""); 
+        } else {
+            document.exitFullscreen();
+            document.body.removeAttribute("fullscreen"); 
+        }
+    }
+
+    const alone_button = document.createElement("button");
+    alone_button.setAttribute('id','alone-button');
+    // alone_button.addEventListener("click", toggle_fullscreen);
+    document.body.appendChild(alone_button);
+
+    const together_button = document.createElement("button");
+    together_button.setAttribute('id','together-button');
+    // together_button.addEventListener("click", toggle_fullscreen);
+    document.body.appendChild(together_button);
+
+    const orbie_button = document.createElement("button");
+    orbie_button.setAttribute('id','orbie-button');
+    // together_button.addEventListener("click", toggle_fullscreen);
+    document.body.appendChild(orbie_button);
+
+</script>
 <style> 
 .noselect {
     cursor: default;
@@ -359,8 +448,7 @@
 </style> 
 <body>
     <font color="green">
-        <p class="noselect" id="streak" style=" position: absolute; bottom: 2em; left: 0; width: 100%; text-align: left; text-indent: 2em"></p>
-    <a href="together" class="noselect" id="link" style=" position: absolute; bottom: 1em; left: 0; width: 100%; text-align: left; text-indent: 2em; color: green"></a>
+        <p class="noselect" id="streak" style=" position: absolute; bottom: 5px; left: 0; width: 40%; text-align: left; text-indent: 1em; font-size: 30px"></p>
     </font>
 </body>
 
