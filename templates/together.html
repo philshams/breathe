@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-    <title>Synchrony</title>
+    <title>Breathe together</title>
     <style>
         body {
             margin: 0;
@@ -109,12 +109,8 @@
             // Connect to the Socket.IO server.
             // The connection URL has the following format, relative to the current page:
             //     http[s]://<domain>:<port>[/<namespace>]
-            var socket = io("/", 
-            {
-                reconnectionDelayMax: 10000, 
-                // this is used to keep track of which user has joined
-                auth: { id: user_id }
-            });
+            var socket = io("/");
+            console.log(socket)
 
             function timeout(prev_num_breaths) {
                 if (prev_num_breaths == num_breaths) {
@@ -327,7 +323,6 @@
             function update() {
 
                 speed_multiplier_client = calculate_speed(last_client_event, circle_client, "client")
-                console.log(last_server_event)
                 speed_multiplier_server = calculate_speed(last_server_event, circle_server)
 
                 update_inner_circle(circle_server, speed_multiplier_server)
@@ -347,46 +342,59 @@
         position: absolute;
         bottom:  30px;
         right:  30px;
-        background: rgb(100, 100, 100);
-        opacity: 0.7;
+        background: rgb(200, 200, 200);
+        border-radius: 6px;
+        opacity: 0.5;
         border:  0;
-        width:  40px;
-        height:  40px;
+        width:  36px;
+        height:  36px;
         box-sizing: border-box;
         cursor:  pointer;
     }
 
     #fullscreen-button2 {
         position: absolute;
-        bottom:  34px;
-        right:  34px;
+        bottom:  31.75px;
+        right:  31.75px;
         background: rgb(0, 0, 0);
+        border-radius: 4px;
         opacity: 1.0;
         border:  0;
-        width:  32px;
-        height:  32px;
+        width:  32.5px;
+        height:  32.5px;
         box-sizing: border-box;
         cursor:  pointer;
+        text-align: center;
+        font-size: 22px;
+        color: rgb(120, 120, 120);
+        text-decoration: none;
+        font-family: Trebuchet MS;
     }
 
     .orby-button {
         position: absolute;
         bottom:  85px;
-        right:  31px;
+        right:  29px;
         background: rgb(0, 50, 200);
-        opacity: 1.0;
+        opacity: 0.7;
         border:  0;
         width:  40px;
         height:  40px;
         border-radius: 50%;
         box-sizing: border-box;
         cursor:  pointer;
+        text-align: center;
+        line-height: 40px;
+        font-size: 24px;
+        color: white;
+        text-decoration: none;
+        font-family: Trebuchet MS;
     }
 
     .alone-button {
         position: absolute;
         bottom:  140px;
-        right:  31px;
+        right:  29px;
         background: rgb(0, 100, 225);
         opacity: 0.7;
         border:  0;
@@ -395,49 +403,67 @@
         border-radius: 50%;
         box-sizing: border-box;
         cursor:  pointer;
+        text-align: center;
+        line-height: 40px;
+        font-size: 24px;
+        color: white;
+        text-decoration: none;
+        font-family: Trebuchet MS;
     }
 
     .together-button {
         position: absolute;
         bottom:  195px;
-        right:  31px;
+        right:  29px;
         background: rgb(0, 200, 250);
-        opacity: 0.5;
-        border:  0;
+        opacity: 0.7;
+        border:  2px solid wheat;
         width:  40px;
         height:  40px;
         border-radius: 50%;
         box-sizing: border-box;
         cursor:  pointer;
+        text-align: center;
+        line-height: 40px;
+        font-size: 24px;
+        color: white;
+        text-decoration: none;
+        font-family: Trebuchet MS;
     }
 
     .together-button-empty {
         position: absolute;
         bottom:  195px;
-        right:  31px;
+        right:  29px;
         background: rgb(100, 100, 100);
-        opacity: 0.4;
-        border:  0;
+        opacity: 0.7;
+        border:  2px solid wheat;
         width:  40px;
         height:  40px;
         border-radius: 50%;
         box-sizing: border-box;
         cursor:  pointer;
+        text-align: center;
+        line-height: 40px;
+        font-size: 24px;
+        color: white;
+        text-decoration: none;
+        font-family: Trebuchet MS;
     }
-
 </style>
 <script>
-if (document.fullscreenEnabled) {
-const fullscreen_button = document.createElement("button");
-fullscreen_button.setAttribute('id','fullscreen-button');
-fullscreen_button.addEventListener("click", toggle_fullscreen);
-document.body.appendChild(fullscreen_button);
+    if (document.fullscreenEnabled) {
+    const fullscreen_button = document.createElement("button");
+    fullscreen_button.setAttribute('id','fullscreen-button');
+    fullscreen_button.addEventListener("click", toggle_fullscreen);
+    document.body.appendChild(fullscreen_button);
 
-const fullscreen_button2 = document.createElement("button");
-fullscreen_button2.setAttribute('id','fullscreen-button2');
-fullscreen_button2.addEventListener("click", toggle_fullscreen);
-document.body.appendChild(fullscreen_button2);
-}
+    const fullscreen_button2 = document.createElement("button");
+    fullscreen_button2.setAttribute('id','fullscreen-button2');
+    fullscreen_button2.textContent = '+';
+    fullscreen_button2.addEventListener("click", toggle_fullscreen);
+    document.body.appendChild(fullscreen_button2);
+    }
 
 function toggle_fullscreen() {
     if (!document.fullscreenElement) {
@@ -464,11 +490,11 @@ user-select: none;
 <body>
 <font color="green">
     <p class="noselect" id="others" style=" position: absolute; bottom: 5px; left: 0; width: 80%; text-align: left; text-indent: 1em; font-size: 26px"></p>
-    <p class="noselect" style=" position: absolute; bottom: 40px; left: 0; width: 80%; text-align: left; text-indent: 1em; font-size: 26px">Breathe together.</p>
+    <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 80%; text-align: left; text-indent: 1em; font-size: 26px">Breathe together.</p>
 </font>
-<a href="", id = "together"></a>
-<a href="../alone" class='alone-button'></a>
-<a href="../" class='orby-button'></a>
+<a href="", id = "together">T</a>
+<a href="../alone" class='alone-button'>A</a>
+<a href="../" class='orby-button'>O</a>
 </body>
 
 </html>
