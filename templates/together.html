@@ -96,10 +96,11 @@
             var num_others_inhaling = 0;
             var num_others_exhaling = 0;
             var longest_lockon = 0;
-            var current_lockon_duration = 0;
             var locked_on = false;
 
             var partner_id = 0
+
+            var total_lockon_duration = 0;
 
             function getRandomInt(max) {
                 return Math.floor(Math.random() * max);
@@ -164,6 +165,8 @@
                     num_breaths = num_breaths + 1
                     setTimeout(timeout, timeout_counter, num_breaths);
                     last_client_event = 'inhale'
+
+                    remove_instructions()
                 }
             }
 
@@ -215,11 +218,21 @@
                 socket.emit('leave');
             }
 
+            function remove_instructions() {
+
+                if (total_lockon_duration > 4) {
+                    const instructions_upper = document.getElementById("instructions_upper"); 
+                    instructions_upper.textContent = ""
+                    const instructions_lower = document.getElementById("instructions_lower"); 
+                    instructions_lower.textContent = ""
+                }
+            }
+
             function display_num_active_users() {
                 const divElement = document.getElementById("others");
                 var buttonElement = document.getElementById("together");
                 if (num_active<=0){
-                    divElement.textContent = "It's just you in here.";
+                    divElement.textContent = "Nobody is online.";
                     buttonElement.setAttribute('class', "together-button-empty");
                 }
                 if (num_active>0){
@@ -279,11 +292,11 @@
                 if ((last_server_event=="inhale" && (circle_client.radius - circle_server.radius) < 30 && (circle_client.radius - circle_server.radius) > -20) || (last_server_event=="exhale" && (circle_client.radius - circle_server.radius) < 20 && (circle_client.radius - circle_server.radius) > -30)) {
                     circle_client.ring_color = ring_color_on;
                     locked_on = true;
+                    total_lockon_duration = total_lockon_duration + 0.016
                 }
                 else {
                     circle_client.ring_color = ring_color_off;
                     locked_on = false;
-                    current_lockon_duration = 0;
                 }
             }
 
@@ -424,7 +437,7 @@
         box-sizing: border-box;
         cursor:  pointer;
         text-align: center;
-        line-height: 40px;
+        line-height: 37px;
         font-size: 24px;
         color: white;
         text-decoration: none;
@@ -444,7 +457,7 @@
         box-sizing: border-box;
         cursor:  pointer;
         text-align: center;
-        line-height: 40px;
+        line-height: 37px;
         font-size: 24px;
         color: white;
         text-decoration: none;
@@ -489,8 +502,11 @@ user-select: none;
 </style> 
 <body>
 <font color="green">
-    <p class="noselect" id="others" style=" position: absolute; bottom: 5px; left: 0; width: 80%; text-align: left; text-indent: 1em; font-size: 26px"></p>
+    <p class="noselect" id="others" style=" position: absolute; bottom: 5px; left: 0; width: 80%; text-align: left; text-indent: 1em; font-size: 26px; font-family: Trebuchet MS;"></p>
     <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 80%; text-align: left; text-indent: 1em; font-size: 26px">Breathe together.</p>
+    <p class="noselect" id="instructions_upper" style=" position: absolute; top: 100px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS;"><b>Instructions: </b>Press and hold as you inhale. Release as you exhale.<br>You can tap the screen, click the mouse, or use the spacebar.</p>
+
+    <p class="noselect" id="instructions_lower" style=" position: absolute; bottom: 120px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS;">Try to synchronize with your partner's breaths.</p>
 </font>
 <a href="", id = "together">T</a>
 <a href="../alone" class='alone-button'>A</a>

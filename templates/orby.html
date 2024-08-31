@@ -213,9 +213,21 @@
                 socket.emit('leave');
             }
 
+            function remove_instructions() {
+
+                if (longest_lockon >= 1) {
+                    const instructions_upper = document.getElementById("instructions_upper"); 
+                    instructions_upper.textContent = ""
+                    const instructions_lower = document.getElementById("instructions_lower"); 
+                    instructions_lower.textContent = ""
+                }
+            }
+
             function display_streak() {
                 const divElement = document.getElementById("streak"); 
                 divElement.textContent = "high score: " + longest_lockon.toString()
+                
+                remove_instructions()
             }
 
             socket.on('assign_user_id', function (msg) {
@@ -490,8 +502,12 @@
 </style> 
 <body>
     <font color="green">
-        <p class="noselect" id="streak" style=" position: absolute; bottom: 5px; left: 0; width: 40%; text-align: left; text-indent: 1em; font-size: 26px"></p>
-        <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 80%; text-align: left; text-indent: 1em; font-size: 26px">Breathe with Orby.</p>
+        <p class="noselect" id="streak" style=" position: absolute; bottom: 5px; left: 0; width: 40%; text-align: left; text-indent: 1em; font-size: 26px; font-family: Trebuchet MS;"></p>
+        <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 10em; text-align: left; text-indent: 1em; font-size: 26px">Breathe with Orby.</p>
+
+        <p class="noselect" id="instructions_upper" style=" position: absolute; top: 100px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS;"><b>Instructions: </b>Press and hold as you inhale. Release as you exhale.<br>You can tap the screen, click the mouse, or use the spacebar.</p>
+
+        <p class="noselect" id="instructions_lower" style=" position: absolute; bottom: 120px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS;">Synchronize with Orby to score points.</p>
 
     <a href="together" id='together'>T</a>
     <a href="alone" class='alone-button'>A</a>
