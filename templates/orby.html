@@ -94,7 +94,7 @@
             };
 
             var num_breaths = 0;
-            const timeout_counter = 8000;
+            const timeout_counter = 15000;
             var num_active;
             var last_client_event = 'none';
             var last_server_event = 'exhale';
@@ -162,6 +162,7 @@
                     num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter, num_breaths);
                     last_client_event = 'inhale'
+                    remove_instructions()
                 }
             }
 
@@ -215,19 +216,31 @@
 
             function remove_instructions() {
 
-                if (longest_lockon >= 1) {
+                if (num_breaths > 2) {
                     const instructions_upper = document.getElementById("instructions_upper"); 
                     instructions_upper.textContent = ""
                     const instructions_lower = document.getElementById("instructions_lower"); 
                     instructions_lower.textContent = ""
+                    const button_desc_1 = document.getElementById("button_desc_1"); 
+                    if (num_active > 0) {
+                        button_desc_1.textContent = num_active.toString()
+                    }
+                    else {
+                        button_desc_1.textContent = ""
+
+                    }
+                    const button_desc_2 = document.getElementById("button_desc_2"); 
+                    button_desc_2.textContent = ""
+                    const button_desc_3 = document.getElementById("button_desc_3"); 
+                    button_desc_3.textContent = ""
+                    const button_desc_4 = document.getElementById("button_desc_4"); 
+                    button_desc_4.textContent = ""
                 }
             }
 
             function display_streak() {
                 const divElement = document.getElementById("streak"); 
                 divElement.textContent = "high score: " + longest_lockon.toString()
-                
-                remove_instructions()
             }
 
             socket.on('assign_user_id', function (msg) {
@@ -236,11 +249,18 @@
 
             function display_num_active_users() {
                 var element = document.getElementById("together");
+                const button_desc_1 = document.getElementById("button_desc_1"); 
                 if (num_active > 0) {
                     element.setAttribute('class', "together-button");
+                    if (num_breaths > 2) {
+                        button_desc_1.textContent = num_active.toString()
+                    }
                 }
                 if (num_active <= 0) {
                     element.setAttribute('class', "together-button-empty");
+                    if (num_breaths > 2){
+                        button_desc_1.textContent = ""
+                    }
                 }
             }
 
@@ -503,11 +523,19 @@
 <body>
     <font color="green">
         <p class="noselect" id="streak" style=" position: absolute; bottom: 5px; left: 0; width: 40%; text-align: left; text-indent: 1em; font-size: 26px; font-family: Trebuchet MS;"></p>
-        <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 10em; text-align: left; text-indent: 1em; font-size: 26px">Breathe with Orby.</p>
+        <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 10em; text-align: left; text-indent: 1em; font-size: 26px">Breathe with Orby</p>
 
         <p class="noselect" id="instructions_upper" style=" position: absolute; top: 100px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS;"><b>Instructions: </b>Press and hold as you inhale. Release as you exhale.<br>You can tap the screen, click the mouse, or use the spacebar.</p>
 
         <p class="noselect" id="instructions_lower" style=" position: absolute; bottom: 120px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS;">Synchronize with Orby to score points.</p>
+
+        <p class="noselect" id="button_desc_1" style=" position: absolute; bottom: 183px; right: 75px; width: 30%; text-align: right; font-size: 22px; line-height: 22px; font-family: Trebuchet MS;">Breathe Together -</p>
+
+        <p class="noselect" id="button_desc_2" style=" position: absolute; bottom: 128px; right: 75px; width: 20%; text-align: right; font-size: 22px; line-height: 22px; font-family: Trebuchet MS;">Breathe Alone -</p>
+
+        <p class="noselect" id="button_desc_3" style=" position: absolute; bottom: 73px; right: 75px; width: 20%; text-align: right; font-size: 22px; line-height: 22px; font-family: Trebuchet MS;">Breathe with Orby -</p>
+
+        <p class="noselect" id="button_desc_4" style=" position: absolute; bottom: 16px; right: 75px; width: 20%; text-align: right; font-size: 22px; line-height: 22px; font-family: Trebuchet MS;">Go fullscreen -</p>
 
     <a href="together" id='together'>T</a>
     <a href="alone" class='alone-button'>A</a>
