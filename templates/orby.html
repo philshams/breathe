@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-    <title>Breathe with The Orb</title>
+    <title>Breathe with Orb</title>
     <style>
         body {
             margin: 0;
@@ -405,7 +405,7 @@
 
     .fullscreen-button3 {
         position: absolute;
-        bottom:  95px;
+        bottom:  70px;
         right:  29px;
         background: rgb(40, 40, 40);
         opacity: 0.7;
@@ -418,34 +418,34 @@
         text-align: center;
         line-height: 37px;
         font-size: 18px;
-        color: skyblue;
+        color: lightgray;
         text-decoration: none;
         font-family: Trebuchet MS;
     }
 
-    .orby-button {
+    .timer-button {
         position: absolute;
-        bottom:  195px;
+        bottom:  115px;
         right:  29px;
         background: rgb(40, 40, 40);
         opacity: 0.7;
-        border:  2px solid greenyellow;
+        border:  2px solid gray;
         width:  240px;
         height:  40px;
         border-radius: 5px;
         box-sizing: border-box;
         cursor:  pointer;
         text-align: center;
-        line-height: 37px;
+        line-height: 40px;
         font-size: 18px;
-        color: white;
+        color: lightgray;
         text-decoration: none;
         font-family: Trebuchet MS;
     }
 
     .alone-button {
         position: absolute;
-        bottom:  140px;
+        bottom:  160px;
         right:  29px;
         background: rgb(40, 40, 40);
         opacity: 0.7;
@@ -463,9 +463,29 @@
         font-family: Trebuchet MS;
     }
 
+    .orby-button {
+        position: absolute;
+        bottom:  250px;
+        right:  29px;
+        background: rgb(40, 40, 40);
+        opacity: 0.7;
+        border:  2px solid greenyellow;
+        width:  240px;
+        height:  40px;
+        border-radius: 5px;
+        box-sizing: border-box;
+        cursor:  pointer;
+        text-align: center;
+        line-height: 37px;
+        font-size: 18px;
+        color: skyblue;
+        text-decoration: none;
+        font-family: Trebuchet MS;
+    }
+
     .together-button {
         position: absolute;
-        bottom:  245px;
+        bottom:  205px;
         right:  29px;
         background: rgb(40, 40, 40);
         opacity: 0.7;
@@ -522,13 +542,13 @@
 </style> 
 <body>
         <p class="noselect" id="streak" style=" position: absolute; bottom: 5px; left: 0; width: 40%; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue"></p>
-        <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 10em; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue"">Breathe with the Orb</p>
+        <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 10em; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue"">Breathe with Orb</p>
 
-        <p class="noselect" style=" position: absolute; bottom: 14px; right: 80px; width: 10em; text-align: right; font-size: 22px; font-family: Trebuchet MS; color: rgb(40, 100, 153)"">6 people breathing</p>
+        <p class="noselect" style=" position: absolute; bottom: 14px; right: 75px; width: 10em; text-align: right; font-size: 22px; font-family: Trebuchet MS; color: rgb(40, 100, 153)"">6 people breathing</p>
 
         <p class="noselect" id="instructions_upper" style=" position: absolute; top: 100px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green""><b>Instructions: </b>Press and hold as you inhale. Release as you exhale.<br>You can tap the screen, click the mouse, or use the spacebar.</p>
 
-        <p class="noselect" id="instructions_lower" style=" position: absolute; bottom: 120px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green"">Synchronize with The Orb to score points.</p>
+        <p class="noselect" id="instructions_lower" style=" position: absolute; bottom: 120px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green"">Synchronize with the Orb to earn points.</p>
 <!-- 
         <p class="noselect" id="button_desc_1" style=" position: absolute; bottom: 238px; right: 29px; width: 30%; text-align: right; font-size: 22px; line-height: 22px; font-family: Trebuchet MS; color: green"">Breathe together</p>
 
@@ -538,12 +558,14 @@
 
         <!-- <p class="noselect" id="button_desc_4" style=" position: absolute; bottom: 73px; right: 29px; width: 20%; text-align: right; font-size: 22px; line-height: 22px; font-family: Trebuchet MS; color: green"">Toggle fullscreen</p> -->
 
-        <p class="noselect" id="button_desc_5" style=" position: absolute; bottom: 16px; right: 75px; width: 20%; text-align: right; font-size: 22px; line-height: 22px; font-family: Trebuchet MS; color: green"">View options -</p>
+        <!-- <p class="noselect" id="button_desc_5" style=" position: absolute; bottom: 230px; right: 85px; width: 20%; text-align: right; font-size: 22px; line-height: 22px; font-family: Trebuchet MS; color: green"">Options panel</p> -->
 
-    <a href="together" class='together-button'>Breathe together</a>
-    <a href="alone" class='alone-button'>Zen mode</a>
-    <a href="" class='orby-button'>Breathe with the Orb</a>
-    <a href="" class='fullscreen-button3'>Toggle fullscreen</a>
+    <a href="together" class='together-button'>Breathe Together</a>
+    <a href="" class='orby-button'>Breathe with Orb</a>
+    <a href="alone" class='alone-button'>Breathe Alone</a>
+    <a href="" class='timer-button'>Toggle Timer</a>
+    <a href="" class='fullscreen-button3'>Toggle Fullscreen</a>
+    
 
 </body>
 
