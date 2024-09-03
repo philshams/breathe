@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-    <title>Breathe with the Orb</title>
+    <title>Breathe Together</title>
     <style>
         body {
             margin: 0;
@@ -220,9 +220,17 @@
                 else {
                     prev_action_scored = false;
                     current_lockon = 0;
+                    reset_level()
                 }
 
                 display_streak()
+            }
+
+            function reset_level() {
+                const level_el = document.getElementById("level"); 
+                level_el.textContent = "level: Apprentice";
+                level_el.style.color = "rgb(70,70,70)";
+                lockon_distance = 30;
             }
 
             function update_level() {
@@ -246,17 +254,17 @@
                 } else if ((current_lockon == 30 || current_lockon == 31) && last_client_event == "inhale") {
                     encourage.textContent = "Level up!"
                     lockon_distance = 26 // higher difficulty
-                    level_el.textContent = "level: Prodigy"
+                    level_el.textContent = "level: Disciple"
                     level_el.style.color = "darkcyan"
                 } else if ((current_lockon == 40 || current_lockon == 41) && last_client_event == "inhale") {
                     encourage.textContent = "Just superb!"
                 } else if ((current_lockon == 50 || current_lockon == 51) && last_client_event == "inhale") {
+                    encourage.textContent = "You're good at this."
+                } else if ((current_lockon == 60 || current_lockon == 61) && last_client_event == "inhale") {
                     encourage.textContent = "Level up!"
                     lockon_distance = 22 // higher difficulty
                     level_el.textContent = "level: Monk"
-                    level_el.style.color = "rgb(100,0,130)"
-                } else if ((current_lockon == 60 || current_lockon == 61) && last_client_event == "inhale") {
-                    encourage.textContent = "You're good at this."
+                    level_el.style.color = "rgb(100,0,130)"                    
                 } else if ((current_lockon == 70 || current_lockon == 71) && last_client_event == "inhale") {
                     encourage.textContent = "Concentrate..."
                 } else if ((current_lockon == 80 || current_lockon == 81) && last_client_event == "inhale") {
@@ -417,6 +425,7 @@
                     circle_client.ring_color = ring_color_off;
                     locked_on = false;
                     current_lockon = 0;
+                    reset_level()
                     display_streak()
                 }
             }
@@ -658,7 +667,7 @@
         border-radius: 6px;
         border:  1px solid white;
         opacity: 0.7;
-        width:  200px;
+        width:  175px;
         height:  30px;
         color: lightgray;
         font-size: 18px;
@@ -690,7 +699,7 @@
 
     .alone-button {
         position: absolute;
-        bottom:  120px;
+        bottom:  210px;
         right:  30px;
         color: rgb(150, 220, 255);
     }
@@ -701,7 +710,7 @@
 
     .orb-button {
         position: absolute;
-        bottom:  150px;
+        bottom:  180px;
         right:  30px;
         color: rgb(150, 220, 255);
     }
@@ -712,7 +721,7 @@
 
     .together-button {
         position: absolute;
-        bottom:  210px;
+        bottom:  150px;
         right:  30px;
         color: rgb(150, 220, 255);
     }
@@ -723,7 +732,7 @@
 
     .together-button2 {
         position: absolute;
-        bottom:  180px;
+        bottom:  120px;
         right:  30px;
         color: rgb(150, 220, 255);
     }
@@ -736,7 +745,7 @@
         background: rgb(40, 40, 40);
         opacity: 0.7;
         border:  2px solid rgb(40, 40, 40);
-        width:  200px;
+        width:  175px;
         height:  30px;
         border-radius: 5px;
         box-sizing: border-box;
@@ -766,11 +775,11 @@
 
         <p class="noselect" id="level" style=" position: absolute; bottom: 90px; left: 0px; width: 10em; text-align: center; text-indent: 1em; font-size: 20px; font-family: Trebuchet MS; color: rgb(70,70,70)">level: Apprentice</p>
 
-        <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 20em; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue">Game mode</p>
+        <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 20em; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue">Challenge mode</p>
 
         <p class="noselect" id = "timer" style=" position: absolute; top: 5px; right: 30px; width: 10em; text-align: right; font-size: 26px; color: skyblue"></p>
 
-        <p class="noselect" id="others" style=" position: absolute; bottom: 18px; right: 250px; width: 10em; text-align: right; font-size: 18px; font-family: Trebuchet MS;"></p>
+        <p class="noselect" id="others" style=" position: absolute; bottom: 18px; right: 230px; width: 10em; text-align: right; font-size: 18px; font-family: Trebuchet MS;"></p>
 
         <p class="noselect" id="instructions_upper" style=" position: absolute; top: 90px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green"><b>Instructions: </b>Press and hold as you inhale. Release as you exhale.<br>You can tap the screen, click the mouse, or use the spacebar.</p>
 
@@ -784,10 +793,10 @@
 
         <p class="noselect" id="instructions_right" style=" position: absolute; bottom: 230px; right: 55px; width: 20%; text-align: right; font-size: 18px; line-height: 22px; font-family: Trebuchet MS; color: skyblue">Four modes to try!</p>
 
-    <a id = "together-button" href="together" class='together-button button-style noselect'>breathe with a friend</a>
-    <a id = "together-button2" href="together2" class='together-button2 button-style noselect'>breathe with a stranger</a>
-    <a id = "orb-button" href="" class='button-style orb-button noselect'>breathe with the orb</a>
-    <a id = "alone-button" href="alone" class='alone-button button-style noselect'>breathe in zen mode</a>
+    <a id = "together-button" href="together" class='together-button button-style noselect'>Private room</a>
+    <a id = "together-button2" href="together2" class='together-button2 button-style noselect'>Public room</a>
+    <a id = "orb-button" href="" class='button-style orb-button noselect'>Challenge mode</a>
+    <a id = "alone-button" href="alone" class='alone-button button-style noselect'>Daily meditation</a>
     
 
 </body>
