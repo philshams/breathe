@@ -51,7 +51,6 @@
             const max_radius = 380;
 
             var lockon_distance = 30;
-            prev_action_scored = false;
 
             const min_red = 60;
             const max_red = 160;
@@ -73,8 +72,6 @@
 
             var speed_multiplier_server = 0;
             var speed_multiplier_client = 0;
-
-            const beginner_score = 10;
 
             const ring_color_off = [80, 80, 80];
             const ring_color_on = [255, 255, 190];
@@ -114,8 +111,6 @@
             var last_client_event = 'none';
             var last_server_event = 'exhale';
 
-            var longest_lockon = 0;
-            var current_lockon = 0;
             var locked_on = false;
 
             var out_of_bounds = false;
@@ -180,11 +175,12 @@
                     num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter, num_breaths);
                     last_client_event = 'inhale'
-                    score_points()
 
                     if (!instructions_present) {
                        remove_options()
                     }   
+
+                    display_streak()
                 }
             }
 
@@ -194,8 +190,6 @@
                     num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter, num_breaths);
                     last_client_event = 'exhale'
-                    score_points()
-
                     if (num_breaths == 2 || num_breaths == 3) {
                         remove_instructions()
                         remove_options()
@@ -203,93 +197,6 @@
                 }
             }
 
-            function score_points() {
-
-                if ((locked_on && last_client_event == "inhale" && circle_client.radius < (robot_start_radius + lockon_distance) && (prev_action_scored || current_lockon == 0)) || (locked_on && last_client_event == "exhale" && circle_client.radius > (robot_end_radius - lockon_distance) && (prev_action_scored || current_lockon == 0))) {
-                    point_scored = true;
-                } else {
-                    point_scored = false;
-                }
-                if (point_scored) {
-                    current_lockon = current_lockon + 1
-                    longest_lockon = Math.max(longest_lockon, current_lockon)
-                    prev_action_scored = true;
-                    update_level()
-
-                }
-                else {
-                    prev_action_scored = false;
-                    current_lockon = 0;
-                    reset_level()
-                }
-
-                display_streak()
-            }
-
-            function reset_level() {
-                const level_el = document.getElementById("level"); 
-                level_el.textContent = "level: Apprentice";
-                level_el.style.color = "rgb(70,70,70)";
-                lockon_distance = 30;
-            }
-
-            function update_level() {
-                const level_el = document.getElementById("level"); 
-                const encourage = document.getElementById("breathe_in"); 
-                const element2 = document.getElementById("breathe_out"); 
-                if (current_lockon > beginner_score) {
-                    encourage.textContent = ""
-                    element2.textContent = ""
-                }
-
-                if ((current_lockon == beginner_score || current_lockon == beginner_score+1) && last_client_event == "inhale") {
-                    encourage.textContent = "Good luck!"
-                    element2.textContent = ""
-                    level_el.textContent = "level: Grasshopper"
-                    level_el.style.color = "darkgreen"
-                } else if ((current_lockon == 15 || current_lockon == 16) && last_client_event == "inhale") {
-                    encourage.textContent = "You're doing great!"
-                } else if ((current_lockon == 20 || current_lockon == 21) && last_client_event == "inhale") {
-                    encourage.textContent = "Impressive"
-                } else if ((current_lockon == 30 || current_lockon == 31) && last_client_event == "inhale") {
-                    encourage.textContent = "Level up!"
-                    lockon_distance = 26 // higher difficulty
-                    level_el.textContent = "level: Disciple"
-                    level_el.style.color = "darkcyan"
-                } else if ((current_lockon == 40 || current_lockon == 41) && last_client_event == "inhale") {
-                    encourage.textContent = "Just superb!"
-                } else if ((current_lockon == 50 || current_lockon == 51) && last_client_event == "inhale") {
-                    encourage.textContent = "You're good at this."
-                } else if ((current_lockon == 60 || current_lockon == 61) && last_client_event == "inhale") {
-                    encourage.textContent = "Level up!"
-                    lockon_distance = 22 // higher difficulty
-                    level_el.textContent = "level: Monk"
-                    level_el.style.color = "rgb(100,0,130)"                    
-                } else if ((current_lockon == 70 || current_lockon == 71) && last_client_event == "inhale") {
-                    encourage.textContent = "Concentrate..."
-                } else if ((current_lockon == 80 || current_lockon == 81) && last_client_event == "inhale") {
-                    encourage.textContent = "Wow!"
-                } else if ((current_lockon == 90 || current_lockon == 91) && last_client_event == "inhale") {
-                    encourage.textContent = "Masterful!"
-                } else if ((current_lockon == 100 || current_lockon == 101) && last_client_event == "inhale") {
-                    encourage.textContent = "Level up!"
-                    level_el.textContent = "level: Zen Master"
-                    level_el.style.color = "maroon"
-                    lockon_distance = 18 // higher difficulty
-                } else if ((current_lockon == 110 || current_lockon == 111) && last_client_event == "inhale") {
-                    encourage.textContent = "One more level to go..."
-                } else if ((current_lockon == 150 || current_lockon == 151) && last_client_event == "inhale") {
-                    encourage.textContent = "Are you the chosen one?"
-                } else if ((current_lockon == 200 || current_lockon == 201) && last_client_event == "inhale") {
-                    encourage.textContent = "you ARE the chosen one."
-                    level_el.textContent = "level: Bodhisattva"
-                    level_el.style.color = "gold"
-                    lockon_distance = 14 // higher difficulty
-                } else if (current_lockon > 202 && (current_lockon%50 == 0 || current_lockon%50 == 1) && last_client_event == "inhale") {
-                    encourage.textContent = current_lockon.toString() + "!"
-                }
-    
-            }
 
             // Add event listener for the "keydown" event on the document object
             document.addEventListener('keydown', (event) => {
@@ -367,9 +274,7 @@
 
             function display_streak() {
                 const divElement1 = document.getElementById("streak"); 
-                divElement1.textContent = "high score: " + longest_lockon.toString()
-                const divElement2 = document.getElementById("current_streak"); 
-                divElement2.textContent = "current score: " + current_lockon.toString()
+                divElement1.textContent = "Number of breaths: " + Math.floor((num_breaths+1) / 2).toString()
             }
 
             socket.on('assign_user_id', function (msg) {
@@ -424,9 +329,6 @@
                 else {
                     circle_client.ring_color = ring_color_off;
                     locked_on = false;
-                    current_lockon = 0;
-                    reset_level()
-                    display_streak()
                 }
             }
 
@@ -466,17 +368,13 @@
 
                 const element1 = document.getElementById("breathe_in");
                 const element2 = document.getElementById("breathe_out");
-                if (circle_server.radius > (robot_end_radius - 3)) {
-                        element1.textContent = ""
+                if (circle_server.radius < (robot_start_radius + 3)) {
+                    element1.textContent = "Breathe in..."
+                    element2.textContent = ""
                 }
-                if (current_lockon <= beginner_score) {
-                    if (circle_server.radius < (robot_start_radius + 3)) {
-                        element1.textContent = "Breathe in..."
-                        element2.textContent = ""
-                    }
-                    else if (circle_server.radius > (robot_end_radius - 3)) {
-                        element2.textContent = "...and breathe out."
-                    }
+                else if (circle_server.radius > (robot_end_radius - 3)) {
+                    element2.textContent = "...and breathe out."
+                    element1.textContent = ""
                 }
 
                 if (circle_server.radius < robot_start_radius) {                
@@ -769,13 +667,9 @@
 }
 </style> 
 <body>
-        <p class="noselect" id="streak" style=" position: absolute; bottom: 5px; left: 0; width: 40%; text-align: left; text-indent: 2.05em; font-size: 26px; color: skyblue"></p>
+        <p class="noselect" id="streak" style=" position: absolute; bottom: 5px; left: 0; width: 40%; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue"></p>
 
-        <p class="noselect" id="current_streak" style=" position: absolute; bottom: 45px; left: 0; width: 40%; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue"></p>
-
-        <p class="noselect" id="level" style=" position: absolute; bottom: 90px; left: 0px; width: 10em; text-align: center; text-indent: 1em; font-size: 20px; font-family: Trebuchet MS; color: rgb(70,70,70)">level: Apprentice</p>
-
-        <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 20em; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue">Challenge mode</p>
+        <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 20em; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue">Daily meditation</p>
 
         <p class="noselect" id = "timer" style=" position: absolute; top: 5px; right: 30px; width: 10em; text-align: right; font-size: 26px; color: skyblue"></p>
 
@@ -783,7 +677,7 @@
 
         <p class="noselect" id="instructions_upper" style=" position: absolute; top: 90px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green"><b>Instructions: </b>Press and hold as you inhale. Release as you exhale.<br>You can tap the screen, click the mouse, or use the spacebar.</p>
 
-        <p class="noselect" id="instructions_lower" style=" position: absolute; bottom: 40px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green">Stay synchronized with the Orb to score points.<br>With each level more focus is required.<br><br>Can you make it to Zen Master level...or beyond?</p>
+        <p class="noselect" id="instructions_lower" style=" position: absolute; bottom: 90px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green">Select how long you want to meditate for, and find a breathing speed you like.<br>Daily meditation is relaxing and good for you!</p>
 
         <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: skyblue"></p>
 
@@ -795,8 +689,8 @@
 
     <a id = "together-button" href="together" class='together-button button-style noselect'>Private room</a>
     <a id = "together-button2" href="together2" class='together-button2 button-style noselect'>Public room</a>
-    <a id = "orb-button" href="" class='button-style orb-button noselect'>Challenge mode</a>
-    <a id = "alone-button" href="alone" class='alone-button button-style noselect'>Daily meditation</a>
+    <a id = "orb-button" href="../" class='button-style orb-button noselect'>Challenge mode</a>
+    <a id = "alone-button" href="" class='alone-button button-style noselect'>Daily meditation</a>
     
 
 </body>

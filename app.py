@@ -27,9 +27,9 @@ def orby():
 def together():
     return render_template('together.html')
 
-@app.route('/alone/')
+@app.route('/daily/')
 def alone():
-    return render_template('alone.html')
+    return render_template('daily.html')
 
 # when a client connects
 @socketio.on('connect')
