@@ -42,29 +42,33 @@
             meditationCanvas.height = window.innerHeight;
             const ctx = meditationCanvas.getContext('2d');
 
-            const min_radius = 100;
-            const robot_start_radius = 115;
-            const start_radius = 130;
-            const fast_radius_start = 130;
+            const min_radius = 95;
+            const robot_start_radius = 110;
+            const start_radius = 120;
+            const fast_radius_start = 120;
             const fast_radius_end = 250;
             const robot_end_radius = 270;
             const max_radius = 380;
 
             const lockon_distance = 30;
 
-            const min_redness = 0;
-            const max_redness = 180;
+            const min_red = 60;
+            const max_red = 160;
+
+            const min_green = 120;
+            const max_green = 220;
 
             const max_ring_width = 11
             const max_ring_offset = 10
 
-            const start_redness = 100;
+            const start_red = 80;
+            const start_green = 140;
 
-            const redness_change = 0.45;
+            const color_change = 0.45;
             const radius_change = 0.6;
             const speed_factor = 1.2;
             const inhale_speed_boost = 1.25;
-            const out_of_bounds_slowdown = 4;
+            const out_of_bounds_slowdown = 5;
 
             var speed_multiplier_server = 0;
             var speed_multiplier_client = 0;
@@ -72,13 +76,18 @@
             const ring_color_off = [80, 80, 80];
             const ring_color_on = [255, 255, 190];
 
+            const start_time = (new Date).getTime()
+            var time_in_session = -1;
+            var timer_on = false;
+
             user_id = 0;
 
             var circle_server = {
                 x: meditationCanvas.width / 2,
                 y: meditationCanvas.height / 2,
                 radius: start_radius,
-                redness: start_redness,
+                red: start_red,
+                green: start_green,
                 outer_radius: start_radius + max_ring_width,
                 ring_width: max_ring_width,
                 ring_offset: max_ring_offset,
@@ -88,7 +97,8 @@
                 x: meditationCanvas.width / 2,
                 y: meditationCanvas.height / 2,
                 radius: start_radius,
-                redness: start_redness,
+                red: start_red,
+                green: start_green,
                 outer_radius: start_radius + max_ring_width,
                 ring_width: max_ring_width,
                 ring_offset: max_ring_offset,
@@ -122,8 +132,8 @@
 
             function createInnerCircle(circle) {
                 const gradient = ctx.createRadialGradient(circle.x, circle.y, 0, circle.x, circle.y, circle.radius);
-                gradient.addColorStop(0, `rgba(${circle.redness}, 200, 255, 1)`);
-                gradient.addColorStop(1, `rgba(${circle.redness}, 200, 255, 0)`);
+                gradient.addColorStop(0, `rgba(${circle.red}, ${circle.green}, 255, 1)`);
+                gradient.addColorStop(1, `rgba(${circle.red}, ${circle.green}, 255, 0)`);
                 return gradient;
             }
 
@@ -174,11 +184,13 @@
             }
 
             function key_up_response(event) {
-                if (last_client_event != 'exhale') {
+                if (last_client_event != 'exhale' && !out_of_bounds) {
                     socket.emit('client_keyup');
                     num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter, num_breaths);
                     last_client_event = 'exhale'
+
+                    console.log(num_breaths)
 
                     if (num_breaths == 4) {
                         remove_instructions()
@@ -291,15 +303,19 @@
             });
 
             function check_value_limits(circle) {
-                circle.redness = Math.min(circle.redness, max_redness)
-                circle.redness = Math.max(circle.redness, min_redness)
+                circle.red = Math.min(circle.red, max_red)
+                circle.red = Math.max(circle.red, min_red)
                 circle.radius = Math.min(circle.radius, max_radius)
                 circle.radius = Math.max(circle.radius, min_radius)
+                circle.green = Math.min(circle.green, max_green)
+                circle.green = Math.max(circle.green, min_green)
             }
 
             function update_inner_circle(circle, speed_multiplier) {
-                circle.redness += redness_change * speed_multiplier;
+                circle.red += color_change * speed_multiplier;
+                circle.green += color_change * speed_multiplier;
                 circle.radius += radius_change * speed_multiplier;
+                
 
                 check_value_limits(circle)
             }
@@ -370,11 +386,15 @@
                 speed_multiplier_client = calculate_speed(last_client_event, circle_client, "client")
                 last_server_event = get_robot_action(last_server_event, circle_server)
                 speed_multiplier_server = calculate_speed(last_server_event, circle_server, "server")
-               
 
                 update_inner_circle(circle_server, speed_multiplier_server)
                 update_inner_circle(circle_client, speed_multiplier_client)
                 update_outer_circle(circle_client) 
+
+                if (timer_on) {
+                    update_timer()
+                }
+                
 
             }
 
@@ -396,7 +416,16 @@
                     document.body.removeAttribute("fullscreen"); 
                 }
                 toggle_options()
+                const instructions_right = document.getElementById("instructions_right"); 
+                instructions_right.textContent = ""
             }
+
+            const timer_button = document.createElement("button");
+            timer_button.setAttribute('id','timer-button');
+            timer_button.setAttribute('class','timer-button button-style noselect');
+            timer_button.textContent = 'toggle timer';
+            timer_button.addEventListener("click", toggle_timer);
+            document.body.appendChild(timer_button);
 
             const options_button = document.createElement("button");
             options_button.setAttribute('id','options-button');
@@ -413,6 +442,8 @@
             const tob = document.getElementById('together-button');
             const tob2 = document.getElementById('together-button2');
             const ab = document.getElementById('alone-button');
+
+            tib.addEventListener('click', toggle_timer);
 
             fb.addEventListener('mouseover', on_options);
             fb.addEventListener('mouseout', back_in_bounds);
@@ -466,9 +497,26 @@
                     tob2.style.display = "none"
                     ab.style.display = "none"
                     opt.style.border = "1px solid rgb(40, 40, 40)"
-                }
+                }  
+            }
 
-                remove_instructions()   
+            function toggle_timer() {
+                const timer = document.getElementById('timer');
+                if (timer_on) {
+                    timer.style.display = "none";
+                    timer_on = false;
+                } else {
+                    timer.style.display = "";
+                    timer_on = true;
+                }
+            }
+
+            function update_timer() {
+                const divElement = document.getElementById("timer"); 
+                new_time_in_session = Math.floor(((new Date).getTime() - start_time) / 1000 / 60)
+                if (new_time_in_session != time_in_session) {
+                    divElement.textContent = "minutes complete: " + new_time_in_session.toString()
+                }
             }
 
             function show_options() {
@@ -611,6 +659,8 @@
 
         <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 10em; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue">Breathe with the Orb</p>
 
+        <p class="noselect" id = "timer" style=" position: absolute; top: 5px; right: 30px; width: 10em; text-align: right; font-size: 26px; color: skyblue"></p>
+
         <p class="noselect" id="others" style=" position: absolute; bottom: 18px; right: 250px; width: 10em; text-align: right; font-size: 18px; font-family: Trebuchet MS;"></p>
 
         <p class="noselect" id="instructions_upper" style=" position: absolute; top: 100px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green""><b>Instructions: </b>Press and hold as you inhale. Release as you exhale.<br>You can tap the screen, click the mouse, or use the spacebar.</p>
@@ -623,7 +673,6 @@
     <a id = "together-button2" href="together2" class='together-button2 button-style noselect'>breathe with a stranger</a>
     <a id = "orb-button" href="" class='button-style orb-button noselect'>breathe with the orb</a>
     <a id = "alone-button" href="alone" class='alone-button button-style noselect'>breathe by yourself</a>
-    <a id = "timer-button" href="" class='timer-button button-style noselect'>toggle timer</a>
     
 
 </body>
