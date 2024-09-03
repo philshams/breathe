@@ -51,6 +51,7 @@
             const max_radius = 380;
 
             const lockon_distance = 30;
+            prev_action_scored = false;
 
             const min_red = 60;
             const max_red = 160;
@@ -177,9 +178,11 @@
                     num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter, num_breaths);
                     last_client_event = 'inhale'
+                    score_points()
+
                     if (!instructions_present) {
                        remove_options()
-                    }
+                    }   
                 }
             }
 
@@ -189,8 +192,7 @@
                     num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter, num_breaths);
                     last_client_event = 'exhale'
-
-                    console.log(num_breaths)
+                    score_points()
 
                     if (num_breaths == 4 || num_breaths == 5) {
                         remove_instructions()
@@ -198,6 +200,25 @@
                     }
                 }
 
+            }
+
+            function score_points() {
+
+                if (locked_on && last_client_event == "inhale" && circle_client.radius < (robot_start_radius + lockon_distance) && (prev_action_scored || current_lockon_duration == 0)) {
+                        current_lockon_duration = current_lockon_duration + 1
+                        longest_lockon = Math.max(longest_lockon, current_lockon_duration)
+                        prev_action_scored = true;
+                        display_streak()
+                } else if (locked_on && last_client_event == "exhale" && circle_client.radius > (robot_end_radius - lockon_distance) && (prev_action_scored || current_lockon_duration == 0)) {
+                        current_lockon_duration = current_lockon_duration + 1
+                        longest_lockon = Math.max(longest_lockon, current_lockon_duration)
+                        prev_action_scored = true;
+                        display_streak()
+                } else {
+                    prev_action_scored = false;
+                    current_lockon_duration = 0;
+                    display_streak()
+                }
             }
 
             // Add event listener for the "keydown" event on the document object
@@ -276,7 +297,7 @@
 
             function display_streak() {
                 const divElement = document.getElementById("streak"); 
-                divElement.textContent = "high score: " + longest_lockon.toString()
+                divElement.textContent = "current score: " + current_lockon_duration.toString() + ". high score: " + longest_lockon.toString()
             }
 
             socket.on('assign_user_id', function (msg) {
@@ -332,6 +353,7 @@
                     circle_client.ring_color = ring_color_off;
                     locked_on = false;
                     current_lockon_duration = 0;
+                    display_streak()
                 }
             }
 
@@ -389,24 +411,10 @@
                     }
                 }
 
-                if (circle_server.radius < robot_start_radius) {
-
-                    if (locked_on && last_server_event == "exhale") {
-                        current_lockon_duration = current_lockon_duration + 1
-                        longest_lockon = Math.max(longest_lockon, current_lockon_duration - 1)
-                        display_streak()
-                    }
-                
+                if (circle_server.radius < robot_start_radius) {                
                     return "inhale"
                 }
                 if (circle_server.radius > robot_end_radius) {
-
-                    if (locked_on && last_server_event == "inhale") {
-                        current_lockon_duration = current_lockon_duration + 1
-                        longest_lockon = Math.max(longest_lockon, current_lockon_duration - 1)
-                        display_streak()
-                    }
-
                     return "exhale"
                 }
                 return last_server_event
