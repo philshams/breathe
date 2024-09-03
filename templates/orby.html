@@ -366,6 +366,7 @@
 
             function get_robot_action(last_server_event, circle_server) {
                 if (circle_server.radius < robot_start_radius) {
+
                     if (locked_on && last_server_event == "exhale") {
                         current_lockon_duration = current_lockon_duration + 1
                         longest_lockon = Math.max(longest_lockon, current_lockon_duration - 1)
@@ -375,6 +376,13 @@
                     return "inhale"
                 }
                 if (circle_server.radius > robot_end_radius) {
+
+                    if (locked_on && last_server_event == "inhale") {
+                        current_lockon_duration = current_lockon_duration + 1
+                        longest_lockon = Math.max(longest_lockon, current_lockon_duration - 1)
+                        display_streak()
+                    }
+
                     return "exhale"
                 }
                 return last_server_event
@@ -665,7 +673,7 @@
 
         <p class="noselect" id="instructions_upper" style=" position: absolute; top: 100px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green""><b>Instructions: </b>Press and hold as you inhale. Release as you exhale.<br>You can tap the screen, click the mouse, or use the spacebar.</p>
 
-        <p class="noselect" id="instructions_lower" style=" position: absolute; bottom: 120px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green"">Stay synchronized with the Orb to score points.<br>Try to get to 5 points!</p>
+        <p class="noselect" id="instructions_lower" style=" position: absolute; bottom: 120px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green"">Stay synchronized with the Orb to score points.<br>Try to get to 10 points!</p>
 
         <p class="noselect" id="instructions_right" style=" position: absolute; bottom: 230px; right: 55px; width: 20%; text-align: right; font-size: 18px; line-height: 22px; font-family: Trebuchet MS; color: skyblue">Four modes to try!</p>
 
