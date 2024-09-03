@@ -113,7 +113,7 @@
             var last_server_event = 'exhale';
 
             var longest_lockon = 0;
-            var current_lockon_duration = 0;
+            var current_lockon = 0;
             var locked_on = false;
 
             var out_of_bounds = false;
@@ -194,30 +194,49 @@
                     last_client_event = 'exhale'
                     score_points()
 
-                    if (num_breaths == 4 || num_breaths == 5) {
+                    if (num_breaths == 2 || num_breaths == 3) {
                         remove_instructions()
                         remove_options()
                     }
                 }
-
             }
 
             function score_points() {
 
-                if (locked_on && last_client_event == "inhale" && circle_client.radius < (robot_start_radius + lockon_distance) && (prev_action_scored || current_lockon_duration == 0)) {
-                        current_lockon_duration = current_lockon_duration + 1
-                        longest_lockon = Math.max(longest_lockon, current_lockon_duration)
-                        prev_action_scored = true;
-                        display_streak()
-                } else if (locked_on && last_client_event == "exhale" && circle_client.radius > (robot_end_radius - lockon_distance) && (prev_action_scored || current_lockon_duration == 0)) {
-                        current_lockon_duration = current_lockon_duration + 1
-                        longest_lockon = Math.max(longest_lockon, current_lockon_duration)
-                        prev_action_scored = true;
-                        display_streak()
+                if ((locked_on && last_client_event == "inhale" && circle_client.radius < (robot_start_radius + lockon_distance) && (prev_action_scored || current_lockon == 0)) || (locked_on && last_client_event == "exhale" && circle_client.radius > (robot_end_radius - lockon_distance) && (prev_action_scored || current_lockon == 0))) {
+                    point_scored = true;
                 } else {
+                    point_scored = false;
+                }
+                if (point_scored) {
+                    current_lockon = current_lockon + 1
+                    longest_lockon = Math.max(longest_lockon, current_lockon)
+                    prev_action_scored = true;
+                    update_level()
+
+                }
+                else {
                     prev_action_scored = false;
-                    current_lockon_duration = 0;
-                    display_streak()
+                    current_lockon = 0;
+                }
+
+                display_streak()
+            }
+
+            function update_level() {
+                const level_el = document.getElementById("level"); 
+                if (longest_lockon == 10){
+                    level_el.textContent = "level: Grasshopper"
+                    level_el.style.color = "darkgreen"
+                } else if (longest_lockon == 30) {
+                    level_el.textContent = "level: Monk"
+                    level_el.style.color = "rgb(100,0,130)" 
+                } else if (longest_lockon == 51) {
+                    level_el.textContent = "level: Zen Master"
+                    level_el.style.color = "maroon"
+                } else if (longest_lockon == 101) {
+                    level_el.textContent = "level: Bodhisattva"
+                    level_el.style.color = "gold"
                 }
             }
 
@@ -296,8 +315,10 @@
             }
 
             function display_streak() {
-                const divElement = document.getElementById("streak"); 
-                divElement.textContent = "current score: " + current_lockon_duration.toString() + ". high score: " + longest_lockon.toString()
+                const divElement1 = document.getElementById("streak"); 
+                divElement1.textContent = "high score: " + longest_lockon.toString()
+                const divElement2 = document.getElementById("current_streak"); 
+                divElement2.textContent = "current score: " + current_lockon.toString()
             }
 
             socket.on('assign_user_id', function (msg) {
@@ -352,7 +373,7 @@
                 else {
                     circle_client.ring_color = ring_color_off;
                     locked_on = false;
-                    current_lockon_duration = 0;
+                    current_lockon = 0;
                     display_streak()
                 }
             }
@@ -696,9 +717,13 @@
 }
 </style> 
 <body>
-        <p class="noselect" id="streak" style=" position: absolute; bottom: 5px; left: 0; width: 40%; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue"></p>
+        <p class="noselect" id="streak" style=" position: absolute; bottom: 5px; left: 0; width: 40%; text-align: left; text-indent: 2.05em; font-size: 26px; color: skyblue"></p>
 
-        <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 10em; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue">Breathe with the Orb</p>
+        <p class="noselect" id="current_streak" style=" position: absolute; bottom: 45px; left: 0; width: 40%; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue"></p>
+
+        <p class="noselect" id="level" style=" position: absolute; bottom: 90px; left: 0px; width: 10em; text-align: center; text-indent: 1em; font-size: 20px; font-family: Trebuchet MS; color: rgb(70,70,70)">level: Apprentice</p>
+
+        <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 10em; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue">The Orb</p>
 
         <p class="noselect" id = "timer" style=" position: absolute; top: 5px; right: 30px; width: 10em; text-align: right; font-size: 26px; color: skyblue"></p>
 
@@ -717,7 +742,7 @@
     <a id = "together-button" href="together" class='together-button button-style noselect'>breathe with a friend</a>
     <a id = "together-button2" href="together2" class='together-button2 button-style noselect'>breathe with a stranger</a>
     <a id = "orb-button" href="" class='button-style orb-button noselect'>breathe with the orb</a>
-    <a id = "alone-button" href="alone" class='alone-button button-style noselect'>breathe by yourself</a>
+    <a id = "alone-button" href="alone" class='alone-button button-style noselect'>breathe in zen mode</a>
     
 
 </body>
