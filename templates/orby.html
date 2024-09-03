@@ -46,11 +46,11 @@
             const robot_start_radius = 110;
             const start_radius = 120;
             const fast_radius_start = 120;
-            const fast_radius_end = 250;
-            const robot_end_radius = 270;
+            const fast_radius_end = 245;
+            const robot_end_radius = 265;
             const max_radius = 380;
 
-            const lockon_distance = 30;
+            var lockon_distance = 30;
             prev_action_scored = false;
 
             const min_red = 60;
@@ -68,11 +68,13 @@
             const color_change = 0.45;
             const radius_change = 0.6;
             const speed_factor = 1.2;
-            const inhale_speed_boost = 1.25;
+            const inhale_speed_boost = 1.35;
             const out_of_bounds_slowdown = 5;
 
             var speed_multiplier_server = 0;
             var speed_multiplier_client = 0;
+
+            const beginner_score = 10;
 
             const ring_color_off = [80, 80, 80];
             const ring_color_on = [255, 255, 190];
@@ -225,19 +227,49 @@
 
             function update_level() {
                 const level_el = document.getElementById("level"); 
-                if (longest_lockon == 10){
+                const encourage = document.getElementById("breathe_in"); 
+                const element2 = document.getElementById("breathe_out"); 
+                if (current_lockon > beginner_score) {
+                    encourage.textContent = ""
+                    element2.textContent = ""
+                }
+
+                if ((current_lockon == beginner_score || current_lockon == beginner_score+1) && last_client_event == "inhale") {
+                    encourage.textContent = "Good luck!"
+                    element2.textContent = ""
                     level_el.textContent = "level: Grasshopper"
                     level_el.style.color = "darkgreen"
-                } else if (longest_lockon == 30) {
+                } else if ((current_lockon == 15 || current_lockon == 16) && last_client_event == "inhale") {
+                    encourage.textContent = "You're doing great!"
+                } else if ((current_lockon == 20 || current_lockon == 21) && last_client_event == "inhale") {
+                    encourage.textContent = "Impressive."
+                } else if ((current_lockon == 30 || current_lockon == 31) && last_client_event == "inhale") {
+                    encourage.textContent = "Monk level activated"
+                    lockon_distance = 26 // higher difficulty
                     level_el.textContent = "level: Monk"
                     level_el.style.color = "rgb(100,0,130)" 
-                } else if (longest_lockon == 51) {
+                } else if ((current_lockon == 40 || current_lockon == 41) && last_client_event == "inhale") {
+                    encourage.textContent = "Superb performance"
+                } else if ((current_lockon == 50 || current_lockon == 51) && last_client_event == "inhale") {
+                    encourage.textContent = "Zen Master level"
+                    lockon_distance = 22 // higher difficulty
                     level_el.textContent = "level: Zen Master"
                     level_el.style.color = "maroon"
-                } else if (longest_lockon == 101) {
+                } else if ((current_lockon == 60 || current_lockon == 61) && last_client_event == "inhale") {
+                    encourage.textContent = "You're good at this."
+                } else if ((current_lockon == 70 || current_lockon == 71) && last_client_event == "inhale") {
+                    encourage.textContent = "One more level to go..."
+                } else if ((current_lockon == 80 || current_lockon == 81) && last_client_event == "inhale") {
+                    encourage.textContent = "Wow!"
+                } else if ((current_lockon == 90 || current_lockon == 91) && last_client_event == "inhale") {
+                    encourage.textContent = "Are you the chosen one?"
+                } else if ((current_lockon == 101 || current_lockon == 102) && last_client_event == "inhale") {
+                    encourage.textContent = "you ARE the chosen one."
                     level_el.textContent = "level: Bodhisattva"
                     level_el.style.color = "gold"
+                    lockon_distance = 18 // higher difficulty
                 }
+    
             }
 
             // Add event listener for the "keydown" event on the document object
@@ -412,22 +444,17 @@
 
             function get_robot_action(last_server_event, circle_server) {
 
-                if (longest_lockon >= 10) {
-                        const element1 = document.getElementById("breathe_in");
+                const element1 = document.getElementById("breathe_in");
+                const element2 = document.getElementById("breathe_out");
+                if (circle_server.radius > (robot_end_radius - 3)) {
                         element1.textContent = ""
-                        const element2 = document.getElementById("breathe_out");
-                        element2.textContent = ""
-                } else { 
+                }
+                if (current_lockon <= beginner_score) {
                     if (circle_server.radius < (robot_start_radius + 3)) {
-                        const element1 = document.getElementById("breathe_in");
                         element1.textContent = "Breathe in..."
-                        const element2 = document.getElementById("breathe_out");
                         element2.textContent = ""
                     }
-                    if (circle_server.radius > (robot_end_radius - 3)) {
-                        const element1 = document.getElementById("breathe_in");
-                        element1.textContent = ""
-                        const element2 = document.getElementById("breathe_out");
+                    else if (circle_server.radius > (robot_end_radius - 3)) {
                         element2.textContent = "...and breathe out."
                     }
                 }
@@ -731,7 +758,9 @@
 
         <p class="noselect" id="instructions_upper" style=" position: absolute; top: 90px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green"><b>Instructions: </b>Press and hold as you inhale. Release as you exhale.<br>You can tap the screen, click the mouse, or use the spacebar.</p>
 
-        <p class="noselect" id="instructions_lower" style=" position: absolute; bottom: 90px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green">Stay synchronized with the Orb to score points.<br>After 10 points points the prompts go away!</p>
+        <p class="noselect" id="instructions_lower" style=" position: absolute; bottom: 90px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green">Stay synchronized with the Orb to score points.<br>After 10 points, the prompts go away!</p>
+
+        <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: skyblue"></p>
 
         <p class="noselect" id="breathe_in" style=" position: absolute; top: 390px; left: 0; width: 100%; text-align: center; font-size: 22px; font-weight: bold; line-height: 30px; font-family: Trebuchet MS; color: lightgoldenrodyellow"></p>
 
