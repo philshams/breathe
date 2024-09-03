@@ -242,32 +242,43 @@
                 } else if ((current_lockon == 15 || current_lockon == 16) && last_client_event == "inhale") {
                     encourage.textContent = "You're doing great!"
                 } else if ((current_lockon == 20 || current_lockon == 21) && last_client_event == "inhale") {
-                    encourage.textContent = "Impressive."
+                    encourage.textContent = "Impressive"
                 } else if ((current_lockon == 30 || current_lockon == 31) && last_client_event == "inhale") {
-                    encourage.textContent = "Monk level activated"
+                    encourage.textContent = "Level up!"
                     lockon_distance = 26 // higher difficulty
-                    level_el.textContent = "level: Monk"
-                    level_el.style.color = "rgb(100,0,130)" 
+                    level_el.textContent = "level: Prodigy"
+                    level_el.style.color = "darkcyan"
                 } else if ((current_lockon == 40 || current_lockon == 41) && last_client_event == "inhale") {
-                    encourage.textContent = "Superb performance"
+                    encourage.textContent = "Just superb!"
                 } else if ((current_lockon == 50 || current_lockon == 51) && last_client_event == "inhale") {
-                    encourage.textContent = "Zen Master level"
+                    encourage.textContent = "Level up!"
                     lockon_distance = 22 // higher difficulty
-                    level_el.textContent = "level: Zen Master"
-                    level_el.style.color = "maroon"
+                    level_el.textContent = "level: Monk"
+                    level_el.style.color = "rgb(100,0,130)"
                 } else if ((current_lockon == 60 || current_lockon == 61) && last_client_event == "inhale") {
                     encourage.textContent = "You're good at this."
                 } else if ((current_lockon == 70 || current_lockon == 71) && last_client_event == "inhale") {
-                    encourage.textContent = "One more level to go..."
+                    encourage.textContent = "Concentrate..."
                 } else if ((current_lockon == 80 || current_lockon == 81) && last_client_event == "inhale") {
                     encourage.textContent = "Wow!"
                 } else if ((current_lockon == 90 || current_lockon == 91) && last_client_event == "inhale") {
+                    encourage.textContent = "Masterful!"
+                } else if ((current_lockon == 100 || current_lockon == 101) && last_client_event == "inhale") {
+                    encourage.textContent = "Level up!"
+                    level_el.textContent = "level: Zen Master"
+                    level_el.style.color = "maroon"
+                    lockon_distance = 18 // higher difficulty
+                } else if ((current_lockon == 110 || current_lockon == 111) && last_client_event == "inhale") {
+                    encourage.textContent = "One more level to go..."
+                } else if ((current_lockon == 150 || current_lockon == 151) && last_client_event == "inhale") {
                     encourage.textContent = "Are you the chosen one?"
-                } else if ((current_lockon == 101 || current_lockon == 102) && last_client_event == "inhale") {
+                } else if ((current_lockon == 200 || current_lockon == 201) && last_client_event == "inhale") {
                     encourage.textContent = "you ARE the chosen one."
                     level_el.textContent = "level: Bodhisattva"
                     level_el.style.color = "gold"
-                    lockon_distance = 18 // higher difficulty
+                    lockon_distance = 14 // higher difficulty
+                } else if (current_lockon > 202 && (current_lockon%50 == 0 || current_lockon%50 == 1) && last_client_event == "inhale") {
+                    encourage.textContent = current_lockon.toString() + "!"
                 }
     
             }
@@ -604,7 +615,12 @@
                 const divElement = document.getElementById("timer"); 
                 new_time_in_session = Math.floor(((new Date).getTime() - start_time) / 1000 / 60)
                 if (new_time_in_session != time_in_session) {
-                    divElement.textContent = "minutes complete: " + new_time_in_session.toString()
+                    if (new_time_in_session == 1) {
+                        plural = ""
+                    } else {
+                        plural = "s"
+                    }
+                    divElement.textContent = new_time_in_session.toString() + " minute" + plural + " complete"
                 }
             }
 
@@ -750,7 +766,7 @@
 
         <p class="noselect" id="level" style=" position: absolute; bottom: 90px; left: 0px; width: 10em; text-align: center; text-indent: 1em; font-size: 20px; font-family: Trebuchet MS; color: rgb(70,70,70)">level: Apprentice</p>
 
-        <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 10em; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue">The Orb</p>
+        <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 20em; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue">Game mode</p>
 
         <p class="noselect" id = "timer" style=" position: absolute; top: 5px; right: 30px; width: 10em; text-align: right; font-size: 26px; color: skyblue"></p>
 
@@ -758,7 +774,7 @@
 
         <p class="noselect" id="instructions_upper" style=" position: absolute; top: 90px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green"><b>Instructions: </b>Press and hold as you inhale. Release as you exhale.<br>You can tap the screen, click the mouse, or use the spacebar.</p>
 
-        <p class="noselect" id="instructions_lower" style=" position: absolute; bottom: 90px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green">Stay synchronized with the Orb to score points.<br>After 10 points, the prompts go away!</p>
+        <p class="noselect" id="instructions_lower" style=" position: absolute; bottom: 90px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green">Stay synchronized with the Orb to score points.<br>As you level up, it will require more focus!</p>
 
         <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: skyblue"></p>
 
