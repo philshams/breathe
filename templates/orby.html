@@ -192,7 +192,7 @@
 
                     console.log(num_breaths)
 
-                    if (num_breaths == 4) {
+                    if (num_breaths == 4 || num_breaths == 5) {
                         remove_instructions()
                         remove_options()
                     }
@@ -258,6 +258,9 @@
 
                     opt.style.border = "1px solid rgb(40, 40, 40)"
                 }
+
+                const instructions_right = document.getElementById("instructions_right"); 
+                instructions_right.textContent = ""
             }
 
             function remove_instructions() {
@@ -365,6 +368,27 @@
             }
 
             function get_robot_action(last_server_event, circle_server) {
+
+                if (longest_lockon >= 10) {
+                        const element1 = document.getElementById("breathe_in");
+                        element1.textContent = ""
+                        const element2 = document.getElementById("breathe_out");
+                        element2.textContent = ""
+                } else { 
+                    if (circle_server.radius < (robot_start_radius + 3)) {
+                        const element1 = document.getElementById("breathe_in");
+                        element1.textContent = "Breathe in..."
+                        const element2 = document.getElementById("breathe_out");
+                        element2.textContent = ""
+                    }
+                    if (circle_server.radius > (robot_end_radius - 3)) {
+                        const element1 = document.getElementById("breathe_in");
+                        element1.textContent = ""
+                        const element2 = document.getElementById("breathe_out");
+                        element2.textContent = "...and breathe out."
+                    }
+                }
+
                 if (circle_server.radius < robot_start_radius) {
 
                     if (locked_on && last_server_event == "exhale") {
@@ -424,8 +448,6 @@
                     document.body.removeAttribute("fullscreen"); 
                 }
                 toggle_options()
-                const instructions_right = document.getElementById("instructions_right"); 
-                instructions_right.textContent = ""
             }
 
             const timer_button = document.createElement("button");
@@ -505,6 +527,9 @@
                     tob2.style.display = "none"
                     ab.style.display = "none"
                     opt.style.border = "1px solid rgb(40, 40, 40)"
+
+                    const instructions_right = document.getElementById("instructions_right"); 
+                    instructions_right.textContent = ""
                 }  
             }
 
@@ -671,9 +696,13 @@
 
         <p class="noselect" id="others" style=" position: absolute; bottom: 18px; right: 250px; width: 10em; text-align: right; font-size: 18px; font-family: Trebuchet MS;"></p>
 
-        <p class="noselect" id="instructions_upper" style=" position: absolute; top: 100px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green""><b>Instructions: </b>Press and hold as you inhale. Release as you exhale.<br>You can tap the screen, click the mouse, or use the spacebar.</p>
+        <p class="noselect" id="instructions_upper" style=" position: absolute; top: 90px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green"><b>Instructions: </b>Press and hold as you inhale. Release as you exhale.<br>You can tap the screen, click the mouse, or use the spacebar.</p>
 
-        <p class="noselect" id="instructions_lower" style=" position: absolute; bottom: 120px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green"">Stay synchronized with the Orb to score points.<br>Try to get to 10 points!</p>
+        <p class="noselect" id="instructions_lower" style=" position: absolute; bottom: 90px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green">Stay synchronized with the Orb to score points.<br>After 10 points points the prompts go away!</p>
+
+        <p class="noselect" id="breathe_in" style=" position: absolute; top: 390px; left: 0; width: 100%; text-align: center; font-size: 22px; font-weight: bold; line-height: 30px; font-family: Trebuchet MS; color: lightgoldenrodyellow"></p>
+
+        <p class="noselect" id="breathe_out" style=" position: absolute; top: 390px; left: 0; width: 100%; text-align: center; font-size: 22px; font-weight: bold; line-height: 30px; font-family: Trebuchet MS; color: black"></p>
 
         <p class="noselect" id="instructions_right" style=" position: absolute; bottom: 230px; right: 55px; width: 20%; text-align: right; font-size: 18px; line-height: 22px; font-family: Trebuchet MS; color: skyblue">Four modes to try!</p>
 
