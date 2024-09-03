@@ -66,7 +66,10 @@
 
             const color_change = 0.45;
             const radius_change = 0.6;
-            const speed_factor = 1.2;
+            var speed_factor = 1.2;
+            const max_speed = 2.7;
+            const min_speed = 0.5;
+
             const inhale_speed_boost = 1.35;
             const out_of_bounds_slowdown = 5;
 
@@ -78,7 +81,9 @@
 
             const start_time = (new Date).getTime()
             var time_in_session = -1;
-            var timer_on = false;
+            var timer_on = true;
+
+            const session_duration = 10;
 
             user_id = 0;
 
@@ -274,7 +279,11 @@
 
             function display_streak() {
                 const divElement1 = document.getElementById("streak"); 
-                divElement1.textContent = "Number of breaths: " + Math.floor((num_breaths+1) / 2).toString()
+                if (num_breaths > 9) {
+                    divElement1.textContent = "Number of breaths: a lot"
+                } else {
+                    divElement1.textContent = "Number of breaths: " + Math.floor((num_breaths+1) / 2).toString()
+                }
             }
 
             socket.on('assign_user_id', function (msg) {
@@ -368,11 +377,11 @@
 
                 const element1 = document.getElementById("breathe_in");
                 const element2 = document.getElementById("breathe_out");
-                if (circle_server.radius < (robot_start_radius + 3)) {
+                if (circle_server.radius < (robot_start_radius + 3 * speed_factor / 1.2)) {
                     element1.textContent = "Breathe in..."
                     element2.textContent = ""
                 }
-                else if (circle_server.radius > (robot_end_radius - 3)) {
+                else if (circle_server.radius > (robot_end_radius - 3 * speed_factor / 1.2)) {
                     element2.textContent = "...and breathe out."
                     element1.textContent = ""
                 }
@@ -440,6 +449,24 @@
             options_button.addEventListener('click', toggle_options);
             document.body.appendChild(options_button);
 
+            const slower_button = document.createElement("button");
+            slower_button.setAttribute('id','slower-button');
+            slower_button.setAttribute('class','slower-button noselect');
+            slower_button.textContent = 'slower';
+            slower_button.addEventListener('mouseover', go_out_of_bounds);
+            slower_button.addEventListener('mouseout', back_in_bounds);
+            slower_button.addEventListener('click', go_slower);
+            document.body.appendChild(slower_button);
+
+            const faster_button = document.createElement("button");
+            faster_button.setAttribute('id','faster-button');
+            faster_button.setAttribute('class','faster-button noselect');
+            faster_button.textContent = 'faster';
+            faster_button.addEventListener('mouseover', go_out_of_bounds);
+            faster_button.addEventListener('mouseout', back_in_bounds);
+            faster_button.addEventListener('click', go_faster);
+            document.body.appendChild(faster_button);
+
             const fb = document.getElementById('fullscreen-button');
             const tib = document.getElementById('timer-button');
             const ob = document.getElementById('orb-button');
@@ -463,7 +490,7 @@
             ab.addEventListener('mouseout', back_in_bounds);
             
 
-            function out_of_bounds() {
+            function go_out_of_bounds() {
                 out_of_bounds = true;
             }
 
@@ -472,8 +499,18 @@
             }
 
             function on_options() {
-                out_of_bounds = true;
+                go_out_of_bounds()
                 show_options()
+            }
+
+            function go_faster() {
+                speed_factor = Math.min(max_speed, speed_factor + 0.2)
+                console.log(speed_factor)
+            }
+
+            function go_slower() {
+                speed_factor = Math.max(min_speed, speed_factor - 0.1)
+                console.log(speed_factor)
             }
 
             function toggle_options() {
@@ -522,12 +559,7 @@
                 const divElement = document.getElementById("timer"); 
                 new_time_in_session = Math.floor(((new Date).getTime() - start_time) / 1000 / 60)
                 if (new_time_in_session != time_in_session) {
-                    if (new_time_in_session == 1) {
-                        plural = ""
-                    } else {
-                        plural = "s"
-                    }
-                    divElement.textContent = new_time_in_session.toString() + " minute" + plural + " complete"
+                    divElement.textContent = new_time_in_session.toString() + " / " + session_duration.toString() + " minutes complete"
                 }
             }
 
@@ -571,6 +603,46 @@
         font-size: 18px;
         box-sizing: border-box;
         cursor:  pointer;
+    }
+
+    .slower-button {
+        position: absolute;
+        bottom:  30px;
+        left:  290px;
+        background: rgb(40, 40, 40);
+        border-radius: 6px;
+        border:  1px solid white;
+        opacity: 0.7;
+        width:  90px;
+        height:  30px;
+        color: lightgray;
+        font-size: 18px;
+        box-sizing: border-box;
+        cursor:  pointer;
+    }
+
+    .slower-button:hover {
+        background: rgb(70, 70, 70);
+    }
+
+    .faster-button {
+        position: absolute;
+        bottom:  30px;
+        left:  390px;
+        background: rgb(40, 40, 40);
+        border-radius: 6px;
+        border:  1px solid white;
+        opacity: 0.7;
+        width:  90px;
+        height:  30px;
+        color: lightgray;
+        font-size: 18px;
+        box-sizing: border-box;
+        cursor:  pointer;
+    }
+
+    .faster-button:hover {
+        background: rgb(70, 70, 70);
     }
 
     #fullscreen-button {
@@ -677,7 +749,7 @@
 
         <p class="noselect" id="instructions_upper" style=" position: absolute; top: 90px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green"><b>Instructions: </b>Press and hold as you inhale. Release as you exhale.<br>You can tap the screen, click the mouse, or use the spacebar.</p>
 
-        <p class="noselect" id="instructions_lower" style=" position: absolute; bottom: 90px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green">Select how long you want to meditate for, and find a breathing speed you like.<br>Daily meditation is relaxing and good for you!</p>
+        <p class="noselect" id="instructions_lower" style=" position: absolute; bottom: 90px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green">Select how long you want to meditate for, and find a speed you like.<br>Daily meditation is relaxing and good for you!</p>
 
         <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: skyblue"></p>
 

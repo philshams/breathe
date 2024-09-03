@@ -122,6 +122,8 @@
             var instructions_present = true;
 
             display_streak()
+            const bodhi = document.getElementById('bodhi');
+            bodhi.style.display = "none"
 
             // Connect to the Socket.IO server.
             var socket = io("/");
@@ -264,7 +266,7 @@
                     encourage.textContent = "Level up!"
                     lockon_distance = 22 // higher difficulty
                     level_el.textContent = "level: Monk"
-                    level_el.style.color = "rgb(100,0,130)"                    
+                    level_el.style.color = "rgb(100,0,130)"
                 } else if ((current_lockon == 70 || current_lockon == 71) && last_client_event == "inhale") {
                     encourage.textContent = "Concentrate..."
                 } else if ((current_lockon == 80 || current_lockon == 81) && last_client_event == "inhale") {
@@ -285,6 +287,7 @@
                     level_el.textContent = "level: Bodhisattva"
                     level_el.style.color = "gold"
                     lockon_distance = 14 // higher difficulty
+                    bodhi.style.display = ""
                 } else if (current_lockon > 202 && (current_lockon%50 == 0 || current_lockon%50 == 1) && last_client_event == "inhale") {
                     encourage.textContent = current_lockon.toString() + "!"
                 }
@@ -769,34 +772,36 @@
 }
 </style> 
 <body>
-        <p class="noselect" id="streak" style=" position: absolute; bottom: 5px; left: 0; width: 40%; text-align: left; text-indent: 2.05em; font-size: 26px; color: skyblue"></p>
+    <img id="bodhi" src="{{url_for('static', filename='bodhi.png')}}" style=" position: absolute; bottom: 140px; left: 75px; width: 100px; height: 100px;" alt="Bodhisattva" />
 
-        <p class="noselect" id="current_streak" style=" position: absolute; bottom: 45px; left: 0; width: 40%; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue"></p>
+    <p class="noselect" id="streak" style=" position: absolute; bottom: 5px; left: 0; width: 40%; text-align: left; text-indent: 2.05em; font-size: 26px; color: skyblue"></p>
 
-        <p class="noselect" id="level" style=" position: absolute; bottom: 90px; left: 0px; width: 10em; text-align: center; text-indent: 1em; font-size: 20px; font-family: Trebuchet MS; color: rgb(70,70,70)">level: Apprentice</p>
+    <p class="noselect" id="current_streak" style=" position: absolute; bottom: 45px; left: 0; width: 40%; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue"></p>
 
-        <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 20em; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue">Challenge mode</p>
+    <p class="noselect" id="level" style=" position: absolute; bottom: 90px; left: 0px; width: 10em; text-align: center; text-indent: 1em; font-size: 20px; font-family: Trebuchet MS; color: rgb(70,70,70)">level: Apprentice</p>
 
-        <p class="noselect" id = "timer" style=" position: absolute; top: 5px; right: 30px; width: 10em; text-align: right; font-size: 26px; color: skyblue"></p>
+    <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 20em; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue">Challenge mode</p>
 
-        <p class="noselect" id="others" style=" position: absolute; bottom: 18px; right: 230px; width: 10em; text-align: right; font-size: 18px; font-family: Trebuchet MS;"></p>
+    <p class="noselect" id = "timer" style=" position: absolute; top: 5px; right: 30px; width: 10em; text-align: right; font-size: 26px; color: skyblue"></p>
 
-        <p class="noselect" id="instructions_upper" style=" position: absolute; top: 90px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green"><b>Instructions: </b>Press and hold as you inhale. Release as you exhale.<br>You can tap the screen, click the mouse, or use the spacebar.</p>
+    <p class="noselect" id="others" style=" position: absolute; bottom: 18px; right: 230px; width: 10em; text-align: right; font-size: 18px; font-family: Trebuchet MS;"></p>
 
-        <p class="noselect" id="instructions_lower" style=" position: absolute; bottom: 40px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green">Stay synchronized with the Orb to score points.<br>With each level more focus is required.<br><br>Can you make it to Zen Master level...or beyond?</p>
+    <p class="noselect" id="instructions_upper" style=" position: absolute; top: 90px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green"><b>Instructions: </b>Press and hold as you inhale. Release as you exhale.<br>You can tap the screen, click the mouse, or use the spacebar.</p>
 
-        <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: skyblue"></p>
+    <p class="noselect" id="instructions_lower" style=" position: absolute; bottom: 40px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green">Stay synchronized with the Orb to score points.<br>With each level, more focus is required.<br><br>Can you make it to Zen Master...or beyond?</p>
 
-        <p class="noselect" id="breathe_in" style=" position: absolute; top: 390px; left: 0; width: 100%; text-align: center; font-size: 22px; font-weight: bold; line-height: 30px; font-family: Trebuchet MS; color: lightgoldenrodyellow"></p>
+    <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: skyblue"></p>
 
-        <p class="noselect" id="breathe_out" style=" position: absolute; top: 390px; left: 0; width: 100%; text-align: center; font-size: 22px; font-weight: bold; line-height: 30px; font-family: Trebuchet MS; color: black"></p>
+    <p class="noselect" id="breathe_in" style=" position: absolute; top: 390px; left: 0; width: 100%; text-align: center; font-size: 22px; font-weight: bold; line-height: 30px; font-family: Trebuchet MS; color: lightgoldenrodyellow"></p>
 
-        <p class="noselect" id="instructions_right" style=" position: absolute; bottom: 230px; right: 40px; width: 20%; text-align: right; font-size: 18px; line-height: 22px; font-family: Trebuchet MS; color: skyblue">Four modes to try!</p>
+    <p class="noselect" id="breathe_out" style=" position: absolute; top: 390px; left: 0; width: 100%; text-align: center; font-size: 22px; font-weight: bold; line-height: 30px; font-family: Trebuchet MS; color: black"></p>
+
+    <p class="noselect" id="instructions_right" style=" position: absolute; bottom: 230px; right: 40px; width: 20%; text-align: right; font-size: 18px; line-height: 22px; font-family: Trebuchet MS; color: skyblue">Four modes to try!</p>
 
     <a id = "together-button" href="together" class='together-button button-style noselect'>Private room</a>
     <a id = "together-button2" href="together2" class='together-button2 button-style noselect'>Public room</a>
     <a id = "orb-button" href="" class='button-style orb-button noselect'>Challenge mode</a>
-    <a id = "alone-button" href="alone" class='alone-button button-style noselect'>Daily meditation</a>
+    <a id = "alone-button" href="daily" class='alone-button button-style noselect'>Daily meditation</a>
     
 
 </body>
