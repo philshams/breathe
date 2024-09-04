@@ -66,9 +66,10 @@
 
             const color_change = 0.45;
             const radius_change = 0.6;
-            var speed_factor = 1.2;
-            const max_speed = 2.7;
-            const min_speed = 0.5;
+            const init_speed_factor = 1.2;
+            var speed_factor = init_speed_factor;
+            const max_speed = 2.2;
+            const min_speed = 0.7;
 
             const inhale_speed_boost = 1.35;
             const out_of_bounds_slowdown = 5;
@@ -262,8 +263,8 @@
                     opt.style.border = "1px solid rgb(40, 40, 40)"
                 }
 
-                const instructions_right = document.getElementById("instructions_right"); 
-                instructions_right.textContent = ""
+                // const instructions_right = document.getElementById("instructions_right"); 
+                // instructions_right.textContent = ""
             }
 
             function remove_instructions() {
@@ -271,15 +272,15 @@
                 instructions_upper.textContent = ""
                 const instructions_lower = document.getElementById("instructions_lower"); 
                 instructions_lower.textContent = ""
-                const instructions_right = document.getElementById("instructions_right"); 
-                instructions_right.textContent = ""
+                // const instructions_right = document.getElementById("instructions_right"); 
+                // instructions_right.textContent = ""
 
                 instructions_present = false;
             }
 
             function display_streak() {
                 const divElement1 = document.getElementById("streak"); 
-                if (num_breaths > 9) {
+                if (num_breaths > 9999) {
                     divElement1.textContent = "Number of breaths: a lot"
                 } else {
                     divElement1.textContent = "Number of breaths: " + Math.floor((num_breaths+1) / 2).toString()
@@ -443,7 +444,7 @@
             const options_button = document.createElement("button");
             options_button.setAttribute('id','options-button');
             options_button.setAttribute('class','options-button noselect');
-            options_button.textContent = 'options';
+            options_button.textContent = "options"
             options_button.addEventListener('mouseover', on_options);
             options_button.addEventListener('mouseout', back_in_bounds);
             options_button.addEventListener('click', toggle_options);
@@ -452,7 +453,7 @@
             const slower_button = document.createElement("button");
             slower_button.setAttribute('id','slower-button');
             slower_button.setAttribute('class','slower-button noselect');
-            slower_button.textContent = 'slower';
+            slower_button.textContent = '-';
             slower_button.addEventListener('mouseover', go_out_of_bounds);
             slower_button.addEventListener('mouseout', back_in_bounds);
             slower_button.addEventListener('click', go_slower);
@@ -461,7 +462,7 @@
             const faster_button = document.createElement("button");
             faster_button.setAttribute('id','faster-button');
             faster_button.setAttribute('class','faster-button noselect');
-            faster_button.textContent = 'faster';
+            faster_button.textContent = '+';
             faster_button.addEventListener('mouseover', go_out_of_bounds);
             faster_button.addEventListener('mouseout', back_in_bounds);
             faster_button.addEventListener('click', go_faster);
@@ -504,13 +505,29 @@
             }
 
             function go_faster() {
-                speed_factor = Math.min(max_speed, speed_factor + 0.2)
-                console.log(speed_factor)
+                if (speed_factor >= init_speed_factor) {
+                    speed_factor = Math.min(max_speed, speed_factor + 0.2)
+                } else {
+                    speed_factor = Math.min(max_speed, speed_factor + 0.1)
+                }
+                
+                if (speed_factor != max_speed) {
+                    const speed = document.getElementById('speed');
+                    speed.textContent = speed.textContent + "|"
+                }
             }
 
             function go_slower() {
-                speed_factor = Math.max(min_speed, speed_factor - 0.1)
-                console.log(speed_factor)
+                if (speed_factor != min_speed) {
+                    const speed = document.getElementById('speed');
+                    speed.textContent = speed.textContent.slice(0,-1)
+                }
+
+                if (speed_factor <= init_speed_factor) {
+                    speed_factor = Math.max(min_speed, speed_factor - 0.1)
+                } else {
+                    speed_factor = Math.max(min_speed, speed_factor - 0.2)
+                }
             }
 
             function toggle_options() {
@@ -539,8 +556,8 @@
                     ab.style.display = "none"
                     opt.style.border = "1px solid rgb(40, 40, 40)"
 
-                    const instructions_right = document.getElementById("instructions_right"); 
-                    instructions_right.textContent = ""
+                    // const instructions_right = document.getElementById("instructions_right"); 
+                    // instructions_right.textContent = ""
                 }  
             }
 
@@ -600,49 +617,54 @@
         width:  175px;
         height:  30px;
         color: lightgray;
-        font-size: 18px;
+        font-size: 16px;
         box-sizing: border-box;
         cursor:  pointer;
     }
 
     .slower-button {
         position: absolute;
-        bottom:  30px;
-        left:  290px;
+        bottom:  34px;
+        left:  318.5px;
         background: rgb(40, 40, 40);
-        border-radius: 6px;
+        border-radius: 50%;
         border:  1px solid white;
         opacity: 0.7;
-        width:  90px;
-        height:  30px;
-        color: lightgray;
-        font-size: 18px;
+        width:  22px;
+        height:  22px;
+        line-height: 5px;
+        margin: 0px;
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
         box-sizing: border-box;
         cursor:  pointer;
     }
 
     .slower-button:hover {
-        background: rgb(70, 70, 70);
+        background: rgb(90, 90, 90);
     }
 
     .faster-button {
         position: absolute;
-        bottom:  30px;
+        bottom:  34px;
         left:  390px;
         background: rgb(40, 40, 40);
-        border-radius: 6px;
+        border-radius: 50%;
         border:  1px solid white;
         opacity: 0.7;
-        width:  90px;
-        height:  30px;
-        color: lightgray;
-        font-size: 18px;
+        width:  22px;
+        height:  22px;
+        /* line-height: 10px; */
+        margin: auto;
+        color: white;
+        font-size: 14px;
         box-sizing: border-box;
         cursor:  pointer;
     }
 
     .faster-button:hover {
-        background: rgb(70, 70, 70);
+        background: rgb(90, 90, 90);
     }
 
     #fullscreen-button {
@@ -747,21 +769,23 @@
 
         <p class="noselect" id="others" style=" position: absolute; bottom: 18px; right: 230px; width: 10em; text-align: right; font-size: 18px; font-family: Trebuchet MS;"></p>
 
+        <p class="noselect" id="speed" style=" position: absolute; bottom: 24px; left: 340px; width: 10em; text-align: left; font-size: 14px; font-weight: 900; font-family: Trebuchet MS; letter-spacing: -4px; color: rgb(200,200,200);">||||||</p>
+
         <p class="noselect" id="instructions_upper" style=" position: absolute; top: 90px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green"><b>Instructions: </b>Press and hold as you inhale. Release as you exhale.<br>You can tap the screen, click the mouse, or use the spacebar.</p>
 
         <p class="noselect" id="instructions_lower" style=" position: absolute; bottom: 90px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green">Select how long you want to meditate for, and find a speed you like.<br>Daily meditation is relaxing and good for you!</p>
 
         <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: skyblue"></p>
 
-        <p class="noselect" id="breathe_in" style=" position: absolute; top: 390px; left: 0; width: 100%; text-align: center; font-size: 22px; font-weight: bold; line-height: 30px; font-family: Trebuchet MS; color: lightgoldenrodyellow"></p>
+        <p class="noselect" id="breathe_in" style=" position: absolute; top: 348px; left: 0; width: 100%; text-align: center; font-size: 22px; font-weight: bold; line-height: 30px; font-family: Trebuchet MS; color: lightgoldenrodyellow"></p>
 
-        <p class="noselect" id="breathe_out" style=" position: absolute; top: 390px; left: 0; width: 100%; text-align: center; font-size: 22px; font-weight: bold; line-height: 30px; font-family: Trebuchet MS; color: black"></p>
+        <p class="noselect" id="breathe_out" style=" position: absolute; top: 348px; left: 0; width: 100%; text-align: center; font-size: 22px; font-weight: bold; line-height: 30px; font-family: Trebuchet MS; color: black"></p>
 
-        <p class="noselect" id="instructions_right" style=" position: absolute; bottom: 230px; right: 40px; width: 20%; text-align: right; font-size: 18px; line-height: 22px; font-family: Trebuchet MS; color: skyblue">Four modes to try!</p>
+        <!-- <p class="noselect" id="instructions_right" style=" position: absolute; bottom: 230px; right: 40px; width: 20%; text-align: right; font-size: 18px; line-height: 22px; font-family: Trebuchet MS; color: skyblue">Four modes to try!</p> -->
 
     <a id = "together-button" href="together" class='together-button button-style noselect'>Private room</a>
     <a id = "together-button2" href="together2" class='together-button2 button-style noselect'>Public room</a>
-    <a id = "orb-button" href="../" class='button-style orb-button noselect'>Challenge mode</a>
+    <a id = "orb-button" href="challenge" class='button-style orb-button noselect'>Challenge mode</a>
     <a id = "alone-button" href="" class='alone-button button-style noselect'>Daily meditation</a>
     
 

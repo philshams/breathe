@@ -21,15 +21,15 @@ users_exhaling = set()
 
 @app.route('/')
 def orby():
-    return render_template('orby.html', async_mode=socketio.async_mode)
+    return render_template('daily.html', async_mode=socketio.async_mode)
 
 @app.route('/together/')
 def together():
     return render_template('together.html')
 
-@app.route('/daily/')
+@app.route('/challenge/')
 def alone():
-    return render_template('daily.html')
+    return render_template('challenge.html')
 
 # when a client connects
 @socketio.on('connect')
