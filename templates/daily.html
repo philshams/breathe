@@ -53,10 +53,10 @@
             var lockon_distance = 30;
 
             const min_red = 60;
-            const max_red = 160;
+            const max_red = 150;
 
             const min_green = 120;
-            const max_green = 220;
+            const max_green = 150;
 
             const max_ring_width = 11
             const max_ring_offset = 10
@@ -64,12 +64,14 @@
             const start_red = 80;
             const start_green = 140;
 
-            const color_change = 0.45;
+            const color_change = 0.25;
             const radius_change = 0.6;
             const init_speed_factor = 1.2;
             var speed_factor = init_speed_factor;
-            const max_speed = 2.2;
+            const max_speed = 2.4;
             const min_speed = 0.7;
+            const init_breaths_per_min = 7;
+            var breaths_per_min = init_breaths_per_min;
 
             const inhale_speed_boost = 1.35;
             const out_of_bounds_slowdown = 5;
@@ -121,8 +123,6 @@
 
             var out_of_bounds = false;
             var instructions_present = true;
-
-            display_streak()
 
             // Connect to the Socket.IO server.
             var socket = io("/");
@@ -185,8 +185,6 @@
                     if (!instructions_present) {
                        remove_options()
                     }   
-
-                    display_streak()
                 }
             }
 
@@ -246,21 +244,21 @@
                 const fb = document.getElementById('fullscreen-button');
 
                 if (fb.style.display == "") {
-                    const tib = document.getElementById('timer-button');
+                    // const tib = document.getElementById('timer-button');
                     const ob = document.getElementById('orb-button');
                     const tob = document.getElementById('together-button');
-                    const tob2 = document.getElementById('together-button2');
+                    // const tob2 = document.getElementById('together-button2');
                     const ab = document.getElementById('alone-button');
                     const opt = document.getElementById('options-button');
                     
                     fb.style.display = "none"
-                    tib.style.display = "none"
+                    // tib.style.display = "none"
                     ob.style.display = "none"
                     tob.style.display = "none"
-                    tob2.style.display = "none"
+                    // tob2.style.display = "none"
                     ab.style.display = "none"
 
-                    opt.style.border = "1px solid rgb(40, 40, 40)"
+                    opt.style.border = "1.5px solid rgb(40, 40, 40)"
                 }
 
                 // const instructions_right = document.getElementById("instructions_right"); 
@@ -278,15 +276,6 @@
                 instructions_present = false;
             }
 
-            function display_streak() {
-                const divElement1 = document.getElementById("streak"); 
-                if (num_breaths > 9999) {
-                    divElement1.textContent = "Number of breaths: a lot"
-                } else {
-                    divElement1.textContent = "Number of breaths: " + Math.floor((num_breaths+1) / 2).toString()
-                }
-            }
-
             socket.on('assign_user_id', function (msg) {
                 user_id = msg;
             });
@@ -294,11 +283,9 @@
             function display_num_active_users() {
                 const num_active_text = document.getElementById("others"); 
                 if (num_active == 0) {
-                    num_active_text.textContent = "online: just you"
-                    num_active_text.style.color = "rgb(70,70,70)"
+                    num_active_text.textContent = "" // "online: just you"
                 } else {
-                    num_active_text.textContent = "online: " + (num_active + 1).toString() + " people"
-                    num_active_text.style.color = "skyblue"
+                    num_active_text.textContent = "online: " + (num_active + 1).toString()
                 }
             }
 
@@ -418,7 +405,7 @@
                 const fullscreen_button = document.createElement("button");
                 fullscreen_button.setAttribute('id','fullscreen-button');
                 fullscreen_button.setAttribute('class','fullscreen-button button-style noselect');
-                fullscreen_button.textContent = 'toggle fullscreen';
+                fullscreen_button.textContent = 'fullscreen';
                 fullscreen_button.addEventListener("click", toggle_fullscreen);
                 document.body.appendChild(fullscreen_button);
             }
@@ -434,12 +421,12 @@
                 toggle_options()
             }
 
-            const timer_button = document.createElement("button");
-            timer_button.setAttribute('id','timer-button');
-            timer_button.setAttribute('class','timer-button button-style noselect');
-            timer_button.textContent = 'toggle timer';
-            timer_button.addEventListener("click", toggle_timer);
-            document.body.appendChild(timer_button);
+            // const timer_button = document.createElement("button");
+            // timer_button.setAttribute('id','timer-button');
+            // timer_button.setAttribute('class','timer-button button-style noselect');
+            // timer_button.textContent = 'toggle timer';
+            // timer_button.addEventListener("click", toggle_timer);
+            // document.body.appendChild(timer_button);
 
             const options_button = document.createElement("button");
             options_button.setAttribute('id','options-button');
@@ -450,43 +437,43 @@
             options_button.addEventListener('click', toggle_options);
             document.body.appendChild(options_button);
 
-            const slower_button = document.createElement("button");
-            slower_button.setAttribute('id','slower-button');
-            slower_button.setAttribute('class','slower-button noselect');
-            slower_button.textContent = '-';
-            slower_button.addEventListener('mouseover', go_out_of_bounds);
-            slower_button.addEventListener('mouseout', back_in_bounds);
-            slower_button.addEventListener('click', go_slower);
-            document.body.appendChild(slower_button);
+            // const slower_button = document.createElement("button");
+            // slower_button.setAttribute('id','slower-button');
+            // slower_button.setAttribute('class','slower-button noselect');
+            // slower_button.textContent = '-';
+            // slower_button.addEventListener('mouseover', go_out_of_bounds);
+            // slower_button.addEventListener('mouseout', back_in_bounds);
+            // slower_button.addEventListener('click', go_slower);
+            // document.body.appendChild(slower_button);
 
-            const faster_button = document.createElement("button");
-            faster_button.setAttribute('id','faster-button');
-            faster_button.setAttribute('class','faster-button noselect');
-            faster_button.textContent = '+';
-            faster_button.addEventListener('mouseover', go_out_of_bounds);
-            faster_button.addEventListener('mouseout', back_in_bounds);
-            faster_button.addEventListener('click', go_faster);
-            document.body.appendChild(faster_button);
+            // const faster_button = document.createElement("button");
+            // faster_button.setAttribute('id','faster-button');
+            // faster_button.setAttribute('class','faster-button noselect');
+            // faster_button.textContent = '+';
+            // faster_button.addEventListener('mouseover', go_out_of_bounds);
+            // faster_button.addEventListener('mouseout', back_in_bounds);
+            // faster_button.addEventListener('click', go_faster);
+            // document.body.appendChild(faster_button);
 
             const fb = document.getElementById('fullscreen-button');
-            const tib = document.getElementById('timer-button');
+            // const tib = document.getElementById('timer-button');
             const ob = document.getElementById('orb-button');
             const tob = document.getElementById('together-button');
-            const tob2 = document.getElementById('together-button2');
+            // const tob2 = document.getElementById('together-button2');
             const ab = document.getElementById('alone-button');
 
-            tib.addEventListener('click', toggle_timer);
+            // tib.addEventListener('click', toggle_timer);
 
             fb.addEventListener('mouseover', on_options);
             fb.addEventListener('mouseout', back_in_bounds);
-            tib.addEventListener('mouseover', on_options);
-            tib.addEventListener('mouseout', back_in_bounds);
+            // tib.addEventListener('mouseover', on_options);
+            // tib.addEventListener('mouseout', back_in_bounds);
             ob.addEventListener('mouseover', on_options);
             ob.addEventListener('mouseout', back_in_bounds);
             tob.addEventListener('mouseover', on_options);
             tob.addEventListener('mouseout', back_in_bounds);
-            tob2.addEventListener('mouseover', on_options);
-            tob2.addEventListener('mouseout', back_in_bounds);
+            // tob2.addEventListener('mouseover', on_options);
+            // tob2.addEventListener('mouseout', back_in_bounds);
             ab.addEventListener('mouseover', on_options);
             ab.addEventListener('mouseout', back_in_bounds);
             
@@ -505,54 +492,47 @@
             }
 
             function go_faster() {
-                if (speed_factor >= init_speed_factor) {
-                    speed_factor = Math.min(max_speed, speed_factor + 0.2)
-                } else {
-                    speed_factor = Math.min(max_speed, speed_factor + 0.1)
-                }
+                speed_factor = Math.min(max_speed, speed_factor * (breaths_per_min + 1) / breaths_per_min)
+
+                breaths_per_min = Math.round(init_breaths_per_min * speed_factor / init_speed_factor)
                 
-                if (speed_factor != max_speed) {
-                    const speed = document.getElementById('speed');
-                    speed.textContent = speed.textContent + "|"
-                }
+                const speed = document.getElementById('behind-button');
+                speed.textContent = breaths_per_min.toString() + " breaths per min"
+
             }
 
             function go_slower() {
-                if (speed_factor != min_speed) {
-                    const speed = document.getElementById('speed');
-                    speed.textContent = speed.textContent.slice(0,-1)
-                }
+                speed_factor = Math.max(min_speed, speed_factor * (breaths_per_min - 1) / breaths_per_min)
 
-                if (speed_factor <= init_speed_factor) {
-                    speed_factor = Math.max(min_speed, speed_factor - 0.1)
-                } else {
-                    speed_factor = Math.max(min_speed, speed_factor - 0.2)
-                }
+                breaths_per_min = Math.round(init_breaths_per_min * speed_factor / init_speed_factor)
+                
+                const speed = document.getElementById('behind-button');
+                speed.textContent = breaths_per_min.toString() + " breaths per min"
             }
 
             function toggle_options() {
                 const fb = document.getElementById('fullscreen-button');
-                const tib = document.getElementById('timer-button');
+                // const tib = document.getElementById('timer-button');
                 const ob = document.getElementById('orb-button');
                 const tob = document.getElementById('together-button');
-                const tob2 = document.getElementById('together-button2');
+                // const tob2 = document.getElementById('together-button2');
                 const ab = document.getElementById('alone-button');
                 const opt = document.getElementById('options-button');
                 
                 if (fb.style.display == "none") {
                     fb.style.display = ""
-                    tib.style.display = ""
+                    // tib.style.display = ""
                     ob.style.display = ""
                     tob.style.display = ""
-                    tob2.style.display = ""
+                    // tob2.style.display = ""
                     ab.style.display = ""
                     opt.style.border = "1px solid white"       
                 } else {
                     fb.style.display = "none"
-                    tib.style.display = "none"
+                    // tib.style.display = "none"
                     ob.style.display = "none"
                     tob.style.display = "none"
-                    tob2.style.display = "none"
+                    // tob2.style.display = "none"
                     ab.style.display = "none"
                     opt.style.border = "1px solid rgb(40, 40, 40)"
 
@@ -576,25 +556,25 @@
                 const divElement = document.getElementById("timer"); 
                 new_time_in_session = Math.floor(((new Date).getTime() - start_time) / 1000 / 60)
                 if (new_time_in_session != time_in_session) {
-                    divElement.textContent = new_time_in_session.toString() + " / " + session_duration.toString() + " minutes complete"
+                    divElement.textContent = "Daily meditation - " + new_time_in_session.toString() + " / " + session_duration.toString() + " min"
                 }
             }
 
             function show_options() {
                 const fb = document.getElementById('fullscreen-button');
-                const tib = document.getElementById('timer-button');
+                // const tib = document.getElementById('timer-button');
                 const ob = document.getElementById('orb-button');
                 const tob = document.getElementById('together-button');
-                const tob2 = document.getElementById('together-button2');
+                // const tob2 = document.getElementById('together-button2');
                 const ab = document.getElementById('alone-button');
                 const opt = document.getElementById('options-button');
                 
                 if (fb.style.display == "none") {
                     fb.style.display = ""
-                    tib.style.display = ""
+                    // tib.style.display = ""
                     ob.style.display = ""
                     tob.style.display = ""
-                    tob2.style.display = ""
+                    // tob2.style.display = ""
                     ab.style.display = ""
                     opt.style.border = "1px solid white"       
                 } 
@@ -608,28 +588,42 @@
 <style>
     #options-button {
         position: absolute;
-        bottom:  30px;
+        bottom:  26px;
         right:  30px;
-        background: rgb(40, 40, 40);
+        background: rgb(20, 20, 20);
         border-radius: 6px;
         border:  1px solid white;
         opacity: 0.7;
         width:  175px;
         height:  30px;
-        color: lightgray;
+        color: lightgoldenrodyellow;
         font-size: 16px;
         box-sizing: border-box;
         cursor:  pointer;
     }
 
+    .behind-button {
+        position: absolute;
+        bottom:  33.5px;
+        left:  329.5px;
+        background: rgb(50, 50, 50);
+        width:  155px;
+        height:  23px;
+        line-height: 22px;
+        text-align: center;
+        color: skyblue;
+        font-size: 14px;
+        font-family: Trebuchet MS;
+        box-sizing: border-box;
+    }
+
     .slower-button {
         position: absolute;
         bottom:  34px;
-        left:  318.5px;
-        background: rgb(40, 40, 40);
+        left:  323px;
+        background: rgb(50, 50, 50);
         border-radius: 50%;
         border:  1px solid white;
-        opacity: 0.7;
         width:  22px;
         height:  22px;
         line-height: 5px;
@@ -642,20 +636,18 @@
     }
 
     .slower-button:hover {
-        background: rgb(90, 90, 90);
+        background: rgb(100, 100, 100);
     }
 
     .faster-button {
         position: absolute;
         bottom:  34px;
-        left:  390px;
-        background: rgb(40, 40, 40);
+        left:  470px;
+        background: rgb(50, 50, 50);
         border-radius: 50%;
         border:  1px solid white;
-        opacity: 0.7;
         width:  22px;
         height:  22px;
-        /* line-height: 10px; */
         margin: auto;
         color: white;
         font-size: 14px;
@@ -664,34 +656,34 @@
     }
 
     .faster-button:hover {
-        background: rgb(90, 90, 90);
+        background: rgb(100, 100, 100);
     }
 
     #fullscreen-button {
         position: absolute;
-        bottom:  60px;
+        bottom:  56px;
         right:  30px;
-        color: white;
+        color: lightgoldenrodyellow;
     }
 
     .fullscreen-button:hover {
         background: rgb(70, 70, 70);
     }
 
-    .timer-button {
+    /* .timer-button {
         position: absolute;
         bottom:  90px;
         right:  30px;
-        color: white;
+        color: lightgoldenrodyellow;
     }
 
     .timer-button:hover {
         background: rgb(70, 70, 70);
-    }
+    } */
 
     .alone-button {
         position: absolute;
-        bottom:  210px;
+        bottom:  143px;
         right:  30px;
         color: rgb(150, 220, 255);
     }
@@ -702,7 +694,7 @@
 
     .orb-button {
         position: absolute;
-        bottom:  180px;
+        bottom:  114px;
         right:  30px;
         color: rgb(150, 220, 255);
     }
@@ -713,7 +705,7 @@
 
     .together-button {
         position: absolute;
-        bottom:  150px;
+        bottom:  85px;
         right:  30px;
         color: rgb(150, 220, 255);
     }
@@ -722,29 +714,30 @@
         background: rgb(70, 70, 70);
     }
 
-    .together-button2 {
+    /* .together-button2 {
         position: absolute;
-        bottom:  120px;
+        bottom:  90px;
         right:  30px;
         color: rgb(150, 220, 255);
     }
 
     .together-button2:hover {
         background: rgb(70, 70, 70);
-    }
+    } */
 
     .button-style {
-        background: rgb(40, 40, 40);
-        opacity: 0.7;
+        background: rgb(20, 20, 20);
+        opacity: 0.8;
         border:  2px solid rgb(40, 40, 40);
         width:  175px;
         height:  30px;
-        border-radius: 5px;
+        border-radius: 3px;
         box-sizing: border-box;
         cursor:  pointer;
         text-align: center;
         line-height: 25px;
         font-size: 16px;
+        color: gold;
         text-decoration: none;
         font-family: Trebuchet MS;
     }
@@ -761,19 +754,16 @@
 }
 </style> 
 <body>
-        <p class="noselect" id="streak" style=" position: absolute; bottom: 5px; left: 0; width: 40%; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue"></p>
 
-        <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 20em; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue">Daily meditation</p>
+        <!-- <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 20em; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue">Daily meditation</p> -->
 
-        <p class="noselect" id = "timer" style=" position: absolute; top: 5px; right: 30px; width: 10em; text-align: right; font-size: 26px; color: skyblue"></p>
+        <p class="noselect" id = "timer" style=" position: absolute; bottom: 5px; left: 0; width: 30em; text-align: left; text-indent: 1em; font-size: 22px; color: palegoldenrod; font-family: Trebuchet MS;"></p>
 
-        <p class="noselect" id="others" style=" position: absolute; bottom: 18px; right: 230px; width: 10em; text-align: right; font-size: 18px; font-family: Trebuchet MS;"></p>
+        <p class="noselect" id="others" style=" position: absolute; bottom: 12px; right: 225px; width: 10em; text-align: right; font-size: 18px; font-family: Trebuchet MS; color: rgb(70,70,70)"></p>
 
-        <p class="noselect" id="speed" style=" position: absolute; bottom: 24px; left: 340px; width: 10em; text-align: left; font-size: 14px; font-weight: 900; font-family: Trebuchet MS; letter-spacing: -4px; color: rgb(200,200,200);">||||||</p>
+        <p class="noselect" id="instructions_upper" style=" position: absolute; top: 90px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: khaki"><b>Instructions: </b>Press and hold as you inhale. Release as you exhale.<br>You can tap the screen, click the mouse, or use the spacebar.</p>
 
-        <p class="noselect" id="instructions_upper" style=" position: absolute; top: 90px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green"><b>Instructions: </b>Press and hold as you inhale. Release as you exhale.<br>You can tap the screen, click the mouse, or use the spacebar.</p>
-
-        <p class="noselect" id="instructions_lower" style=" position: absolute; bottom: 90px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: green">Select how long you want to meditate for, and find a speed you like.<br>Daily meditation is relaxing and good for you!</p>
+        <p class="noselect" id="instructions_lower" style=" position: absolute; bottom: 90px; left: 0; width: 100%; text-align: center; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: khaki">Select how long you want to meditate for, and find a speed you like.<br>Daily meditation is relaxing and good for you!</p>
 
         <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: skyblue"></p>
 
@@ -783,8 +773,10 @@
 
         <!-- <p class="noselect" id="instructions_right" style=" position: absolute; bottom: 230px; right: 40px; width: 20%; text-align: right; font-size: 18px; line-height: 22px; font-family: Trebuchet MS; color: skyblue">Four modes to try!</p> -->
 
-    <a id = "together-button" href="together" class='together-button button-style noselect'>Private room</a>
-    <a id = "together-button2" href="together2" class='together-button2 button-style noselect'>Public room</a>
+    <!-- <a id = "behind-button" class='behind-button noselect'>7 breaths per min</a> -->
+
+    <a id = "together-button" href="together" class='together-button button-style noselect'>Breathe Together</a>
+    <!-- <a id = "together-button2" href="together2" class='together-button2 button-style noselect'>Public room</a> -->
     <a id = "orb-button" href="challenge" class='button-style orb-button noselect'>Challenge mode</a>
     <a id = "alone-button" href="" class='alone-button button-style noselect'>Daily meditation</a>
     
