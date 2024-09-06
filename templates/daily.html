@@ -42,13 +42,15 @@
             meditationCanvas.height = window.innerHeight;
             const ctx = meditationCanvas.getContext('2d');
 
-            const min_radius = 95;
-            const robot_start_radius = 110;
-            const start_radius = 120;
-            const fast_radius_start = 120;
-            const fast_radius_end = 245;
-            const robot_end_radius = 265;
-            const max_radius = 290;
+            const radius_scale = 0.7;
+
+            const min_radius = 95 * radius_scale;
+            const robot_start_radius = 110 * radius_scale;
+            const start_radius = 120 * radius_scale;
+            const fast_radius_start = 120 * radius_scale;
+            const fast_radius_end = 245 * radius_scale;
+            const robot_end_radius = 265 * radius_scale;
+            const max_radius = 275 * radius_scale;
 
             var lockon_distance = 30;
 
@@ -58,19 +60,19 @@
             const min_green = 120;
             const max_green = 150;
 
-            const max_ring_width = 11
-            const max_ring_offset = 10
+            const max_ring_width = 11  * radius_scale
+            const max_ring_offset = 10 * radius_scale
 
             const start_red = 80;
             const start_green = 140;
 
             const color_change = 0.25;
-            const radius_change = 0.6;
-            const init_speed_factor = 1.2;
+            const radius_change = 0.6 * radius_scale;
+            const init_speed_factor = 1.0;
             var speed_factor = init_speed_factor;
             const max_speed = 2.4;
             const min_speed = 0.7;
-            const init_breaths_per_min = 7;
+            const init_breaths_per_min = 6;
             var breaths_per_min = init_breaths_per_min;
 
             const inhale_speed_boost = 1.35;
@@ -92,7 +94,7 @@
 
             var circle_server = {
                 x: meditationCanvas.width / 2,
-                y: meditationCanvas.height * 0.4,
+                y: meditationCanvas.height * 0.43,
                 radius: start_radius,
                 red: start_red,
                 green: start_green,
@@ -103,7 +105,7 @@
 
             var circle_client = {
                 x: meditationCanvas.width / 2,
-                y: meditationCanvas.height * 0.4,
+                y: meditationCanvas.height * 0.43,
                 radius: start_radius,
                 red: start_red,
                 green: start_green,
@@ -137,7 +139,8 @@
             function createInnerCircle(circle) {
                 const gradient = ctx.createRadialGradient(circle.x, circle.y, 0, circle.x, circle.y, circle.radius);
                 gradient.addColorStop(0, `rgba(${circle.red}, ${circle.green}, 255, 1)`);
-                gradient.addColorStop(1, `rgba(${circle.red}, ${circle.green}, 255, 0)`);
+                // gradient.addColorStop(0.4, `rgba(${circle.red}, ${circle.green}, 255, 1)`);
+                gradient.addColorStop(1, `rgba(${circle.red}, ${circle.green}, 255, 0.05)`);
                 return gradient;
             }
 
@@ -147,7 +150,7 @@
 
                 gradient.addColorStop(0, ring_color + ', 0)');
                 gradient.addColorStop( (circle.radius + circle.ring_offset) / circle.outer_radius, ring_color + ', 0)');
-                gradient.addColorStop((1 + (circle.radius + circle.ring_offset) / circle.outer_radius) / 2, ring_color + ', 1)');
+                gradient.addColorStop((1 + (circle.radius + circle.ring_offset) / circle.outer_radius) / 2, ring_color + ', 0.9)');
                 gradient.addColorStop(1, ring_color + ', 0)');
                 return gradient;
             }
@@ -170,8 +173,20 @@
 
             function animate() {
                 ctx.clearRect(0, 0, meditationCanvas.width, meditationCanvas.height);
-                drawInnerCircle(circle_server);
-                drawOuterCircle(circle_client);
+                if (num_breaths == 1) {
+                    circle_client.x = circle_server.x
+                    circle_client.y = circle_server.y
+                    circle_client.radius = circle_server.radius
+                    circle_client.red = circle_server.red
+                    circle_client.green = circle_server.green
+                }
+                if (num_breaths > 0) {
+                    drawInnerCircle(circle_client)
+                    // drawOuterCircle(circle_client);
+                }
+                else {
+                    drawInnerCircle(circle_server);
+                }
                 requestAnimationFrame(animate);
             }
 
@@ -181,6 +196,11 @@
                     num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter, num_breaths);
                     last_client_event = 'inhale'
+
+                    if (num_breaths == 1 || num_breaths == 2) {
+                        remove_instructions()
+                        remove_options()
+                    }
 
                     if (!instructions_present) {
                        remove_options()
@@ -194,10 +214,8 @@
                     num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter, num_breaths);
                     last_client_event = 'exhale'
-                    if (num_breaths == 2 || num_breaths == 3) {
-                        remove_instructions()
-                        remove_options()
-                    }
+                    
+                    
                 }
             }
 
@@ -244,22 +262,21 @@
                 const fb = document.getElementById('fullscreen-button');
 
                 if (fb.style.display == "") {
-                    // const tib = document.getElementById('timer-button');
+                    const db = document.getElementById('duration-button');
                     const ob = document.getElementById('orb-button');
                     const tob = document.getElementById('together-button');
-                    // const tob2 = document.getElementById('together-button2');
+                    const spb = document.getElementById('speed-button');
                     const ab = document.getElementById('alone-button');
                     const opt = document.getElementById('options-button');
                     
                     fb.style.display = "none"
-                    // tib.style.display = "none"
+                    db.style.display = "none"
                     ob.style.display = "none"
                     tob.style.display = "none"
-                    // tob2.style.display = "none"
+                    spb.style.display = "none"
                     ab.style.display = "none"
 
                     opt.style.border = "1.5px solid rgb(140, 140, 140)"
-                    opt.textContent = ""
                 }
 
                 // const instructions_right = document.getElementById("instructions_right"); 
@@ -267,10 +284,8 @@
             }
 
             function remove_instructions() {
-                const instructions_upper = document.getElementById("instructions_upper"); 
-                instructions_upper.textContent = ""
-                // const instructions_right = document.getElementById("instructions_right"); 
-                // instructions_right.textContent = ""
+                // const instructions_upper = document.getElementById("instructions_upper"); 
+                // instructions_upper.style.display = "none"
 
                 instructions_present = false;
             }
@@ -365,12 +380,25 @@
                 const element1 = document.getElementById("breathe_in");
                 const element2 = document.getElementById("breathe_out");
                 if (circle_server.radius < (robot_start_radius + 3 * speed_factor / 1.2)) {
-                    element1.textContent = "Breathe in..."
+                    element1.textContent = "breathe in"
+                    element1.style.opacity = 1.0
                     element2.textContent = ""
                 }
                 else if (circle_server.radius > (robot_end_radius - 3 * speed_factor / 1.2)) {
-                    element2.textContent = "...and breathe out."
+                    element2.textContent = "breathe out"
+                    element2.style.opacity = 1.0
                     element1.textContent = ""
+                }
+                if (element1.style.opacity < 0.93) {
+                    element1.style.opacity = element1.style.opacity - 0.007
+                } else {
+                    element1.style.opacity = element1.style.opacity - 0.001
+                }
+                
+                if (element2.style.opacity < 0.93) {
+                    element2.style.opacity = element2.style.opacity - 0.007
+                } else {
+                    element2.style.opacity = element2.style.opacity - 0.001
                 }
 
                 if (circle_server.radius < robot_start_radius) {                
@@ -429,33 +457,33 @@
 
             const options_button = document.createElement("button");
             options_button.setAttribute('id','options-button');
-            options_button.setAttribute('class','options-button noselect');
-            options_button.textContent = "options"
+            options_button.setAttribute('class','options-button noselect rotate-90');
+            options_button.textContent = "..."
             options_button.addEventListener('mouseover', on_options);
             options_button.addEventListener('mouseout', back_in_bounds);
             options_button.addEventListener('click', toggle_options);
             document.body.appendChild(options_button);
 
-            const slower_button = document.createElement("button");
-            slower_button.setAttribute('id','slower-button');
-            slower_button.setAttribute('class','slower-button noselect');
-            slower_button.textContent = '-';
-            slower_button.addEventListener('mouseover', go_out_of_bounds);
-            slower_button.addEventListener('mouseout', back_in_bounds);
-            slower_button.addEventListener('click', go_slower);
-            document.body.appendChild(slower_button);
+            // const slower_button = document.createElement("button");
+            // slower_button.setAttribute('id','slower-button');
+            // slower_button.setAttribute('class','slower-button noselect');
+            // slower_button.textContent = '-';
+            // slower_button.addEventListener('mouseover', go_out_of_bounds);
+            // slower_button.addEventListener('mouseout', back_in_bounds);
+            // slower_button.addEventListener('click', go_slower);
+            // document.body.appendChild(slower_button);
 
-            const faster_button = document.createElement("button");
-            faster_button.setAttribute('id','faster-button');
-            faster_button.setAttribute('class','faster-button noselect');
-            faster_button.textContent = '+';
-            faster_button.addEventListener('mouseover', go_out_of_bounds);
-            faster_button.addEventListener('mouseout', back_in_bounds);
-            faster_button.addEventListener('click', go_faster);
-            document.body.appendChild(faster_button);
+            // const faster_button = document.createElement("button");
+            // faster_button.setAttribute('id','faster-button');
+            // faster_button.setAttribute('class','faster-button noselect');
+            // faster_button.textContent = '+';
+            // faster_button.addEventListener('mouseover', go_out_of_bounds);
+            // faster_button.addEventListener('mouseout', back_in_bounds);
+            // faster_button.addEventListener('click', go_faster);
+            // document.body.appendChild(faster_button);
 
             const fb = document.getElementById('fullscreen-button');
-            // const tib = document.getElementById('timer-button');
+            const db = document.getElementById('duration-button');
             const ob = document.getElementById('orb-button');
             const tob = document.getElementById('together-button');
             const ab = document.getElementById('alone-button');
@@ -508,31 +536,29 @@
 
             function toggle_options() {
                 const fb = document.getElementById('fullscreen-button');
-                // const tib = document.getElementById('timer-button');
+                const db = document.getElementById('duration-button');
                 const ob = document.getElementById('orb-button');
                 const tob = document.getElementById('together-button');
-                // const tob2 = document.getElementById('together-button2');
+                const spb = document.getElementById('speed-button');
                 const ab = document.getElementById('alone-button');
                 const opt = document.getElementById('options-button');
                 
                 if (fb.style.display == "none") {
                     fb.style.display = ""
-                    // tib.style.display = ""
+                    db.style.display = ""
                     ob.style.display = ""
                     tob.style.display = ""
-                    // tob2.style.display = ""
+                    spb.style.display = ""
                     ab.style.display = ""
-                    opt.style.border = "1px solid white"    
-                    opt.textContent = "options"   
+                    opt.style.border = "1px solid white"      
                 } else {
                     fb.style.display = "none"
-                    // tib.style.display = "none"
+                    db.style.display = "none"
                     ob.style.display = "none"
                     tob.style.display = "none"
-                    // tob2.style.display = "none"
+                    spb.style.display = "none"
                     ab.style.display = "none"
                     opt.style.border = "1.5px solid rgb(140, 140, 140)"
-                    opt.textContent = ""
 
                     // const instructions_right = document.getElementById("instructions_right"); 
                     // instructions_right.textContent = ""
@@ -560,22 +586,21 @@
 
             function show_options() {
                 const fb = document.getElementById('fullscreen-button');
-                // const tib = document.getElementById('timer-button');
+                const db = document.getElementById('duration-button');
                 const ob = document.getElementById('orb-button');
                 const tob = document.getElementById('together-button');
-                // const tob2 = document.getElementById('together-button2');
+                const spb = document.getElementById('speed-button');
                 const ab = document.getElementById('alone-button');
                 const opt = document.getElementById('options-button');
                 
                 if (fb.style.display == "none") {
                     fb.style.display = ""
-                    // tib.style.display = ""
+                    db.style.display = ""
                     ob.style.display = ""
                     tob.style.display = ""
-                    // tob2.style.display = ""
+                    spb.style.display = ""
                     ab.style.display = ""
-                    opt.style.border = "1px solid white"   
-                    opt.textContent = "options"    
+                    opt.style.border = "1px solid white"    
                 } 
             }
 
@@ -588,19 +613,34 @@
     #options-button {
         position: absolute;
         bottom:  26px;
-        right:  calc(50% - 300px);
+        right:  34%;
         background: rgb(20, 20, 20);
-        border-radius: 6px;
+        border-radius: 50%;
         border:  1px solid white;
+        padding-bottom: 28px;
         opacity: 0.7;
-        width:  175px;
+        width:  30px;
         height:  30px;
-        color: lightgoldenrodyellow;
+        color: white;
         font-size: 16px;
+        letter-spacing: 1px;
+        font-family: poppin;
+        font-weight: bold;
         box-sizing: border-box;
         cursor:  pointer;
     }
 
+    #options-button:hover {
+        background: rgb(60, 60, 60);
+        opacity: 0.7;
+    }
+
+    .rotate-90 {
+    -moz-transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    }
     /* .behind-button {
         position: absolute;
         bottom:  33.5px;
@@ -612,14 +652,14 @@
         text-align: center;
         color: skyblue;
         font-size: 14px;
-        font-family: Trebuchet MS;
+        font-family: poppins;
         box-sizing: border-box;
     } */
 
     .slower-button {
         position: absolute;
         bottom:  117px;
-        right:  calc(50% - 150px);
+        right:  34%;
         background: rgb(0, 0, 0);
         border-radius: 50%;
         /* border:  1px solid white; */
@@ -641,7 +681,7 @@
 
     .faster-button {
         position: absolute;
-        bottom:  117px;
+        bottom:  130px;
         right: calc(50% - 300px);
         background: rgb(0, 0, 0);
         border-radius: 50%;
@@ -662,22 +702,20 @@
 
     .speed-button {
         position: absolute;
-        bottom:  114px;
-        right:  calc(50% - 300px);
+        bottom:  159px;
+        right:  calc(50% - 90px);
         color: lightgoldenrodyellow;
     }
 
     .duration-button {
         position: absolute;
-        bottom:  85px;
-        right:  calc(50% - 300px);
+        bottom:  189px;
         color: lightgoldenrodyellow;
     }
 
     #fullscreen-button {
         position: absolute;
-        bottom:  56px;
-        right:  calc(50% - 300px);
+        bottom:  39px;
         color: lightgoldenrodyellow;
     }
 
@@ -698,8 +736,7 @@
 
     .alone-button {
         position: absolute;
-        bottom:  201px;
-        right:  calc(50% - 300px);
+        bottom:  129px;
         color: gold;
     }
 
@@ -709,8 +746,7 @@
 
     .orb-button {
         position: absolute;
-        bottom:  172px;
-        right:  calc(50% - 300px);
+        bottom:  99px;
         color: gold;
     }
 
@@ -720,8 +756,7 @@
 
     .together-button {
         position: absolute;
-        bottom:  143px;
-        right:  calc(50% - 300px);
+        bottom:  69px; 
         color: gold;
     }
 
@@ -742,19 +777,20 @@
 
     .button-style {
         background: rgb(20, 20, 20);
-        opacity: 0.8;
-        border:  2px solid rgb(40, 40, 40);
-        width:  175px;
+        opacity: 0.7;
+        border:  0px solid rgb(0, 0, 0);
+        width:  200px;
         height:  30px;
-        border-radius: 3px;
+        border-radius: 0px;
         box-sizing: border-box;
         cursor:  pointer;
         text-align: center;
-        line-height: 25px;
-        font-size: 16px;
+        line-height: 30px;
+        font-size: 15px;
+        right:  calc(50% - 150px);
         /* color: gold; */
         text-decoration: none;
-        font-family: Trebuchet MS;
+        font-family: poppins;
     }
 
 </style>
@@ -783,27 +819,25 @@
 
         <!-- <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 20em; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue">Daily meditation</p> -->
 
-        <hr style="position: absolute; top: 5.75%; left: 35%; width: 30%; text-align: center; font-size: 20px; border-color: palegoldenrod;">
+        <hr style="position: absolute; top: 5.75%; left: 34%; width: 32%; text-align: center; font-size: 20px; border-color: palegoldenrod;">
 
         <p class="noselect" id = "timer" style="position: absolute; top: 3px; left: 0; width: 100%; text-align: center; font-size: 20px; color: palegoldenrod; font-family: poppins"></p>
 
-        
+        <p class="noselect" id="others" style=" position: absolute; bottom: 12px; left: 32%; width: 10em; text-align: left; font-size: 18px; font-family: poppins; color: rgb(70,70,70)"></p>
 
-        <p class="noselect" id="others" style=" position: absolute; bottom: 12px; left: 32%; width: 10em; text-align: left; font-size: 18px; font-family: Trebuchet MS; color: rgb(70,70,70)"></p>
-
-        <a class="noselect" id="instructions_upper" style="position: absolute; bottom: 11%; left: 32%; width: 15.8em; text-align: left; font-size: 20px; line-height: 30px; font-family: Trebuchet MS; color: khaki; border:  3px solid rgb(40, 40, 40); height: 100px; background-color: rgb(20,20,20);padding-top: 7px; padding-left: 0.5em;"><b>Instructions &nbsp;- &nbsp;</b>Press and hold the mouse, screen or spacebar as you breath in. Release to breathe out.</a> 
+        <!-- <a class="noselect" id="instructions_upper" style="position: absolute; bottom: 11%; left: 32%; width: 18em; text-align: left; font-size: 16px; line-height: 30px; font-family: poppins; color: khaki; border:  3px solid rgb(40, 40, 40); height: 100px; background-color: rgb(20,20,20);padding-top: 7px; padding-left: 0.5em;"><b>Instructions &nbsp;- &nbsp;</b>Press and hold as you breath in. Release as you breathe out.</a>  -->
     
-        <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: Trebuchet MS; color: skyblue"></p>
+        <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: poppins; color: skyblue"></p>
 
-        <p class="noselect" id="breathe_in" style=" position: absolute; top: 35%; left: 0; width: 100%; text-align: center; font-size: 22px; font-weight: bold; line-height: 30px; font-family: Trebuchet MS; color: lightgoldenrodyellow"></p>
+        <p class="noselect" id="breathe_in" style=" position: absolute; top: 37%; left: 0; width: 100%; text-align: center; font-size: 22px; font-weight: normal; line-height: 30px; font-family: Trebuchet MS; color: lightgoldenrodyellow"></p>
 
-        <p class="noselect" id="breathe_out" style=" position: absolute; top: 35%; left: 0; width: 100%; text-align: center; font-size: 22px; font-weight: bold; line-height: 30px; font-family: Trebuchet MS; color: black"></p>
+        <p class="noselect" id="breathe_out" style=" position: absolute; top: 37%; left: 0; width: 100%; text-align: center; font-size: 22px; font-weight: normal; line-height: 30px; font-family: Trebuchet MS; color: black"></p>
 
-        <!-- <p class="noselect" id="instructions_right" style=" position: absolute; bottom: 230px; right: 40px; width: 20%; text-align: right; font-size: 18px; line-height: 22px; font-family: Trebuchet MS; color: skyblue">Four modes to try!</p> -->
+        <!-- <p class="noselect" id="instructions_right" style=" position: absolute; bottom: 230px; right: 40px; width: 20%; text-align: right; font-size: 18px; line-height: 22px; font-family: poppins; color: skyblue">Four modes to try!</p> -->
 
     <!-- <a id = "behind-button" class='behind-button noselect'>7 breaths per min</a> -->
 
-    <a id = "together-button" href="together" class='together-button button-style noselect'>Social mode</a>
+    <a id = "together-button" href="together" class='together-button button-style noselect'>breathe together</a>
     <!-- <a id = "together-button2" href="together2" class='together-button2 button-style noselect'>Public room</a> -->
 
     <a id = "orb-button" href="challenge" class='button-style orb-button noselect'>Zen master mode</a>
@@ -812,7 +846,7 @@
 
     <a id = "speed-button" href="" class='speed-button button-style noselect'>7 breaths per min</a>
 
-    <a id = "duration-button" href="" class='duration-button button-style noselect'>10-min session</a>
+    <a id = "duration-button" href="" class='duration-button button-style noselect'>5-min session</a>
     
 
 </body>
