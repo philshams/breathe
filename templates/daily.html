@@ -52,16 +52,18 @@
             const robot_end_radius = 265 * radius_scale;
             const max_radius = 275 * radius_scale;
 
-            var lockon_distance = 30;
+            var lockon_distance = 50;
+
+            var direction = 1;
+            var alpha_change = 0;
 
             const min_red = 60;
             const max_red = 150;
 
             const min_green = 120;
-            const max_green = 150;
+            const max_green = 250;
 
-            const max_ring_width = 11  * radius_scale
-            const max_ring_offset = 10 * radius_scale
+            const max_ring_width = 6  * radius_scale
 
             const start_red = 80;
             const start_green = 140;
@@ -81,8 +83,8 @@
             var speed_multiplier_server = 0;
             var speed_multiplier_client = 0;
 
-            const ring_color_off = [80, 80, 80];
-            const ring_color_on = [255, 255, 190];
+            const ring_color_off = [200, 150, 50];
+            const ring_color_on = [100, 250, 170];
 
             const start_time = (new Date).getTime()
             var time_in_session = -1;
@@ -100,7 +102,7 @@
                 green: start_green,
                 outer_radius: start_radius + max_ring_width,
                 ring_width: max_ring_width,
-                ring_offset: max_ring_offset,
+                ring_color: ring_color_off,
             };
 
             var circle_client = {
@@ -111,7 +113,6 @@
                 green: start_green,
                 outer_radius: start_radius + max_ring_width,
                 ring_width: max_ring_width,
-                ring_offset: max_ring_offset,
                 ring_color: ring_color_off,
             };
 
@@ -121,7 +122,7 @@
             var last_client_event = 'none';
             var last_server_event = 'exhale';
 
-            var locked_on = false;
+            var locked_on = true;
 
             var out_of_bounds = false;
             var instructions_present = true;
@@ -138,9 +139,14 @@
 
             function createInnerCircle(circle) {
                 const gradient = ctx.createRadialGradient(circle.x, circle.y, 0, circle.x, circle.y, circle.radius);
-                gradient.addColorStop(0, `rgba(${circle.red}, ${circle.green}, 255, 1)`);
-                // gradient.addColorStop(0.4, `rgba(${circle.red}, ${circle.green}, 255, 1)`);
-                gradient.addColorStop(1, `rgba(${circle.red}, ${circle.green}, 255, 0.05)`);
+                if (locked_on) {
+                    gradient.addColorStop(0, `rgba(40, 190, 120, 0)`);
+                    gradient.addColorStop(1, `rgba(180, 255, 180, 0.4)`);
+                } else {
+                    gradient.addColorStop(0, `rgba(255, 140, 40, 0)`);
+                    gradient.addColorStop(1, `rgba(255, 240, 140, 0.4)`);
+                }
+                
                 return gradient;
             }
 
@@ -149,8 +155,8 @@
                 ring_color = 'rgba(' + circle.ring_color[0].toString() + ', ' + circle.ring_color[1].toString() + ', ' + circle.ring_color[2].toString();
 
                 gradient.addColorStop(0, ring_color + ', 0)');
-                gradient.addColorStop( (circle.radius + circle.ring_offset) / circle.outer_radius, ring_color + ', 0)');
-                gradient.addColorStop((1 + (circle.radius + circle.ring_offset) / circle.outer_radius) / 2, ring_color + ', 0.9)');
+                gradient.addColorStop(circle.radius / circle.outer_radius, ring_color + ', 0)');
+                gradient.addColorStop((1 + circle.radius / circle.outer_radius) / 2, ring_color + ', 0.6)');
                 gradient.addColorStop(1, ring_color + ', 0)');
                 return gradient;
             }
@@ -182,10 +188,11 @@
                 }
                 if (num_breaths > 0) {
                     drawInnerCircle(circle_client)
-                    // drawOuterCircle(circle_client);
+                    drawOuterCircle(circle_client);
                 }
                 else {
                     drawInnerCircle(circle_server);
+                    drawOuterCircle(circle_server);
                 }
                 requestAnimationFrame(animate);
             }
@@ -296,7 +303,7 @@
 
             function display_num_active_users() {
                 const num_active_text = document.getElementById("others"); 
-                if (num_active == 0) {
+                if (num_active < 0) {
                     num_active_text.textContent = "" // "online: just you"
                 } else {
                     num_active_text.textContent = "online: " + (num_active + 1).toString()
@@ -332,22 +339,21 @@
                 check_value_limits(circle)
             }
 
-            function lock_on() {
-                if (Math.abs(circle_client.radius - circle_server.radius) < lockon_distance) {
-                    circle_client.ring_color = ring_color_on;
+            function lock_on(circle) {
+                if (Math.abs(circle.radius - circle_server.radius) < lockon_distance) {
+                    circle.ring_color = ring_color_on;
                     locked_on = true;
                 }
                 else {
-                    circle_client.ring_color = ring_color_off;
+                    circle.ring_color = ring_color_off;
                     locked_on = false;
                 }
             }
 
             function update_outer_circle(circle) {
-                circle.ring_width = max_ring_width * Math.min(0.75, Math.max(0.25, (1 - circle.radius / max_radius)))
-                circle.ring_offset = max_ring_offset * (1 - 5 * circle.radius / max_radius)
-                circle.outer_radius = circle.radius + circle.ring_offset + circle.ring_width
-                lock_on()
+                circle.outer_radius = circle.radius + circle.ring_width
+
+                lock_on(circle)
             }
 
 
@@ -379,27 +385,19 @@
 
                 const element1 = document.getElementById("breathe_in");
                 const element2 = document.getElementById("breathe_out");
-                if (circle_server.radius < (robot_start_radius + 3 * speed_factor / 1.2)) {
+
+                element1.style.opacity = (min_radius / circle_server.radius)**2
+                element2.style.opacity = (circle_server.radius / max_radius)**2
+
+                if (circle_server.radius < (robot_start_radius + 3 * speed_factor)) {
                     element1.textContent = "breathe in"
-                    element1.style.opacity = 1.0
-                    element2.textContent = ""
-                }
-                else if (circle_server.radius > (robot_end_radius - 3 * speed_factor / 1.2)) {
-                    element2.textContent = "breathe out"
-                    element2.style.opacity = 1.0
+                    element2.textContent = ""      
+                    console.log(element1.style.opacity)         
+                } else if (circle_server.radius > (robot_end_radius - 3 * speed_factor)) {
+                    element2.textContent = "release"
                     element1.textContent = ""
                 }
-                if (element1.style.opacity < 0.93) {
-                    element1.style.opacity = element1.style.opacity - 0.007
-                } else {
-                    element1.style.opacity = element1.style.opacity - 0.001
-                }
-                
-                if (element2.style.opacity < 0.93) {
-                    element2.style.opacity = element2.style.opacity - 0.007
-                } else {
-                    element2.style.opacity = element2.style.opacity - 0.001
-                }
+
 
                 if (circle_server.radius < robot_start_radius) {                
                     return "inhale"
@@ -420,6 +418,10 @@
                 update_inner_circle(circle_server, speed_multiplier_server)
                 update_inner_circle(circle_client, speed_multiplier_client)
                 update_outer_circle(circle_client) 
+                if (num_breaths == 0) {
+                    update_outer_circle(circle_server) 
+                }
+                
 
                 if (timer_on) {
                     update_timer()
@@ -823,7 +825,7 @@
 
         <p class="noselect" id = "timer" style="position: absolute; top: 3px; left: 0; width: 100%; text-align: center; font-size: 20px; color: palegoldenrod; font-family: poppins"></p>
 
-        <p class="noselect" id="others" style=" position: absolute; bottom: 12px; left: 32%; width: 10em; text-align: left; font-size: 18px; font-family: poppins; color: rgb(70,70,70)"></p>
+        <p class="noselect" id="others" style=" position: absolute; bottom: 5px; left: 34%; width: 10em; text-align: left; font-size: 18px; font-family: poppins; color: rgb(70,70,70)"></p>
 
         <!-- <a class="noselect" id="instructions_upper" style="position: absolute; bottom: 11%; left: 32%; width: 18em; text-align: left; font-size: 16px; line-height: 30px; font-family: poppins; color: khaki; border:  3px solid rgb(40, 40, 40); height: 100px; background-color: rgb(20,20,20);padding-top: 7px; padding-left: 0.5em;"><b>Instructions &nbsp;- &nbsp;</b>Press and hold as you breath in. Release as you breathe out.</a>  -->
     
@@ -831,7 +833,7 @@
 
         <p class="noselect" id="breathe_in" style=" position: absolute; top: 37%; left: 0; width: 100%; text-align: center; font-size: 22px; font-weight: normal; line-height: 30px; font-family: Trebuchet MS; color: lightgoldenrodyellow"></p>
 
-        <p class="noselect" id="breathe_out" style=" position: absolute; top: 37%; left: 0; width: 100%; text-align: center; font-size: 22px; font-weight: normal; line-height: 30px; font-family: Trebuchet MS; color: black"></p>
+        <p class="noselect" id="breathe_out" style=" position: absolute; top: 37%; left: 0; width: 100%; text-align: center; font-size: 22px; font-weight: normal; line-height: 30px; font-family: Trebuchet MS; color: gold"></p>
 
         <!-- <p class="noselect" id="instructions_right" style=" position: absolute; bottom: 230px; right: 40px; width: 20%; text-align: right; font-size: 18px; line-height: 22px; font-family: poppins; color: skyblue">Four modes to try!</p> -->
 
@@ -840,9 +842,9 @@
     <a id = "together-button" href="together" class='together-button button-style noselect'>breathe together</a>
     <!-- <a id = "together-button2" href="together2" class='together-button2 button-style noselect'>Public room</a> -->
 
-    <a id = "orb-button" href="challenge" class='button-style orb-button noselect'>Zen master mode</a>
+    <a id = "orb-button" href="challenge" class='button-style orb-button noselect'>focus training</a>
 
-    <a id = "alone-button" href="" class='alone-button button-style noselect'>Daily meditation</a>
+    <a id = "alone-button" href="" class='alone-button button-style noselect'>zen mode</a>
 
     <a id = "speed-button" href="" class='speed-button button-style noselect'>7 breaths per min</a>
 
