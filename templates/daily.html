@@ -90,6 +90,9 @@
 
             const session_duration = 10;
 
+            var circle_color1 = "mediumseagreen";
+            var circle_color2 = "lightgoldenrodyellow";
+
             user_id = 0;
 
             var circle_server = {
@@ -138,8 +141,8 @@
             function createInnerCircle(circle) {
                 const gradient = ctx.createLinearGradient(circle.x - circle.radius, circle.y - circle.radius, circle.x - circle.radius, circle.y + 1.25 * circle.radius);
 
-                gradient.addColorStop(1, "mediumseagreen") //"rgb(11, 150, 230)")
-                gradient.addColorStop(0, "lightgoldenrodyellow") // "white")
+                gradient.addColorStop(1, circle_color1)
+                gradient.addColorStop(0, circle_color2)
 
                 return gradient;
 
@@ -287,6 +290,7 @@
                     const tob = document.getElementById('together-button');
                     const spb = document.getElementById('speed-button');
                     const ab = document.getElementById('alone-button');
+                    const thb = document.getElementById('theme-button');
                     const opt = document.getElementById('options-button');
                     
                     fb.style.display = "none"
@@ -295,8 +299,9 @@
                     tob.style.display = "none"
                     spb.style.display = "none"
                     ab.style.display = "none"
+                    thb.style.display = "none"
 
-                    opt.style.border = "1.5px solid rgb(140, 140, 140)"
+                    opt.style.border = "0px solid rgb(20, 20, 20)"
                 }
 
                 // const instructions_right = document.getElementById("instructions_right"); 
@@ -469,6 +474,13 @@
             // timer_button.addEventListener("click", toggle_timer);
             // document.body.appendChild(timer_button);
 
+            const theme_button = document.createElement("button");
+            theme_button.setAttribute('id','theme-button');
+            theme_button.setAttribute('class','theme-button button-style noselect');
+            theme_button.textContent = 'theme: dawn';
+            theme_button.addEventListener("click", toggle_theme);
+            document.body.appendChild(theme_button);
+
             const options_button = document.createElement("button");
             options_button.setAttribute('id','options-button');
             options_button.setAttribute('class','options-button noselect rotate-90');
@@ -497,6 +509,7 @@
             // document.body.appendChild(faster_button);
 
             const fb = document.getElementById('fullscreen-button');
+            const thb = document.getElementById('theme-button');
             const db = document.getElementById('duration-button');
             const ob = document.getElementById('orb-button');
             const tob = document.getElementById('together-button');
@@ -506,8 +519,8 @@
 
             fb.addEventListener('mouseover', on_options);
             fb.addEventListener('mouseout', back_in_bounds);
-            // tib.addEventListener('mouseover', on_options);
-            // tib.addEventListener('mouseout', back_in_bounds);
+            thb.addEventListener('mouseover', on_options);
+            thb.addEventListener('mouseout', back_in_bounds);
             ob.addEventListener('mouseover', on_options);
             ob.addEventListener('mouseout', back_in_bounds);
             tob.addEventListener('mouseover', on_options);
@@ -548,6 +561,27 @@
                 speed.textContent = breaths_per_min.toString() + " breaths per min"
             }
 
+            function toggle_theme() {
+                const thb = document.getElementById('theme-button');
+                const num_active_text = document.getElementById("others"); 
+                if (thb.textContent == "theme: dawn") {
+                    thb.textContent = 'theme: dusk';
+                    document.body.style.backgroundImage = `url("{{url_for('static', filename='dusk.png')}}")`;
+                    circle_color1 = "rgb(11, 150, 230)";
+                    circle_color2 = "white"
+                    num_active_text.style.color = "rgb(170,170,170)"
+                } else {
+                    thb.textContent = 'theme: dawn';
+                    document.body.style.backgroundImage = `url("{{url_for('static', filename='dawn.png')}}")`;
+                    circle_color1 = "mediumseagreen";
+                    circle_color2 = "lightgoldenrodyellow"
+                    num_active_text.style.color = "rgb(70,70,70)"
+                }
+                
+
+
+            }
+
             function toggle_options() {
                 const fb = document.getElementById('fullscreen-button');
                 const db = document.getElementById('duration-button');
@@ -555,6 +589,7 @@
                 const tob = document.getElementById('together-button');
                 const spb = document.getElementById('speed-button');
                 const ab = document.getElementById('alone-button');
+                const thb = document.getElementById('theme-button');
                 const opt = document.getElementById('options-button');
                 
                 if (fb.style.display == "none") {
@@ -564,7 +599,8 @@
                     tob.style.display = ""
                     spb.style.display = ""
                     ab.style.display = ""
-                    opt.style.border = "1px solid white"      
+                    thb.style.display = ""
+                    opt.style.border = "1.5px solid white"      
                 } else {
                     fb.style.display = "none"
                     db.style.display = "none"
@@ -572,7 +608,8 @@
                     tob.style.display = "none"
                     spb.style.display = "none"
                     ab.style.display = "none"
-                    opt.style.border = "1.5px solid rgb(140, 140, 140)"
+                    thb.style.display = "none"
+                    opt.style.border = "0px solid rgb(20, 20, 20)"
 
                     // const instructions_right = document.getElementById("instructions_right"); 
                     // instructions_right.textContent = ""
@@ -605,6 +642,7 @@
                 const tob = document.getElementById('together-button');
                 const spb = document.getElementById('speed-button');
                 const ab = document.getElementById('alone-button');
+                const thb = document.getElementById('theme-button');
                 const opt = document.getElementById('options-button');
                 
                 if (fb.style.display == "none") {
@@ -614,7 +652,8 @@
                     tob.style.display = ""
                     spb.style.display = ""
                     ab.style.display = ""
-                    opt.style.border = "1px solid white"    
+                    thb.style.display = ""
+                    opt.style.border = "1.5px solid white"    
                 } 
             }
 
@@ -627,10 +666,10 @@
     #options-button {
         position: absolute;
         bottom:  26px;
-        right:  34%;
+        left:  34%;
         background: rgb(20, 20, 20);
         border-radius: 50%;
-        border:  1px solid white;
+        border: 1.5px solid white;
         padding-bottom: 28px;
         opacity: 0.7;
         width:  30px;
@@ -716,24 +755,34 @@
 
     .speed-button {
         position: absolute;
-        bottom:  159px;
+        bottom:  206px;
         right:  calc(50% - 90px);
         color: lightgoldenrodyellow;
     }
 
     .duration-button {
         position: absolute;
-        bottom:  189px;
+        bottom:  236px;
         color: lightgoldenrodyellow;
     }
 
     #fullscreen-button {
         position: absolute;
-        bottom:  39px;
+        bottom:  56px;
         color: lightgoldenrodyellow;
     }
 
     .fullscreen-button:hover {
+        background: rgb(35, 35, 35);
+    }
+
+    #theme-button {
+        position: absolute;
+        bottom:  86px;
+        color: lightgoldenrodyellow;
+    }
+
+    .theme-button:hover {
         background: rgb(35, 35, 35);
     }
 
@@ -750,7 +799,7 @@
 
     .alone-button {
         position: absolute;
-        bottom:  129px;
+        bottom:  176px;
         color: gold;
     }
 
@@ -760,7 +809,7 @@
 
     .orb-button {
         position: absolute;
-        bottom:  99px;
+        bottom:  146px;
         color: gold;
     }
 
@@ -770,7 +819,7 @@
 
     .together-button {
         position: absolute;
-        bottom:  69px; 
+        bottom:  116px; 
         color: gold;
     }
 
@@ -801,7 +850,7 @@
         text-align: center;
         line-height: 30px;
         font-size: 15px;
-        right:  calc(50% - 150px);
+        left:  calc(34%);
         /* color: gold; */
         text-decoration: none;
         font-family: poppins;
@@ -820,7 +869,7 @@
 </style> 
 <style>
     body {
-      background-image: url("{{url_for('static', filename='background.png')}}");
+      background-image: url("{{url_for('static', filename='dawn.png')}}");
       background-size: cover;
     }
 </style>
@@ -837,7 +886,7 @@
 
         <p class="noselect" id = "timer" style="position: absolute; top: 3px; left: 0; width: 100%; text-align: center; font-size: 20px; color: palegoldenrod; font-family: poppins"></p>
 
-        <p class="noselect" id="others" style=" position: absolute; bottom: 5px; left: 34%; width: 10em; text-align: left; font-size: 18px; font-family: poppins; color: rgb(170,170,170)"></p>
+        <p class="noselect" id="others" style=" position: absolute; bottom: 10px; right: 34%; width: 10em; text-align: right; font-size: 18px; font-family: poppins; color: rgb(70,70,70)"></p>
 
         <!-- <a class="noselect" id="instructions_upper" style="position: absolute; bottom: 11%; left: 32%; width: 18em; text-align: left; font-size: 16px; line-height: 30px; font-family: poppins; color: khaki; border:  3px solid rgb(40, 40, 40); height: 100px; background-color: rgb(20,20,20);padding-top: 7px; padding-left: 0.5em;"><b>Instructions &nbsp;- &nbsp;</b>Press and hold as you breath in. Release as you breathe out.</a>  -->
     
@@ -851,12 +900,12 @@
 
     <!-- <a id = "behind-button" class='behind-button noselect'>7 breaths per min</a> -->
 
-    <a id = "together-button" href="together" class='together-button button-style noselect'>breathe together</a>
+    <a id = "together-button" href="together" class='together-button button-style noselect'>together mode</a>
     <!-- <a id = "together-button2" href="together2" class='together-button2 button-style noselect'>Public room</a> -->
 
-    <a id = "orb-button" href="challenge" class='button-style orb-button noselect'>focus training</a>
+    <a id = "orb-button" href="challenge" class='button-style orb-button noselect'>challenge mode</a>
 
-    <a id = "alone-button" href="" class='alone-button button-style noselect'>zen mode</a>
+    <a id = "alone-button" href="" class='alone-button button-style noselect'>simple mode</a>
 
     <a id = "speed-button" href="" class='speed-button button-style noselect'>7 breaths per min</a>
 
