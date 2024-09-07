@@ -42,20 +42,17 @@
             meditationCanvas.height = window.innerHeight;
             const ctx = meditationCanvas.getContext('2d');
 
-            const radius_scale = 0.7;
+            const radius_scale = 0.5;
 
             const min_radius = 95 * radius_scale;
             const robot_start_radius = 110 * radius_scale;
             const start_radius = 120 * radius_scale;
-            const fast_radius_start = 120 * radius_scale;
+            const fast_radius_start = 130 * radius_scale;
             const fast_radius_end = 245 * radius_scale;
             const robot_end_radius = 265 * radius_scale;
             const max_radius = 275 * radius_scale;
 
             var lockon_distance = 50;
-
-            var direction = 1;
-            var alpha_change = 0;
 
             const min_red = 60;
             const max_red = 150;
@@ -63,28 +60,29 @@
             const min_green = 120;
             const max_green = 250;
 
-            const max_ring_width = 6  * radius_scale
+            const max_ring_width = 166  * radius_scale
 
             const start_red = 80;
             const start_green = 140;
 
             const color_change = 0.25;
             const radius_change = 0.6 * radius_scale;
-            const init_speed_factor = 1.0;
+            const init_speed_factor = 1.2;
             var speed_factor = init_speed_factor;
             const max_speed = 2.4;
             const min_speed = 0.7;
             const init_breaths_per_min = 6;
             var breaths_per_min = init_breaths_per_min;
 
-            const inhale_speed_boost = 1.35;
+            // const inhale_speed_boost = 1.35;
+            const inhale_speed_boost = 1.0; 
             const out_of_bounds_slowdown = 5;
 
             var speed_multiplier_server = 0;
             var speed_multiplier_client = 0;
 
             const ring_color_off = [200, 150, 50];
-            const ring_color_on = [100, 250, 170];
+            const ring_color_on = [40, 200, 250];
 
             const start_time = (new Date).getTime()
             var time_in_session = -1;
@@ -96,7 +94,7 @@
 
             var circle_server = {
                 x: meditationCanvas.width / 2,
-                y: meditationCanvas.height * 0.43,
+                y: meditationCanvas.height * 0.38, //34
                 radius: start_radius,
                 red: start_red,
                 green: start_green,
@@ -107,7 +105,7 @@
 
             var circle_client = {
                 x: meditationCanvas.width / 2,
-                y: meditationCanvas.height * 0.43,
+                y: meditationCanvas.height * 0.38,
                 radius: start_radius,
                 red: start_red,
                 green: start_green,
@@ -138,27 +136,42 @@
             }
 
             function createInnerCircle(circle) {
-                const gradient = ctx.createRadialGradient(circle.x, circle.y, 0, circle.x, circle.y, circle.radius);
-                if (locked_on) {
-                    gradient.addColorStop(0, `rgba(40, 190, 120, 0)`);
-                    gradient.addColorStop(1, `rgba(180, 255, 180, 0.4)`);
-                } else {
-                    gradient.addColorStop(0, `rgba(255, 140, 40, 0)`);
-                    gradient.addColorStop(1, `rgba(255, 240, 140, 0.4)`);
-                }
-                
+                const gradient = ctx.createLinearGradient(circle.x - circle.radius, circle.y - circle.radius, circle.x - circle.radius, circle.y + 1.25 * circle.radius);
+
+                gradient.addColorStop(1, "mediumseagreen") //"rgb(11, 150, 230)")
+                gradient.addColorStop(0, "lightgoldenrodyellow") // "white")
+
                 return gradient;
+
+
+                // const gradient = ctx.createRadialGradient(circle.x, circle.y, 0, circle.x, circle.y, circle.radius);
+                // if (locked_on) {
+                //     // gradient.addColorStop(0, `rgba(40, 190, 120, 0)`);
+                //     // gradient.addColorStop(1, `rgba(200, 255, 200, 0.45)`);
+                //     gradient.addColorStop(0, `rgba(255,255,255, 1)`);
+                //     gradient.addColorStop(1, `rgba(200, 255, 200, 0.1)`);
+                // } else {
+                //     gradient.addColorStop(0, `rgba(255, 140, 40, 0)`);
+                //     gradient.addColorStop(1, `rgba(255, 240, 140, 0.4)`);
+                // }
+                
+                // return gradient;
             }
 
             function createOuterCircle(circle){
-                const gradient = ctx.createRadialGradient(circle.x, circle.y, 0, circle.x, circle.y, circle.outer_radius);
-                ring_color = 'rgba(' + circle.ring_color[0].toString() + ', ' + circle.ring_color[1].toString() + ', ' + circle.ring_color[2].toString();
+                const gradient2 = ctx.createRadialGradient(circle.x, circle.y, 0, circle.x, circle.y, circle.outer_radius);
+                // ring_color = 'rgba(' + circle.ring_color[0].toString() + ', ' + circle.ring_color[1].toString() + ', ' + circle.ring_color[2].toString();
 
-                gradient.addColorStop(0, ring_color + ', 0)');
-                gradient.addColorStop(circle.radius / circle.outer_radius, ring_color + ', 0)');
-                gradient.addColorStop((1 + circle.radius / circle.outer_radius) / 2, ring_color + ', 0.6)');
-                gradient.addColorStop(1, ring_color + ', 0)');
-                return gradient;
+                ring_color = "rgba(255,255,255"
+                gradient2.addColorStop(0, ring_color + ', 0)');
+                gradient2.addColorStop(circle.radius / circle.outer_radius, ring_color + ', 0.16)');
+                gradient2.addColorStop(1, ring_color + ', 0)');
+
+                // gradient.addColorStop(0, ring_color + ', 0)');
+                // gradient.addColorStop(circle.radius / circle.outer_radius, ring_color + ', 0)');
+                // gradient.addColorStop((1 + circle.radius / circle.outer_radius) / 2, ring_color + ', 0.6)');
+                // gradient.addColorStop(1, ring_color + ', 0)');
+                return gradient2;
             }
 
             function drawInnerCircle(circle) {
@@ -386,15 +399,14 @@
                 const element1 = document.getElementById("breathe_in");
                 const element2 = document.getElementById("breathe_out");
 
-                element1.style.opacity = (min_radius / circle_server.radius)**2
-                element2.style.opacity = (circle_server.radius / max_radius)**2
+                element1.style.opacity = (min_radius / circle_server.radius)**2.5
+                element2.style.opacity = (circle_server.radius / max_radius)**2.5
 
-                if (circle_server.radius < (robot_start_radius + 3 * speed_factor)) {
+                if (circle_server.radius < (robot_start_radius + 2.5 * speed_factor)) {
                     element1.textContent = "breathe in"
-                    element2.textContent = ""      
-                    console.log(element1.style.opacity)         
+                    element2.textContent = ""            
                 } else if (circle_server.radius > (robot_end_radius - 3 * speed_factor)) {
-                    element2.textContent = "release"
+                    element2.textContent = "let go"
                     element1.textContent = ""
                 }
 
@@ -825,15 +837,15 @@
 
         <p class="noselect" id = "timer" style="position: absolute; top: 3px; left: 0; width: 100%; text-align: center; font-size: 20px; color: palegoldenrod; font-family: poppins"></p>
 
-        <p class="noselect" id="others" style=" position: absolute; bottom: 5px; left: 34%; width: 10em; text-align: left; font-size: 18px; font-family: poppins; color: rgb(70,70,70)"></p>
+        <p class="noselect" id="others" style=" position: absolute; bottom: 5px; left: 34%; width: 10em; text-align: left; font-size: 18px; font-family: poppins; color: rgb(170,170,170)"></p>
 
         <!-- <a class="noselect" id="instructions_upper" style="position: absolute; bottom: 11%; left: 32%; width: 18em; text-align: left; font-size: 16px; line-height: 30px; font-family: poppins; color: khaki; border:  3px solid rgb(40, 40, 40); height: 100px; background-color: rgb(20,20,20);padding-top: 7px; padding-left: 0.5em;"><b>Instructions &nbsp;- &nbsp;</b>Press and hold as you breath in. Release as you breathe out.</a>  -->
     
         <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: poppins; color: skyblue"></p>
 
-        <p class="noselect" id="breathe_in" style=" position: absolute; top: 37%; left: 0; width: 100%; text-align: center; font-size: 22px; font-weight: normal; line-height: 30px; font-family: Trebuchet MS; color: lightgoldenrodyellow"></p>
+        <p class="noselect" id="breathe_in" style=" position: absolute; top: 32%; left: 0; width: 100%; text-align: center; font-size: 20px; font-weight: normal; line-height: 30px; font-family: Trebuchet MS; color: midnightblue"></p>
 
-        <p class="noselect" id="breathe_out" style=" position: absolute; top: 37%; left: 0; width: 100%; text-align: center; font-size: 22px; font-weight: normal; line-height: 30px; font-family: Trebuchet MS; color: gold"></p>
+        <p class="noselect" id="breathe_out" style=" position: absolute; top: 32%; left: 0; width: 100%; text-align: center; font-size: 20px; font-weight: normal; line-height: 30px; font-family: Trebuchet MS; color: midnightblue"></p>
 
         <!-- <p class="noselect" id="instructions_right" style=" position: absolute; bottom: 230px; right: 40px; width: 20%; text-align: right; font-size: 18px; line-height: 22px; font-family: poppins; color: skyblue">Four modes to try!</p> -->
 
