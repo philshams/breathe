@@ -46,13 +46,13 @@
 
             const min_radius = 100 * radius_scale;
             const robot_start_radius = 110 * radius_scale;
-            const start_radius = 120 * radius_scale;
+            const start_radius = 115 * radius_scale;
             const fast_radius_start = 130 * radius_scale;
             const fast_radius_end = 245 * radius_scale;
             const robot_end_radius = 265 * radius_scale;
             const max_radius = 275 * radius_scale;
 
-            var lockon_distance = 20;
+            var lockon_distance = 30;
 
             const min_red = 60;
             const max_red = 150;
@@ -367,11 +367,8 @@
             }
 
             function lock_on(circle) {
-                const bi = document.getElementById('breathe_in');
-                const bo = document.getElementById('breathe_out');
+                
 
-                bi.style.textDecoration = "none";
-                bo.style.textDecoration = "none";
                 
                 if (Math.abs(circle.radius - circle_server.radius) < lockon_distance) {
                     locked_on = true;
@@ -380,12 +377,6 @@
                 else {
                     locked_on = false;
 
-                    if (bi.textContent!="" && num_breaths > 0 && last_client_event != "inhale" && ((circle.radius - circle_server.radius) < -lockon_distance) && !paused)  {
-                        bi.style.textDecoration = "underline";
-                    } 
-                    if (bo.textContent!="" && num_breaths > 0 && last_client_event != "exhale" && ((circle.radius - circle_server.radius) > lockon_distance)  && !paused)  {
-                        bo.style.textDecoration = "underline";
-                    } 
                 }
             }
 
@@ -422,31 +413,37 @@
 
             function get_robot_action(last_server_event, circle_server) {
 
-                const element1 = document.getElementById("breathe_in");
-                const element2 = document.getElementById("breathe_out");
+                const bi = document.getElementById('breathe_in');
+                const bo = document.getElementById('breathe_out');
 
-                element1.style.opacity = Math.max( (min_radius / circle_client.radius)**2, (min_radius / circle_server.radius)**2)
-                element2.style.opacity = Math.max( (circle_client.radius / max_radius)**2, (circle_server.radius / max_radius)**2)
+                bi.style.opacity = Math.max( (min_radius / circle_client.radius)**2, (min_radius / circle_server.radius)**2)
+                bo.style.opacity = Math.max( (circle_client.radius / max_radius)**2, (circle_server.radius / max_radius)**2)
                 
-                if (paused) {
-                    element1.textContent = "paused"
-                    element2.textContent = ""
-                    element1.style.opacity = (min_radius / circle_server.radius)**2
-                } else {
-                    if (circle_server.radius < (robot_start_radius + 2 * speed_factor)) {
-                    element1.textContent = "breathe in"
-                    element2.textContent = ""            
-                } else if (circle_server.radius > (robot_end_radius - 3 * speed_factor)) {
-                    element2.textContent = "let go"
-                    element1.textContent = ""
+
+                if (circle_server.radius < (robot_start_radius + 1.5 * speed_factor)) {
+                    bi.textContent = "breathe in"
+                    bo.textContent = ""            
+                } else if (circle_server.radius > (robot_end_radius - 2.5 * speed_factor)) {
+                    bo.textContent = "let go"
+                    bi.textContent = ""
                 } else if (last_server_event == "inhale"){
-                    element1.textContent = "breathe in"
-                    element2.textContent = ""  
+                    bi.textContent = "breathe in"
+                    bo.textContent = ""  
                 } else if (last_server_event == "exhale" && num_breaths > 0) {
-                    element2.textContent = "let go"
-                    element1.textContent = ""
+                    bo.textContent = "let go"
+                    bi.textContent = ""
                 }
+
+                if (bi.textContent!="" && num_breaths > 0 && last_client_event == "exhale" && !paused)  {
+                    bi.style.fontWeight = "bold";
+                } else {
+                    bi.style.fontWeight = "normal";
                 }
+                if (bo.textContent!="" && num_breaths > 0 && last_client_event == "inhale" && !paused)  {
+                    bo.style.fontWeight = "bold";
+                } else {
+                    bo.style.fontWeight = "normal";
+                } 
 
                 if (circle_server.radius < robot_start_radius) {                
                     return "inhale"
@@ -467,7 +464,7 @@
 
                 update_inner_circle(circle_server, speed_multiplier_server)
                 
-                if (num_breaths == 0) {
+                if (num_breaths == 0 || paused) {
                     update_outer_circle(circle_server) 
                     circle_client = structuredClone(circle_server);
                 } else {
