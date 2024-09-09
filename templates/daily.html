@@ -97,7 +97,7 @@
             user_id = 0;
 
             const x_pos = meditationCanvas.width / 2;
-            const y_pos = meditationCanvas.height * 0.38;
+            const y_pos = meditationCanvas.height * 0.35;
 
             const time_of_day = (new Date).getHours()
             if (time_of_day >= 18 || time_of_day < 6){
@@ -105,24 +105,6 @@
             } else {
                 var theme = "dawn"
             }
-            // theme = "dawn"
-
-            // const mode_text = document.getElementById("mode"); 
-            // const timer_text = document.getElementById("timer"); 
-
-            // if (theme == "dusk") {
-            //     document.body.style.backgroundImage = `url("{{url_for('static', filename='dusk.png')}}")`;
-            //     circle_color1 = "rgb(11, 150, 230)";
-            //     circle_color2 = "white"
-            //     mode_text.style.color = "rgb(0,0,0)"
-            //     timer_text.style.color = "rgb(0,0,0)"
-            // } else if (theme == "dawn") {
-            //     document.body.style.backgroundImage = `url("{{url_for('static', filename='dawn.png')}}")`;
-            //     circle_color1 = "mediumseagreen";
-            //     circle_color2 = "lightgoldenrodyellow"
-            //     mode_text.style.color = "rgb(70,70,70)"
-            //     timer_text.style.color = "rgb(70,70,70)"
-            // }
 
             var circle_server = {
                 x: x_pos,
@@ -176,20 +158,6 @@
                 gradient.addColorStop(0, circle_color2)
 
                 return gradient;
-
-
-                // const gradient = ctx.createRadialGradient(circle.x, circle.y, 0, circle.x, circle.y, circle.radius);
-                // if (locked_on) {
-                //     // gradient.addColorStop(0, `rgba(40, 190, 120, 0)`);
-                //     // gradient.addColorStop(1, `rgba(200, 255, 200, 0.45)`);
-                //     gradient.addColorStop(0, `rgba(255,255,255, 1)`);
-                //     gradient.addColorStop(1, `rgba(200, 255, 200, 0.1)`);
-                // } else {
-                //     gradient.addColorStop(0, `rgba(255, 140, 40, 0)`);
-                //     gradient.addColorStop(1, `rgba(255, 240, 140, 0.4)`);
-                // }
-                
-                // return gradient;
             }
 
             function createOuterCircle(circle){
@@ -236,7 +204,7 @@
                 if (last_client_event != 'inhale' && !out_of_bounds) {
                     socket.emit('client_keydown');
                     num_breaths = num_breaths + 1;
-                    setTimeout(timeout, timeout_counter, num_breaths);
+                    setTimeout(timeout, timeout_counter * init_breaths_per_min / breaths_per_min, num_breaths);
                     last_client_event = 'inhale'
                     control = "client"
                     paused = false;
@@ -258,7 +226,7 @@
                 if (last_client_event != 'exhale' && !out_of_bounds) {
                     socket.emit('client_keyup');
                     num_breaths = num_breaths + 1;
-                    setTimeout(timeout, timeout_counter, num_breaths);
+                    setTimeout(timeout, timeout_counter * init_breaths_per_min / breaths_per_min, num_breaths);
                     last_client_event = 'exhale'
                     
                     
@@ -467,10 +435,10 @@
                 if (circle_server.radius > robot_end_radius || (last_server_event == "pause exhale" && circle_client.radius < fast_radius_end)) {
                     return "exhale"
                 }
-                if (last_server_event == "exhale" && circle_client.radius > fast_radius_end && control == "client") {
+                if (bo.textContent == "let go" && circle_client.radius > fast_radius_end && control == "client") {
                     return "pause exhale"
                 }
-                if (last_server_event == "inhale" && circle_client.radius < fast_radius_start && control == "client") {
+                if (bi.textContent == "breathe in" && circle_client.radius < fast_radius_start && control == "client") {
                     return "pause inhale"
                 }
                 return last_server_event
@@ -507,7 +475,7 @@
                 const fullscreen_button = document.createElement("button");
                 fullscreen_button.setAttribute('id','fullscreen-button');
                 fullscreen_button.setAttribute('class','fullscreen-button button-style noselect');
-                fullscreen_button.textContent = 'fullscreen';
+                fullscreen_button.textContent = 'fullscreen (recommended)';
                 fullscreen_button.addEventListener("click", toggle_fullscreen);
                 fullscreen_button.style.display = "none"
                 document.body.appendChild(fullscreen_button);
@@ -521,6 +489,8 @@
                     in_text.style.top = "35%"
                     const out_text = document.getElementById('breathe_out');
                     out_text.style.top = "35%"
+                    const fb = document.getElementById('fullscreen-button');
+                    fb.textContent = "fullscreen off"
                 } else {
                     document.exitFullscreen();
                     document.documentElement.removeAttribute("fullscreen"); 
@@ -528,6 +498,8 @@
                     in_text.style.top = "32.2%"
                     const out_text = document.getElementById('breathe_out');
                     out_text.style.top = "32.2%"
+                    const fb = document.getElementById('fullscreen-button');
+                    fb.textContent = "fullscreen (recommended)"
                 }
                 toggle_options()
             }
@@ -843,7 +815,7 @@
     #options-button {
         position: absolute;
         bottom:  26px;
-        left:  calc(34% + 1em);
+        left:  calc(34%);
         background: rgb(20, 20, 20);
         border-radius: 50%;
         border: 1.5px solid white;
@@ -987,6 +959,7 @@
         position: absolute;
         bottom:  56px;
         color: lightgoldenrodyellow;
+        font-size: 13px;
     }
 
     .fullscreen-button:hover {
@@ -1066,7 +1039,7 @@
         cursor:  pointer;
         text-align: center;
         line-height: 30px;
-        font-size: 15px;
+        font-size: 14px;
         left:  calc(34%);
         /* color: gold; */
         text-decoration: none;
@@ -1077,9 +1050,9 @@
         position: absolute; 
         left: 0px; 
         width: 100%; 
-        top: 32.3%;
+        top: 29.3%;
         text-align: center; 
-        font-size: 20px; 
+        font-size: 18px; 
         font-weight: normal; 
         line-height: 30px; 
         font-family: Trebuchet MS; 
@@ -1101,6 +1074,9 @@
     body {
       background-size: cover;
     }
+    br {
+    line-height: 200px;
+    }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1115,13 +1091,15 @@
 
         <p class="noselect" id = "header" style="position: absolute; top: 3px; left: 0; width: 100%; text-align: center; font-size: 20px; color: palegoldenrod; font-family: poppins">breathe together</p>
 
-        <p class="noselect" id="timer" style=" position: absolute; bottom: 10px; right: calc(50% - 0.3em); width: 10em; text-align: right; font-size: 18px; font-family: poppins; color: rgb(70,70,70)"></p>
+        <p class="noselect" id="timer" style=" position: absolute; bottom: 10px; right: calc(50%); width: 10em; text-align: right; font-size: 18px; font-family: poppins; color: rgb(70,70,70)"></p>
 
         <p class="noselect" id="mode" style=" position: absolute; bottom: 10px; right: calc(34%); width: 10em; text-align: right; font-size: 18px; font-family: poppins; color: rgb(70,70,70)">simple mode</p>
 
         <!-- <p class="noselect" id="others" style=" position: absolute; bottom: 10px; right: 34%; width: 10em; text-align: right; font-size: 18px; font-family: poppins; color: rgb(70,70,70)"></p> -->
 
-        <!-- <a class="noselect" id="instructions_upper" style="position: absolute; bottom: 11%; left: 32%; width: 18em; text-align: left; font-size: 16px; line-height: 30px; font-family: poppins; color: khaki; border:  3px solid rgb(40, 40, 40); height: 100px; background-color: rgb(20,20,20);padding-top: 7px; padding-left: 0.5em;"><b>Instructions &nbsp;- &nbsp;</b>Press and hold as you breath in. Release as you breathe out.</a>  -->
+        <p class="noselect" id="instructions1" style="position: absolute; top: 55%; left: 32%; width: 37.5%; text-align: left; font-size: 18px; line-height: 30px; font-family: poppins; text-align: center;color: gold; ">Your simple daily meditation</p> 
+
+        <p class="noselect" id="instructions2" style="position: absolute; top: 63%; left: 32%; width: 37.5%; text-align: left; font-size: 15px; line-height: 28px; font-family: poppins; text-align: center;color: goldenrod; ">Press and hold as you inhale. Release as you exhale.<br>See menu [  ] for settings. <b>Start when you're ready!</b><br><br>Or try <b>challenge mode</b> to hone your concentration.<br>Try <b>together mode</b> to breathe with another person.</p> 
     
         <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: poppins; color: skyblue"></p>
 
