@@ -217,19 +217,28 @@
                     control = "client"
                     paused = false;
 
+                    console.log(num_breaths)
                     if (num_breaths == 1 || num_breaths == 2) {
-                        remove_instructions()
-                        start_time = (new Date).getTime()
-                    }   
+                    // remove_instructions()
+                    start_time = (new Date).getTime()
+                } 
+                      
                 }
             }
 
             function key_up_response(event) {
-                if (last_client_event != 'exhale' && !out_of_bounds  && !options_showing) {
+                if (last_client_event == 'inhale' && !out_of_bounds  && !options_showing) {
                     socket.emit('client_keyup');
                     num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter * init_breaths_per_min / breaths_per_min, num_breaths);
                     last_client_event = 'exhale'
+
+                    console.log(num_breaths)
+
+                if (num_breaths == 1 || num_breaths == 2) {
+                    remove_instructions()
+                    // start_time = (new Date).getTime()
+                } 
                     
                 } else if (!out_of_bounds) {
                     remove_options()
@@ -293,11 +302,11 @@
                     const db = document.getElementById('duration-button');
                     const ob = document.getElementById('orb-button');
                     const tob = document.getElementById('together-button');
-                    const spb = document.getElementById('speed-button');
+                    // const spb = document.getElementById('speed-button');
                     const fb = document.getElementById('fullscreen-button');
                     const thb = document.getElementById('theme-button');
-                    const fab = document.getElementById('faster-button');
-                    const slb = document.getElementById('slower-button');
+                    // const fab = document.getElementById('faster-button');
+                    // const slb = document.getElementById('slower-button');
                     const shb = document.getElementById('shorter-button');
                     const lob = document.getElementById('longer-button');
                     const opt = document.getElementById('options-button');
@@ -306,11 +315,11 @@
                     db.style.display = "none"
                     ob.style.display = "none"
                     tob.style.display = "none"
-                    spb.style.display = "none"
+                    // spb.style.display = "none"
                     ab.style.display = "none"
                     thb.style.display = "none"
-                    fab.style.display = "none"
-                    slb.style.display = "none"
+                    // fab.style.display = "none"
+                    // slb.style.display = "none"
                     shb.style.display = "none"
                     lob.style.display = "none"
 
@@ -431,31 +440,31 @@
 
             function get_robot_action(last_server_event, circle_server) {
 
-                const bi = document.getElementById('breathe_in');
-                const bo = document.getElementById('breathe_out');
+                // const bi = document.getElementById('breathe_in');
+                // const bo = document.getElementById('breathe_out');
 
-                bi.style.opacity = Math.max( (min_radius / circle_client.radius)**2, (min_radius / circle_server.radius)**2)
-                bo.style.opacity = Math.max( (circle_client.radius / max_radius)**2, (circle_server.radius / max_radius)**2)
+                // bi.style.opacity = Math.max( (min_radius / circle_client.radius)**2, (min_radius / circle_server.radius)**2)
+                // bo.style.opacity = Math.max( (circle_client.radius / max_radius)**2, (circle_server.radius / max_radius)**2)
                 
 
-                if (circle_server.radius < (robot_start_radius + 1.5 * speed_factor)) {
-                    bi.textContent = "breathe in"
-                    bo.textContent = ""            
-                } else if (circle_server.radius > (robot_end_radius - 2.5 * speed_factor) ) {
-                    bo.textContent = "let go"
-                    bi.textContent = ""
-                } 
+                // if (circle_server.radius < (robot_start_radius + 1.5 * speed_factor)) {
+                //     bi.textContent = "breathe in"
+                //     bo.textContent = ""            
+                // } else if (circle_server.radius > (robot_end_radius - 2.5 * speed_factor) ) {
+                //     bo.textContent = "let go"
+                //     bi.textContent = ""
+                // } 
 
-                if (bi.textContent!="" && num_breaths > 0 && last_client_event == "exhale" && !paused)  {
-                    bi.style.fontWeight = "bold";
-                } else {
-                    bi.style.fontWeight = "normal";
-                }
-                if (bo.textContent!="" && num_breaths > 0 && last_client_event == "inhale" && !paused)  {
-                    bo.style.fontWeight = "bold";
-                } else {
-                    bo.style.fontWeight = "normal";
-                } 
+                // if (bi.textContent!="" && num_breaths > 0 && last_client_event == "exhale" && !paused)  {
+                //     bi.style.fontWeight = "bold";
+                // } else {
+                //     bi.style.fontWeight = "normal";
+                // }
+                // if (bo.textContent!="" && num_breaths > 0 && last_client_event == "inhale" && !paused)  {
+                //     bo.style.fontWeight = "bold";
+                // } else {
+                //     bo.style.fontWeight = "normal";
+                // } 
 
                 if (circle_server.radius < robot_start_radius || (last_server_event == "pause inhale" && circle_client.radius > fast_radius_start)) {                
                     return "inhale"
@@ -463,12 +472,12 @@
                 if (circle_server.radius > robot_end_radius || (last_server_event == "pause exhale" && circle_client.radius < fast_radius_end)) {
                     return "exhale"
                 }
-                if (bo.textContent == "let go" && circle_client.radius > fast_radius_end && control == "client") {
-                    return "pause exhale"
-                }
-                if (bi.textContent == "breathe in" && circle_client.radius < fast_radius_start && control == "client") {
-                    return "pause inhale"
-                }
+                // if (bo.textContent == "let go" && circle_client.radius > fast_radius_end && control == "client") {
+                //     return "pause exhale"
+                // }
+                // if (bi.textContent == "breathe in" && circle_client.radius < fast_radius_start && control == "client") {
+                //     return "pause inhale"
+                // }
                 return last_server_event
             }
 
@@ -478,7 +487,6 @@
                 
                 speed_multiplier_client = calculate_speed(last_client_event, circle_client, "client")
                 last_server_event = get_robot_action(last_server_event, circle_server)
-                console.log(last_server_event)
                 speed_multiplier_server = calculate_speed(last_server_event, circle_server, "server")
 
                 update_inner_circle(circle_server, speed_multiplier_server)
@@ -503,7 +511,7 @@
                 const fullscreen_button = document.createElement("button");
                 fullscreen_button.setAttribute('id','fullscreen-button');
                 fullscreen_button.setAttribute('class','fullscreen-button button-style noselect');
-                fullscreen_button.textContent = 'fullscreen (recommended)';
+                fullscreen_button.textContent = 'fullscreen';
                 fullscreen_button.addEventListener("click", toggle_fullscreen);
                 fullscreen_button.style.display = "none"
                 document.body.appendChild(fullscreen_button);
@@ -557,25 +565,25 @@
             options_button.addEventListener('click', toggle_options);
             document.body.appendChild(options_button);
 
-            const slower_button = document.createElement("button");
-            slower_button.setAttribute('id','slower-button');
-            slower_button.setAttribute('class','slower-button noselect');
-            slower_button.textContent = '-';
-            slower_button.addEventListener('mouseover', go_out_of_bounds);
-            slower_button.addEventListener('mouseout', back_in_bounds);
-            slower_button.addEventListener('click', go_slower);
-            slower_button.style.display = "none"
-            document.body.appendChild(slower_button);
+            // const slower_button = document.createElement("button");
+            // slower_button.setAttribute('id','slower-button');
+            // slower_button.setAttribute('class','slower-button noselect');
+            // slower_button.textContent = '-';
+            // slower_button.addEventListener('mouseover', go_out_of_bounds);
+            // slower_button.addEventListener('mouseout', back_in_bounds);
+            // slower_button.addEventListener('click', go_slower);
+            // slower_button.style.display = "none"
+            // document.body.appendChild(slower_button);
 
-            const faster_button = document.createElement("button");
-            faster_button.setAttribute('id','faster-button');
-            faster_button.setAttribute('class','faster-button noselect');
-            faster_button.textContent = '+';
-            faster_button.addEventListener('mouseover', go_out_of_bounds);
-            faster_button.addEventListener('mouseout', back_in_bounds);
-            faster_button.addEventListener('click', go_faster);
-            faster_button.style.display = "none"
-            document.body.appendChild(faster_button);
+            // const faster_button = document.createElement("button");
+            // faster_button.setAttribute('id','faster-button');
+            // faster_button.setAttribute('class','faster-button noselect');
+            // faster_button.textContent = '+';
+            // faster_button.addEventListener('mouseover', go_out_of_bounds);
+            // faster_button.addEventListener('mouseout', back_in_bounds);
+            // faster_button.addEventListener('click', go_faster);
+            // faster_button.style.display = "none"
+            // document.body.appendChild(faster_button);
 
             const shorter_button = document.createElement("button");
             shorter_button.setAttribute('id','shorter-button');
@@ -673,12 +681,18 @@
                 if (session_duration==2) {
                     session_duration = 5
                 }
+                if (session_duration==1) {
+                    session_duration = 2
+                }
                 
                 const duration = document.getElementById('duration-button');
                 duration.textContent = session_duration.toString() + "-min session"
             }
 
             function go_shorter() {
+                if (session_duration==2) {
+                    session_duration = 1
+                }
                 if (session_duration==5) {
                     session_duration = 2
                 }
@@ -722,10 +736,10 @@
                 const db = document.getElementById('duration-button');
                 const ob = document.getElementById('orb-button');
                 const tob = document.getElementById('together-button');
-                const spb = document.getElementById('speed-button');
+                // const spb = document.getElementById('speed-button');
                 const ab = document.getElementById('alone-button');
-                const fab = document.getElementById('faster-button');
-                const slb = document.getElementById('slower-button');
+                // const fab = document.getElementById('faster-button');
+                // const slb = document.getElementById('slower-button');
                 const shb = document.getElementById('shorter-button');
                 const lob = document.getElementById('longer-button');
 
@@ -751,10 +765,10 @@
 
                     thb.style.color = "palegoldenrod"
                     db.style.color = "palegoldenrod"
-                    spb.style.color = "palegoldenrod"
+                    // spb.style.color = "palegoldenrod"
                     fb.style.color = "palegoldenrod"
-                    fab.style.color = "palegoldenrod"
-                    slb.style.color = "palegoldenrod"
+                    // fab.style.color = "palegoldenrod"
+                    // slb.style.color = "palegoldenrod"
                     shb.style.color = "palegoldenrod"
                     lob.style.color = "palegoldenrod"
 
@@ -780,10 +794,10 @@
 
                     thb.style.color = "rgb(220, 255, 230)"
                     db.style.color = "rgb(220, 255, 230)"
-                    spb.style.color = "rgb(220, 255, 230)"
+                    // spb.style.color = "rgb(220, 255, 230)"
                     fb.style.color = "rgb(220, 255, 230)"
-                    fab.style.color = "rgb(220, 255, 230)"
-                    slb.style.color = "rgb(220, 255, 230)"
+                    // fab.style.color = "rgb(220, 255, 230)"
+                    // slb.style.color = "rgb(220, 255, 230)"
                     shb.style.color = "rgb(220, 255, 230)"
                     lob.style.color = "rgb(220, 255, 230)"
                 }
@@ -795,11 +809,11 @@
                 const db = document.getElementById('duration-button');
                 const ob = document.getElementById('orb-button');
                 const tob = document.getElementById('together-button');
-                const spb = document.getElementById('speed-button');
+                // const spb = document.getElementById('speed-button');
                 const ab = document.getElementById('alone-button');
                 const thb = document.getElementById('theme-button');
-                const fab = document.getElementById('faster-button');
-                const slb = document.getElementById('slower-button');
+                // const fab = document.getElementById('faster-button');
+                // const slb = document.getElementById('slower-button');
                 const shb = document.getElementById('shorter-button');
                 const lob = document.getElementById('longer-button');
 
@@ -810,11 +824,11 @@
                     db.style.display = ""
                     ob.style.display = ""
                     tob.style.display = ""
-                    spb.style.display = ""
+                    // spb.style.display = ""
                     ab.style.display = ""
                     thb.style.display = ""
-                    fab.style.display = ""
-                    slb.style.display = ""
+                    // fab.style.display = ""
+                    // slb.style.display = ""
                     shb.style.display = ""
                     lob.style.display = ""
                     opt.style.border = "1.5px solid white"  
@@ -824,11 +838,11 @@
                     db.style.display = "none"
                     ob.style.display = "none"
                     tob.style.display = "none"
-                    spb.style.display = "none"
+                    // spb.style.display = "none"
                     ab.style.display = "none"
                     thb.style.display = "none"
-                    fab.style.display = "none"
-                    slb.style.display = "none"
+                    // fab.style.display = "none"
+                    // slb.style.display = "none"
                     shb.style.display = "none"
                     lob.style.display = "none"
                     opt.style.border = "1.5px solid rgba(20, 20, 20, 0)"
@@ -853,6 +867,7 @@
 
             function update_timer() {
                 const divElement = document.getElementById("timer"); 
+
                 if (num_breaths > 0) {
                     new_time_in_session = Math.floor(((new Date).getTime() - start_time) / 1000 / 60)
                 } else {
@@ -869,12 +884,12 @@
                 const db = document.getElementById('duration-button');
                 const ob = document.getElementById('orb-button');
                 const tob = document.getElementById('together-button');
-                const spb = document.getElementById('speed-button');
+                // const spb = document.getElementById('speed-button');
                 const ab = document.getElementById('alone-button');
                 const thb = document.getElementById('theme-button');
                 const opt = document.getElementById('options-button');
-                const fab = document.getElementById('faster-button');
-                const slb = document.getElementById('slower-button');
+                // const fab = document.getElementById('faster-button');
+                // const slb = document.getElementById('slower-button');
                 const shb = document.getElementById('shorter-button');
                 const lob = document.getElementById('longer-button');
                 
@@ -883,11 +898,11 @@
                     db.style.display = ""
                     ob.style.display = ""
                     tob.style.display = ""
-                    spb.style.display = ""
+                    // spb.style.display = ""
                     ab.style.display = ""
                     thb.style.display = ""
-                    fab.style.display = ""
-                    slb.style.display = ""
+                    // fab.style.display = ""
+                    // slb.style.display = ""
                     shb.style.display = ""
                     lob.style.display = ""
                     opt.style.border = "1.5px solid white"    
@@ -904,7 +919,7 @@
     #options-button {
         position: absolute;
         bottom:  23px;
-        left:  calc(33% + 0.5em);
+        left:  calc(33% + 0.7em);
         background: rgb(40, 40, 40);
         border-radius: 50%;
         border: 1.5px solid rgba(20, 20, 20,1);
@@ -972,16 +987,14 @@
 
     .faster-button:hover {
         background: rgb(100, 100, 100);
-        opacity: 0.7;
     }
 
     .shorter-button {
         position: absolute;
-        bottom:  235px;
-        left:  calc(33% + 6px);
+        bottom:  205px;
+        left:  calc(33% + 20px);
         background: rgba(0, 0, 0, 0);
         border: 1px rgb(0,0,0);
-        opacity: 0.7;
         width:  22px;
         height:  22px;
         line-height: 5px;
@@ -999,8 +1012,8 @@
 
     .longer-button {
         position: absolute;
-        bottom:  235px;
-        left:  calc(33% + 172px);
+        bottom:  204px;
+        left:  calc(33% + 158px);
         background: rgba(0, 0, 0, 0);
         border: 1px rgb(0,0,0);
         width:  22px;
@@ -1014,27 +1027,26 @@
 
     .longer-button:hover {
         background: rgb(100, 100, 100);
-        opacity: 0.7;
     }
 
-    .speed-button {
+    /* .speed-button {
         position: absolute;
         bottom:  200px;
         right:  calc(50% - 90px);
         color: rgb(220, 255, 230);
-    }
+    } */
 
     .duration-button {
         position: absolute;
-        bottom:  230px;
+        bottom:  200px;
         color: rgb(220, 255, 230);
     }
 
     #fullscreen-button {
         position: absolute;
-        bottom:  50px;
+        bottom:  170px;
         color: rgb(220, 255, 230);
-        font-size: 13px;
+        /* font-size: 13px; */
     }
 
     .fullscreen-button:hover {
@@ -1043,7 +1055,7 @@
 
     #theme-button {
         position: absolute;
-        bottom:  80px;
+        bottom:  140px;
         color: rgb(220, 255, 230);
     }
 
@@ -1054,7 +1066,7 @@
 
     .alone-button {
         position: absolute;
-        bottom:  170px;
+        bottom:  110px;
         color: rgb(120, 255, 180);
     }
 
@@ -1064,7 +1076,7 @@
 
     .orb-button {
         position: absolute;
-        bottom:  140px;
+        bottom:  80px;
         color: rgb(120, 255, 180);
     }
 
@@ -1074,7 +1086,7 @@
 
     .together-button {
         position: absolute;
-        bottom:  110px; 
+        bottom:  50px; 
         color: rgb(120, 255, 180);
     }
 
@@ -1164,17 +1176,18 @@
 
         <hr id = "line2" style="position: absolute; top: 58%; left: 33%; width: 34%;text-align: center; font-size: 20px; border-color: palegoldenrod;">
 
-        <p class="noselect" id="instructions1" style="position: absolute; top: 58%; left: 32%; width: 37.5%; text-align: left; font-size: 18.5px; line-height: 30px; font-family: poppins; text-align: center; font-weight: 500;">Your daily guided meditation</p> 
+        <p class="noselect" id="instructions1" style="position: absolute; top: 58%; left: 32%; width: 37.5%; text-align: left; font-size: 18.5px; line-height: 30px; font-family: poppins; text-align: center; font-weight: 500;">Your simple daily meditation</p> 
 
-        <p class="noselect" id="instructions2" style="position: absolute; top: 65%; left: 32%; width: 36%; text-align: left; font-size: 14px; line-height: 28px; font-family: poppins; text-align: center;">Press and hold as you inhale. Release as you exhale.<br>See menu [  ] for settings. <b>Press and hold to start!</b></p> 
+        <p class="noselect" id="instructions2" style="position: absolute; top: 65%; left: 32%; width: 36%; text-align: left; font-size: 14px; line-height: 28px; font-family: poppins; text-align: center;">Press and hold as you inhale. Release as you exhale.<br>See menu [  ] for settings. <a style = "font-weight: 700;">Press and hold to start!</a></p> 
 
-        <p class="noselect" id="instructions3" style="position: absolute; top: 76%; left: 32%; width: 36%; text-align: left; font-size: 14px; line-height: 28px; font-family: poppins; text-align: center; ">Try <b>challenge mode</b> to train your mindfulness.<br>Try <b>together mode</b> to breathe with another person.</p> 
+        <p class="noselect" id="instructions3" style="position: absolute; top: 76%; left: 32%; width: 36%; text-align: left; font-size: 14px; line-height: 28px; font-family: poppins; text-align: center; ">Try <a href="challenge" style="color: inherit; font-weight: 600;">challenge mode</a> to train your mindfulness.<br>Try <b><a href="together" style="color: inherit; font-weight: 600;">together mode</a></b> to breathe with another person.</p> 
 
         <hr id = "line3" style="position: absolute; top: 87.8%; left: 33%; width: 34%;text-align: center; font-size: 20px; border-color: palegoldenrod;">
     
         <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: poppins; color: skyblue"></p>
 
-        <p class="noselect prompt" id="breathe_in">breathe in</p>
+        <p class="noselect prompt" id="breathe_in"></p> 
+        <!-- breathe in -->
 
         <p class="noselect prompt" id="breathe_out"></p>
 
@@ -1189,7 +1202,7 @@
 
     <a id = "alone-button" href="" class='alone-button button-style noselect' style = "display: none">simple mode</a>
 
-    <a id = "speed-button" class='speed-button button-style noselect' style = "display: none">7 breaths per min</a>
+    <!-- <a id = "speed-button" class='speed-button button-style noselect' style = "display: none">7 breaths per min</a> -->
 
     <a id = "duration-button" class='duration-button button-style noselect' style = "display: none">5-min session</a>
     
