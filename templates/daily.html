@@ -137,6 +137,7 @@
             var out_of_bounds = false;
             var instructions_present = true;
             var paused = false;
+            var options_showing = false;
 
             // Connect to the Socket.IO server.
             var socket = io("/");
@@ -197,11 +198,18 @@
                     drawInnerCircle(circle_server);
                     drawOuterCircle(circle_server);
                 }
+
+                if (instructions_present){
+                    ctx.fillStyle = "rgba(170,170,170,0.2)";
+
+                    ctx.fillRect(meditationCanvas.width * 0.33, meditationCanvas.height * 0.597, meditationCanvas.width * 0.341, 184)
+                }
+
                 requestAnimationFrame(animate);
             }
 
             function key_down_response(event) {
-                if (last_client_event != 'inhale' && !out_of_bounds) {
+                if (last_client_event != 'inhale' && !out_of_bounds && !options_showing) {
                     socket.emit('client_keydown');
                     num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter * init_breaths_per_min / breaths_per_min, num_breaths);
@@ -211,25 +219,26 @@
 
                     if (num_breaths == 1 || num_breaths == 2) {
                         remove_instructions()
-                        remove_options()
                         start_time = (new Date).getTime()
-                    }
-
-                    if (!instructions_present) {
-                       remove_options()
                     }   
-                    
                 }
             }
 
             function key_up_response(event) {
-                if (last_client_event != 'exhale' && !out_of_bounds) {
+                if (last_client_event != 'exhale' && !out_of_bounds  && !options_showing) {
                     socket.emit('client_keyup');
                     num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter * init_breaths_per_min / breaths_per_min, num_breaths);
                     last_client_event = 'exhale'
                     
-                    
+                } else if (!out_of_bounds) {
+                    remove_options()
+                }
+            }
+
+            function click_response(event) {
+                if (options_showing && !out_of_bounds) {
+                    remove_options()
                 }
             }
 
@@ -268,6 +277,11 @@
                 key_up_response(event)
             });
 
+            // Add event listener for the "keyup" event on the document object
+            document.addEventListener('click', (event) => {
+                click_response(event)
+            });
+
             window.onbeforeunload = function () {
                 socket.emit('leave');
             }
@@ -300,7 +314,9 @@
                     shb.style.display = "none"
                     lob.style.display = "none"
 
-                    opt.style.border = "0px solid rgb(20, 20, 20)"
+                    opt.style.border = "1.5px solid rgba(20, 20, 20, 0)"
+                    options_showing = false;
+                    // back_in_bounds()
                 }
 
                 // const instructions_right = document.getElementById("instructions_right"); 
@@ -308,8 +324,20 @@
             }
 
             function remove_instructions() {
-                // const instructions_upper = document.getElementById("instructions_upper"); 
-                // instructions_upper.style.display = "none"
+                const instructions1 = document.getElementById("instructions1"); 
+                instructions1.style.display = "none"
+
+                const instructions2 = document.getElementById("instructions2"); 
+                instructions2.style.display = "none"
+
+                const instructions3 = document.getElementById("instructions3"); 
+                instructions3.style.display = "none"
+
+                const line2 = document.getElementById("line2"); 
+                line2.style.display = "none"
+
+                // const line3 = document.getElementById("line3"); 
+                // line3.style.display = "none"
 
                 instructions_present = false;
             }
@@ -579,18 +607,18 @@
             const tob = document.getElementById('together-button');
             const ab = document.getElementById('alone-button');
 
-            // tib.addEventListener('click', toggle_timer);
 
-            fb.addEventListener('mouseover', on_options);
+            fb.addEventListener('mouseover', go_out_of_bounds);
             fb.addEventListener('mouseout', back_in_bounds);
-            thb.addEventListener('mouseover', on_options);
+            thb.addEventListener('mouseover', go_out_of_bounds);
             thb.addEventListener('mouseout', back_in_bounds);
             ob.addEventListener('mouseover', on_options);
             ob.addEventListener('mouseout', back_in_bounds);
-            tob.addEventListener('mouseover', on_options);
+            tob.addEventListener('mouseover', go_out_of_bounds);
             tob.addEventListener('mouseout', back_in_bounds);
-            ab.addEventListener('mouseover', on_options);
+            ab.addEventListener('mouseover', go_out_of_bounds);
             ab.addEventListener('mouseout', back_in_bounds);
+
             
 
             function go_out_of_bounds() {
@@ -684,25 +712,82 @@
                 // const num_active_text = document.getElementById("others"); 
                 const mode_text = document.getElementById("mode"); 
                 const timer_text = document.getElementById("timer"); 
+                const in_text1 = document.getElementById("instructions1"); 
+                const in_text2 = document.getElementById("instructions2"); 
+                const in_text3 = document.getElementById("instructions3"); 
+                const line2 = document.getElementById("line2"); 
+                const line3 = document.getElementById("line3"); 
+
+                const fb = document.getElementById('fullscreen-button');
+                const db = document.getElementById('duration-button');
+                const ob = document.getElementById('orb-button');
+                const tob = document.getElementById('together-button');
+                const spb = document.getElementById('speed-button');
+                const ab = document.getElementById('alone-button');
+                const fab = document.getElementById('faster-button');
+                const slb = document.getElementById('slower-button');
+                const shb = document.getElementById('shorter-button');
+                const lob = document.getElementById('longer-button');
+
                 if (theme == "dawn") {
                     theme = "dusk"
                     thb.textContent = 'theme: dusk';
                     document.body.style.backgroundImage = `url("{{url_for('static', filename='dusk.png')}}")`;
                     circle_color1 = "rgb(11, 150, 230)";
                     circle_color2 = "white"
-                    // num_active_text.style.color = "rgb(170,170,170)"
-                    mode_text.style.color = "rgb(0,0,0)"
-                    timer_text.style.color = "rgb(0,0,0)"
+
+                    mode_text.style.color = "darkgoldenrod"
+                    timer_text.style.color = "darkgoldenrod"
+                    in_text1.style.color = "goldenrod"
+                    in_text2.style.color = "goldenrod"
+                    in_text3.style.color = "goldenrod"
+
+                    line2.style.borderColor = "cornflowerblue"
+                    line3.style.borderColor = "cornflowerblue"
+
+                    tob.style.color = "goldenrod"
+                    ab.style.color = "goldenrod"
+                    ob.style.color = "goldenrod"
+
+                    thb.style.color = "palegoldenrod"
+                    db.style.color = "palegoldenrod"
+                    spb.style.color = "palegoldenrod"
+                    fb.style.color = "palegoldenrod"
+                    fab.style.color = "palegoldenrod"
+                    slb.style.color = "palegoldenrod"
+                    shb.style.color = "palegoldenrod"
+                    lob.style.color = "palegoldenrod"
+
                 } else {
                     theme = "dawn"
                     thb.textContent = 'theme: dawn';
                     document.body.style.backgroundImage = `url("{{url_for('static', filename='dawn.png')}}")`;
                     circle_color1 = "mediumseagreen";
                     circle_color2 = "lightgoldenrodyellow"
-                    // num_active_text.style.color = "rgb(70,70,70)"
+
                     mode_text.style.color = "rgb(70,70,70)"
                     timer_text.style.color = "rgb(70,70,70)"
+                    in_text1.style.color =  "rgb(25, 80, 112)" 
+                    in_text2.style.color = "rgb(25, 80, 112)"  // "midnightblue"
+                    in_text3.style.color = "rgb(25, 80, 112)"  // "midnightblue"
+
+                    line2.style.borderColor = "palegoldenrod"
+                    line3.style.borderColor = "palegoldenrod"
+
+                    tob.style.color = "rgb(120, 255, 180)"
+                    ab.style.color = "rgb(120, 255, 180)"
+                    ob.style.color = "rgb(120, 255, 180)"
+
+                    thb.style.color = "rgb(220, 255, 230)"
+                    db.style.color = "rgb(220, 255, 230)"
+                    spb.style.color = "rgb(220, 255, 230)"
+                    fb.style.color = "rgb(220, 255, 230)"
+                    fab.style.color = "rgb(220, 255, 230)"
+                    slb.style.color = "rgb(220, 255, 230)"
+                    shb.style.color = "rgb(220, 255, 230)"
+                    lob.style.color = "rgb(220, 255, 230)"
                 }
+                remove_options()
             }
 
             function toggle_options() {
@@ -732,7 +817,8 @@
                     slb.style.display = ""
                     shb.style.display = ""
                     lob.style.display = ""
-                    opt.style.border = "1.5px solid white"      
+                    opt.style.border = "1.5px solid white"  
+                    options_showing = true;
                 } else {
                     fb.style.display = "none"
                     db.style.display = "none"
@@ -745,7 +831,9 @@
                     slb.style.display = "none"
                     shb.style.display = "none"
                     lob.style.display = "none"
-                    opt.style.border = "0px solid rgb(20, 20, 20)"
+                    opt.style.border = "1.5px solid rgba(20, 20, 20, 0)"
+                    options_showing = false;
+                    // back_in_bounds()
 
                     // const instructions_right = document.getElementById("instructions_right"); 
                     // instructions_right.textContent = ""
@@ -803,6 +891,7 @@
                     shb.style.display = ""
                     lob.style.display = ""
                     opt.style.border = "1.5px solid white"    
+                    options_showing = true;
                 } 
             }
 
@@ -814,17 +903,17 @@
 <style>
     #options-button {
         position: absolute;
-        bottom:  26px;
-        left:  calc(34%);
-        background: rgb(20, 20, 20);
+        bottom:  23px;
+        left:  calc(33% + 0.5em);
+        background: rgb(40, 40, 40);
         border-radius: 50%;
-        border: 1.5px solid white;
-        padding-bottom: 28px;
+        border: 1.5px solid rgba(20, 20, 20,1);
+        padding-bottom: 24px;
         opacity: 0.7;
-        width:  30px;
-        height:  30px;
+        width:  26.5px;
+        height:  26px;
         color: white;
-        font-size: 16px;
+        font-size: 14px;
         letter-spacing: 1px;
         font-family: poppin;
         font-weight: bold;
@@ -843,25 +932,11 @@
     -o-transform: rotate(90deg);
     -ms-transform: rotate(90deg);
     }
-    /* .behind-button {
-        position: absolute;
-        bottom:  33.5px;
-        left:  329.5px;
-        background: rgb(50, 50, 50);
-        width:  155px;
-        height:  23px;
-        line-height: 22px;
-        text-align: center;
-        color: skyblue;
-        font-size: 14px;
-        font-family: poppins;
-        box-sizing: border-box;
-    } */
 
     .slower-button {
         position: absolute;
-        bottom:  211px;
-        left:  calc(34% + 6px);
+        bottom:  205px;
+        left:  calc(33% + 6px);
         background: rgba(0, 0, 0, 0);
         border: 1px rgb(0,0,0);
         opacity: 0.7;
@@ -869,7 +944,7 @@
         height:  22px;
         line-height: 5px;
         /* margin: 0px; */
-        color: lightgoldenrodyellow;
+        color: rgb(220, 255, 230);
         font-size: 14px;
         font-weight: bold;
         /* box-sizing: border-box; */
@@ -882,14 +957,14 @@
 
     .faster-button {
         position: absolute;
-        bottom:  211px;
-        left:  calc(34% + 172px);
+        bottom:  205px;
+        left:  calc(33% + 172px);
         background: rgba(0, 0, 0, 0);
         border: 1px rgb(0,0,0);
         width:  22px;
         height:  22px;
         margin: auto;
-        color: lightgoldenrodyellow;
+        color: rgb(220, 255, 230);
         font-size: 14px;
         box-sizing: border-box;
         cursor:  pointer;
@@ -902,8 +977,8 @@
 
     .shorter-button {
         position: absolute;
-        bottom:  241px;
-        left:  calc(34% + 6px);
+        bottom:  235px;
+        left:  calc(33% + 6px);
         background: rgba(0, 0, 0, 0);
         border: 1px rgb(0,0,0);
         opacity: 0.7;
@@ -911,7 +986,7 @@
         height:  22px;
         line-height: 5px;
         /* margin: 0px; */
-        color: lightgoldenrodyellow;
+        color: rgb(220, 255, 230);
         font-size: 14px;
         font-weight: bold;
         /* box-sizing: border-box; */
@@ -924,14 +999,14 @@
 
     .longer-button {
         position: absolute;
-        bottom:  241px;
-        left:  calc(34% + 172px);
+        bottom:  235px;
+        left:  calc(33% + 172px);
         background: rgba(0, 0, 0, 0);
         border: 1px rgb(0,0,0);
         width:  22px;
         height:  22px;
         margin: auto;
-        color: lightgoldenrodyellow;
+        color: rgb(220, 255, 230);
         font-size: 14px;
         box-sizing: border-box;
         cursor:  pointer;
@@ -944,21 +1019,21 @@
 
     .speed-button {
         position: absolute;
-        bottom:  206px;
+        bottom:  200px;
         right:  calc(50% - 90px);
-        color: lightgoldenrodyellow;
+        color: rgb(220, 255, 230);
     }
 
     .duration-button {
         position: absolute;
-        bottom:  236px;
-        color: lightgoldenrodyellow;
+        bottom:  230px;
+        color: rgb(220, 255, 230);
     }
 
     #fullscreen-button {
         position: absolute;
-        bottom:  56px;
-        color: lightgoldenrodyellow;
+        bottom:  50px;
+        color: rgb(220, 255, 230);
         font-size: 13px;
     }
 
@@ -968,29 +1043,19 @@
 
     #theme-button {
         position: absolute;
-        bottom:  86px;
-        color: lightgoldenrodyellow;
+        bottom:  80px;
+        color: rgb(220, 255, 230);
     }
 
     .theme-button:hover {
         background: rgb(35, 35, 35);
     }
 
-    /* .timer-button {
-        position: absolute;
-        bottom:  90px;
-        right:  30px;
-        color: lightgoldenrodyellow;
-    }
-
-    .timer-button:hover {
-        background: rgb(70, 70, 70);
-    } */
 
     .alone-button {
         position: absolute;
-        bottom:  176px;
-        color: gold;
+        bottom:  170px;
+        color: rgb(120, 255, 180);
     }
 
     .alone-button:hover {
@@ -999,8 +1064,8 @@
 
     .orb-button {
         position: absolute;
-        bottom:  146px;
-        color: gold;
+        bottom:  140px;
+        color: rgb(120, 255, 180);
     }
 
     .orb-button:hover {
@@ -1009,8 +1074,8 @@
 
     .together-button {
         position: absolute;
-        bottom:  116px; 
-        color: gold;
+        bottom:  110px; 
+        color: rgb(120, 255, 180);
     }
 
     .together-button:hover {
@@ -1030,7 +1095,7 @@
 
     .button-style {
         background: rgb(20, 20, 20);
-        opacity: 0.7;
+        opacity: 0.92;
         border:  0px solid rgb(0, 0, 0);
         width:  200px;
         height:  30px;
@@ -1040,7 +1105,7 @@
         text-align: center;
         line-height: 30px;
         font-size: 14px;
-        left:  calc(34%);
+        left:  33%;
         /* color: gold; */
         text-decoration: none;
         font-family: poppins;
@@ -1087,19 +1152,25 @@
 
         <!-- <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 20em; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue">Daily meditation</p> -->
 
-        <hr style="position: absolute; top: 5.75%; left: 34%; width: 32%; text-align: center; font-size: 20px; border-color: palegoldenrod;">
+        <hr style="position: absolute; top: 5.75%; left: 33%; width: 34%;text-align: center; font-size: 20px; border-color: palegoldenrod;">
 
         <p class="noselect" id = "header" style="position: absolute; top: 3px; left: 0; width: 100%; text-align: center; font-size: 20px; color: palegoldenrod; font-family: poppins">breathe together</p>
 
-        <p class="noselect" id="timer" style=" position: absolute; bottom: 10px; right: calc(50%); width: 10em; text-align: right; font-size: 18px; font-family: poppins; color: rgb(70,70,70)"></p>
+        <p class="noselect" id="timer" style=" position: absolute; bottom: 8px; right: calc(50% - 0.2em); width: 10em; text-align: right; font-size: 16px; font-family: poppins; color: rgb(70,70,70)"></p>
 
-        <p class="noselect" id="mode" style=" position: absolute; bottom: 10px; right: calc(34%); width: 10em; text-align: right; font-size: 18px; font-family: poppins; color: rgb(70,70,70)">simple mode</p>
+        <p class="noselect" id="mode" style=" position: absolute; bottom: 8px; right: calc(33% + 0.4em); width: 10em; text-align: right; font-size: 16px; font-family: poppins; color: rgb(70,70,70)">simple mode</p>
 
         <!-- <p class="noselect" id="others" style=" position: absolute; bottom: 10px; right: 34%; width: 10em; text-align: right; font-size: 18px; font-family: poppins; color: rgb(70,70,70)"></p> -->
 
-        <p class="noselect" id="instructions1" style="position: absolute; top: 55%; left: 32%; width: 37.5%; text-align: left; font-size: 18px; line-height: 30px; font-family: poppins; text-align: center;color: gold; ">Your simple daily meditation</p> 
+        <hr id = "line2" style="position: absolute; top: 58%; left: 33%; width: 34%;text-align: center; font-size: 20px; border-color: palegoldenrod;">
 
-        <p class="noselect" id="instructions2" style="position: absolute; top: 63%; left: 32%; width: 37.5%; text-align: left; font-size: 15px; line-height: 28px; font-family: poppins; text-align: center;color: goldenrod; ">Press and hold as you inhale. Release as you exhale.<br>See menu [  ] for settings. <b>Start when you're ready!</b><br><br>Or try <b>challenge mode</b> to hone your concentration.<br>Try <b>together mode</b> to breathe with another person.</p> 
+        <p class="noselect" id="instructions1" style="position: absolute; top: 58%; left: 32%; width: 37.5%; text-align: left; font-size: 18.5px; line-height: 30px; font-family: poppins; text-align: center; font-weight: 500;">Your daily guided meditation</p> 
+
+        <p class="noselect" id="instructions2" style="position: absolute; top: 65%; left: 32%; width: 36%; text-align: left; font-size: 14px; line-height: 28px; font-family: poppins; text-align: center;">Press and hold as you inhale. Release as you exhale.<br>See menu [  ] for settings. <b>Press and hold to start!</b></p> 
+
+        <p class="noselect" id="instructions3" style="position: absolute; top: 76%; left: 32%; width: 36%; text-align: left; font-size: 14px; line-height: 28px; font-family: poppins; text-align: center; ">Try <b>challenge mode</b> to train your mindfulness.<br>Try <b>together mode</b> to breathe with another person.</p> 
+
+        <hr id = "line3" style="position: absolute; top: 87.8%; left: 33%; width: 34%;text-align: center; font-size: 20px; border-color: palegoldenrod;">
     
         <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: poppins; color: skyblue"></p>
 
@@ -1118,9 +1189,9 @@
 
     <a id = "alone-button" href="" class='alone-button button-style noselect' style = "display: none">simple mode</a>
 
-    <a id = "speed-button" href="" class='speed-button button-style noselect' style = "display: none">7 breaths per min</a>
+    <a id = "speed-button" class='speed-button button-style noselect' style = "display: none">7 breaths per min</a>
 
-    <a id = "duration-button" href="" class='duration-button button-style noselect' style = "display: none">5-min session</a>
+    <a id = "duration-button" class='duration-button button-style noselect' style = "display: none">5-min session</a>
     
 
 </body>
