@@ -92,6 +92,8 @@
             var circle_color1 = "mediumseagreen";
             var circle_color2 = "lightgoldenrodyellow";
 
+            var control = "server"
+
             user_id = 0;
 
             const x_pos = meditationCanvas.width / 2;
@@ -103,7 +105,24 @@
             } else {
                 var theme = "dawn"
             }
+            // theme = "dawn"
 
+            // const mode_text = document.getElementById("mode"); 
+            // const timer_text = document.getElementById("timer"); 
+
+            // if (theme == "dusk") {
+            //     document.body.style.backgroundImage = `url("{{url_for('static', filename='dusk.png')}}")`;
+            //     circle_color1 = "rgb(11, 150, 230)";
+            //     circle_color2 = "white"
+            //     mode_text.style.color = "rgb(0,0,0)"
+            //     timer_text.style.color = "rgb(0,0,0)"
+            // } else if (theme == "dawn") {
+            //     document.body.style.backgroundImage = `url("{{url_for('static', filename='dawn.png')}}")`;
+            //     circle_color1 = "mediumseagreen";
+            //     circle_color2 = "lightgoldenrodyellow"
+            //     mode_text.style.color = "rgb(70,70,70)"
+            //     timer_text.style.color = "rgb(70,70,70)"
+            // }
 
             var circle_server = {
                 x: x_pos,
@@ -126,7 +145,7 @@
             };
 
             var num_breaths = 0;
-            const timeout_counter = 15000;
+            const timeout_counter = 12000;
             var num_active;
             var last_client_event = 'none';
             var last_server_event = 'exhale';
@@ -145,6 +164,8 @@
                 if (prev_num_breaths == num_breaths) {
                     socket.emit('timeout');
                     paused = true;
+                    control = "server"
+                    circle_server = structuredClone(circle_client);
                 }
             }
 
@@ -217,6 +238,7 @@
                     num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter, num_breaths);
                     last_client_event = 'inhale'
+                    control = "client"
                     paused = false;
 
                     if (num_breaths == 1 || num_breaths == 2) {
@@ -405,7 +427,7 @@
                         return -speed_factor
                     }
                 }
-                if (last_event == "tie" || last_event == "none") {
+                if (last_event.includes("pause")) {
                     return 0
                 }
                 
@@ -423,16 +445,10 @@
                 if (circle_server.radius < (robot_start_radius + 1.5 * speed_factor)) {
                     bi.textContent = "breathe in"
                     bo.textContent = ""            
-                } else if (circle_server.radius > (robot_end_radius - 2.5 * speed_factor)) {
+                } else if (circle_server.radius > (robot_end_radius - 2.5 * speed_factor) ) {
                     bo.textContent = "let go"
                     bi.textContent = ""
-                } else if (last_server_event == "inhale"){
-                    bi.textContent = "breathe in"
-                    bo.textContent = ""  
-                } else if (last_server_event == "exhale" && num_breaths > 0) {
-                    bo.textContent = "let go"
-                    bi.textContent = ""
-                }
+                } 
 
                 if (bi.textContent!="" && num_breaths > 0 && last_client_event == "exhale" && !paused)  {
                     bi.style.fontWeight = "bold";
@@ -445,11 +461,17 @@
                     bo.style.fontWeight = "normal";
                 } 
 
-                if (circle_server.radius < robot_start_radius) {                
+                if (circle_server.radius < robot_start_radius || (last_server_event == "pause inhale" && circle_client.radius > fast_radius_start)) {                
                     return "inhale"
                 }
-                if (circle_server.radius > robot_end_radius) {
+                if (circle_server.radius > robot_end_radius || (last_server_event == "pause exhale" && circle_client.radius < fast_radius_end)) {
                     return "exhale"
+                }
+                if (last_server_event == "exhale" && circle_client.radius > fast_radius_end && control == "client") {
+                    return "pause exhale"
+                }
+                if (last_server_event == "inhale" && circle_client.radius < fast_radius_start && control == "client") {
+                    return "pause inhale"
                 }
                 return last_server_event
             }
@@ -460,6 +482,7 @@
                 
                 speed_multiplier_client = calculate_speed(last_client_event, circle_client, "client")
                 last_server_event = get_robot_action(last_server_event, circle_server)
+                console.log(last_server_event)
                 speed_multiplier_server = calculate_speed(last_server_event, circle_server, "server")
 
                 update_inner_circle(circle_server, speed_multiplier_server)
@@ -468,7 +491,6 @@
                     update_outer_circle(circle_server) 
                     circle_client = structuredClone(circle_server);
                 } else {
-                    console.log(speed_multiplier_client)
                     update_inner_circle(circle_client, speed_multiplier_client)
                     update_outer_circle(circle_client) 
                 }
@@ -616,15 +638,8 @@
                 const prev_speed_factor = speed_factor;
 
                 speed_factor = Math.min(max_speed, speed_factor * (breaths_per_min + 1) / breaths_per_min)
-
-                console.log(prev_speed_factor)
-                console.log(speed_factor)
                 
-                console.log("")
-
                 breaths_per_min = Math.round(breaths_per_min * speed_factor / prev_speed_factor)
-
-                console.log(breaths_per_min)
                 
                 const speed = document.getElementById('speed-button');
                 speed.textContent = breaths_per_min.toString() + " breaths per min"
@@ -683,13 +698,20 @@
                 const duration = document.getElementById('duration-button');
                 duration.textContent = session_duration.toString() + "-min session"
             }
+            if (theme == "dusk") {
+                theme = "dawn";
+                toggle_theme()
+            }
+            if (theme == "dawn") {
+                theme = "dusk"
+                toggle_theme()
+            }
 
             function toggle_theme() {
                 const thb = document.getElementById('theme-button');
                 // const num_active_text = document.getElementById("others"); 
                 const mode_text = document.getElementById("mode"); 
                 const timer_text = document.getElementById("timer"); 
-                console.log(theme)
                 if (theme == "dawn") {
                     theme = "dusk"
                     thb.textContent = 'theme: dusk';
@@ -709,9 +731,6 @@
                     mode_text.style.color = "rgb(70,70,70)"
                     timer_text.style.color = "rgb(70,70,70)"
                 }
-                
-
-
             }
 
             function toggle_options() {
@@ -729,7 +748,6 @@
 
                 const opt = document.getElementById('options-button');
                 
-                console.log(fb.style.display)
                 if (fb.style.display == "none") {
                     fb.style.display = ""
                     db.style.display = ""
@@ -1059,7 +1077,7 @@
         position: absolute; 
         left: 0px; 
         width: 100%; 
-        top: 32.5%;
+        top: 32.3%;
         text-align: center; 
         font-size: 20px; 
         font-weight: normal; 
@@ -1081,7 +1099,6 @@
 </style> 
 <style>
     body {
-      background-image: url("{{url_for('static', filename='dawn.png')}}");
       background-size: cover;
     }
 </style>
