@@ -194,15 +194,15 @@
                     drawInnerCircle(circle_client)
                     drawOuterCircle(circle_client);
                 }
-                else {
+                else if (false) {
                     drawInnerCircle(circle_server);
                     drawOuterCircle(circle_server);
                 }
 
                 if (instructions_present){
-                    ctx.fillStyle = "rgba(170,170,170,0.15)";
+                    ctx.fillStyle = "rgba(140,140,140,0.15)";
 
-                    ctx.fillRect(meditationCanvas.width * 0.33, meditationCanvas.height * 0.557, meditationCanvas.width * 0.341, meditationCanvas.height * 0.443)
+                    ctx.fillRect(meditationCanvas.width * 0.34, meditationCanvas.height * 0.07, meditationCanvas.width * 0.321, meditationCanvas.height * 0.8)
                 }
 
                 requestAnimationFrame(animate);
@@ -992,7 +992,7 @@
 
     .shorter-button {
         position: absolute;
-        top:  69.9%;
+        top:  44.9%;
         left:  calc(50% - 2.85em);
         background: rgba(0, 0, 0, 0);
         border: 1px rgb(0,0,0);
@@ -1016,7 +1016,7 @@
 
     .longer-button {
         position: absolute;
-        top:  69.9%;
+        top:  44.9%;
         left:  calc(50% + 1.6em);
         background: rgba(0, 0, 0, 0);
         border: 1px rgb(0,0,0);
@@ -1039,16 +1039,16 @@
 
     .yes-button {
         position: absolute;
-        top: 82.4%;
+        top: 60.7%;
         left:  calc(50% - 3.75em);
         /* background: rgba(0, 0, 0, 0.7); */
         background-image: linear-gradient(to right, midnightblue 0%, rgb(17,55,150) 100%);
-        border: 3px gold;
+        border: 1px gold;
         border-radius: 5px;
         width:  50px;
         height:  27px;
         line-height: 27px;
-        margin: auto;
+        /* margin: auto; */
         padding-left: 12px;
         color: gold;
         font-size: 16px;
@@ -1064,7 +1064,7 @@
 
     .no-button {
         position: absolute;
-        top: 82.4%;
+        top: 60.7%;
         left:  calc(50% + 0.65em);
         /* background: rgba(0, 0, 0, 0.4); */
         background-image: linear-gradient(to right, midnightblue 0%, rgb(17,55,150) 100%);
@@ -1091,8 +1091,8 @@
          
     .start-button {
         position: absolute;
-        top:  91%;
-        left: 44.75%;
+        top:  73%;
+        left: 43.75%;
         background-image: linear-gradient(to right, midnightblue  0%, rgb(11,88,189)  100%);
         /* margin: 10px; */
         /* padding: 15px 45px; */
@@ -1102,10 +1102,11 @@
         /* background-size: 200% auto; */
         color: gold;            
         /* box-shadow: 0 0 20px #eee; */
+        border: 1px solid palegoldenrod;
         cursor:  pointer;
         border-radius: 5px;
         display: block;
-        width:  10.5%;
+        width:  12.5%;
         height:  30px;
         line-height: 30px;
         font-size: 16px;
@@ -1119,52 +1120,15 @@
     }
          
 
-    /* .start-button {
-
-        color: palegoldenrod;
-        /* margin: 10px; */
-        /* background-image: linear-gradient(to right, #2b5876 0%, #4e4376  51%, #2b5876  100%);
-        transition: 0.5s;
-        box-shadow: 0 0 20px #eee;
-        border-radius: 10px;
-        display: block; */
-        /* background: rgba(0,0,0, 0.8); */
-        /* border:  1px solid goldenrod; */
-        /* width:  10.5%;
-        height:  30px; */
-        /* line-height: 0px; */
-        /* padding-bottom: 10px; */
-        /* border-radius: 0px;
-        box-sizing: border-box;
-        cursor:  pointer;
-        text-align: center;
-        line-height: 30px;
-        font-size: 16px; */
-        /* color: gold; */
-        /* text-decoration: none;
-        font-family: poppins;
-    } */ 
-
-    /* .start-button:hover {
-        background: rgba(0, 0, 0, 0.7);
-    } */
-
-    /* .speed-button {
-        position: absolute;
-        bottom:  200px;
-        right:  calc(50% - 90px);
-        color: rgb(220, 255, 230);
-    } */
 
     .duration-button {
         position: absolute;
-        top:  69.5%;
+        top:  44.5%;
         left: 44.75%;
         color: rgba(220, 255, 230, 1);
         /* background: rgba(0,0,0,.4); */
         background-image: linear-gradient(to right, midnightblue 0%, rgb(11,88,189) 100%);
         /* opacity: 0.0; */
-        border:  0px solid rgb(0, 0, 0);
         width:  10.5%;
         height:  30px;
         border-radius: 5px;
@@ -1300,7 +1264,7 @@
 
         <!-- <p class="noselect" style=" position: absolute; top: 5px; left: 0; width: 20em; text-align: left; text-indent: 1em; font-size: 26px; color: skyblue">Daily meditation</p> -->
 
-        <hr style="position: absolute; top: 5.75%; left: 33%; width: 34%;text-align: center; font-size: 20px; border-color: palegoldenrod;">
+        <hr style="position: absolute; top: 5.75%; left: 34%; width: 32%;text-align: center; font-size: 20px; border-color: palegoldenrod;">
 
         <p class="noselect" id = "header" style="position: absolute; top: 3px; left: 0; width: 100%; text-align: center; font-size: 20px; color: palegoldenrod; font-family: poppins">breathe together</p>
 
@@ -1310,21 +1274,21 @@
 
         <!-- <p class="noselect" id="others" style=" position: absolute; bottom: 10px; right: 34%; width: 10em; text-align: right; font-size: 18px; font-family: poppins; color: rgb(70,70,70)"></p> -->
 
-        <hr id = "line2" style="position: absolute; top: 54%; left: 33%; width: 34%;text-align: center; font-size: 20px; border-color: palegoldenrod;">
+        <hr id = "line2" style="position: absolute; top: 54%; left: 33%; width: 34%;text-align: center; font-size: 20px; border-color: palegoldenrod; opacity: 0.0">
 
-        <p class="noselect" id="instructions1" style="position: absolute; top: 54%; left: 32%; width: 36%; text-align: left; font-size: 20px; line-height: 30px; font-family: poppins; text-align: center; font-weight: 500;">Daily meditation</p> 
+        <p class="noselect" id="instructions1" style="position: absolute; top: 11%; left: 33%; width: 34%; text-align: left; font-size: 16px; line-height: 25px; font-family: poppins; text-align: center; font-weight: normal; opacity: 1.0">A relaxing <b>daily meditation</b>. <br><br><a style="font-weight: 600; font-style: italic;">Instructions</a><br>Press and hold as you inhale.<br>Release as you exhale.</p> 
 
-        <p class="noselect" id="instructions2" style="position: absolute; top: 63%; left: 32%; width: 36%; text-align: left; font-size: 15px; line-height: 18px; font-family: poppins; text-align: center; font-weight: 500;">
+        <p class="noselect" id="instructions2" style="position: absolute; top: 37%; left: 32%; width: 36%; text-align: left; font-size: 15px; line-height: 18px; font-family: poppins; text-align: center; font-weight: 500;">
         How long would you like to meditate?</p>
             <!-- <a style = "font-weight: 700">Press and hold as you inhale. Release as you exhale.</a><br>See <img id="bodhi" src="{{url_for('static', filename='settings.png')}}" style="width: 15px; height: 22px;" /> for settings. <a style = "font-weight: 400;">The session starts when you press!</a></p>  -->
 
-        <p class="noselect" id="instructions3" style="position: absolute; top: 77%; left: 32%; width: 36%; text-align: left; font-size: 13px; line-height: 24px; font-family: poppins; text-align: center; "></p>
+        <p class="noselect" id="instructions3" style="position: absolute; top: 33%; left: 32%; width: 36%; text-align: left; font-size: 13px; line-height: 24px; font-family: poppins; text-align: center; "></p>
 
-        <p class="noselect" id="instructions4" style="position: absolute; top: 75%; left: 32%; width: 36%; text-align: left; font-size: 15px; line-height: 24px; font-family: poppins; text-align: center; color: palegoldenrod; font-weight: 500;">Want to go fullscreen?</p>
+        <p class="noselect" id="instructions4" style="position: absolute; top: 53%; left: 32%; width: 36%; text-align: left; font-size: 15px; line-height: 24px; font-family: poppins; text-align: center; color: palegoldenrod; font-weight: 500;">Want to go fullscreen?</p>
             
             <!-- Or, try <a href="challenge" style="color: inherit; font-weight: 500;">challenge mode</a> to test your mindfulness.<br>Try <b><a href="together" style="color: inherit; font-weight: 500;">together mode</a></b> to breathe with someone else.</p>  -->
 
-        <hr id = "line3" style="position: absolute; top: 87.8%; left: 33%; width: 34%;text-align: center; font-size: 20px; border-color: palegoldenrod; opacity: 0.0">
+        <hr id = "line3" style="position: absolute; top: 85%; left: 34%; width: 32%;text-align: center; font-size: 20px; border-color: palegoldenrod; opacity: 1.0">
     
         <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: poppins; color: skyblue"></p>
 
