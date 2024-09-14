@@ -259,6 +259,11 @@
                     event.preventDefault();
                     key_down_response(event)
                 }
+                if (event.code === 'KeyT') {
+                    // Prevent default behavior of the spacebar key
+                    event.preventDefault();
+                    toggle_theme()
+                }
             });
 
             // Add event listener for the "keyup" event on the document object
