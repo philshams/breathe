@@ -83,8 +83,6 @@
             const x_pos = meditationCanvas.width / 2;
             const y_pos = meditationCanvas.height * 0.32;
 
-            const time_of_day = 20 // (new Date).getHours()
-
             var circle_client = {
                 x: x_pos,
                 y: y_pos,
@@ -98,12 +96,9 @@
             var num_active;
             var last_client_event = 'paused';
 
-            var locked_on = true;
-
             var out_of_bounds = false;
             var start_screen = true;
             var paused = false;
-            var options_showing = false;
 
             // Connect to the Socket.IO server.
             var socket = io("/");
@@ -172,7 +167,7 @@
             }
 
             function key_down_response(event) {
-                if (last_client_event != 'inhale' && !out_of_bounds && !options_showing) {
+                if (last_client_event != 'inhale') {
                     socket.emit('client_keydown');
                     num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter * init_breaths_per_min / breaths_per_min, num_breaths);
@@ -182,20 +177,13 @@
             }
 
             function key_up_response(event) {
-                if (last_client_event == 'inhale' && !out_of_bounds  && !options_showing) {
+                if (last_client_event == 'inhale') {
                     socket.emit('client_keyup');
                     num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter * init_breaths_per_min / breaths_per_min, num_breaths);
                     last_client_event = 'exhale'   
                 }
             }
-
-            function click_response(event) {
-                if (options_showing && !out_of_bounds) {
-                    remove_options()
-                }
-            }
-
 
             // Add event listener for the "keydown" event on the document object
             document.addEventListener('keydown', (event) => {
@@ -240,7 +228,7 @@
                 socket.emit('leave');
             }
 
-            function remove_instructions() {
+            function start_session() {
                 const instructions = document.getElementById("instructions"); 
                 instructions.style.display = "none"
 
@@ -250,6 +238,9 @@
                 const line1 = document.getElementById("line1"); 
                 line1.style.display = "none"
 
+                const press = document.getElementById("press"); 
+                press.style.display = "none"
+
                 const db = document.getElementById('duration-button');
                 db.style.display = "none"
                 const shb = document.getElementById('shorter-button');
@@ -258,6 +249,10 @@
                 lob.style.display = "none"
                 const stb = document.getElementById('start-button');
                 stb.style.display = "none"
+
+                toggle_fullscreen("on")
+
+                start_screen = false;
 
             }
 
@@ -304,12 +299,41 @@
                 
             }
 
+            function animate_instructions() {
+                const press = document.getElementById('press');
+                const release = document.getElementById('release');
+
+                const instructions = document.getElementById('instructions');
+                const instructions2 = document.getElementById('instructions2');
+
+                cur_time = (new Date).getTime()
+                if ( (cur_time - start_time) > 2000) {
+                    press.style.display = ""
+                    release.style.display = "none"
+
+                    instructions.style.display = ""
+                    instructions2.style.display = "none"
+                }
+                if ( (cur_time - start_time) > 4000 ) {
+                    press.style.display = "none"
+                    release.style.display = ""
+
+                    instructions.style.display = "none"
+                    instructions2.style.display = ""
+                }
+                
+
+            }
+
             // Update the circle color on each frame
             function update() {
                 speed_multiplier_client = calculate_speed(last_client_event, circle_client)
                 update_inner_circle(circle_client, speed_multiplier_client)
-                update_outer_circle(circle_client)                
-
+                update_outer_circle(circle_client)
+                
+                if (start_screen) {
+                    animate_instructions()
+                }
             }
 
             function toggle_fullscreen(command) {
@@ -322,6 +346,13 @@
                 }
             }
 
+            const start_button = document.createElement("button");
+            start_button.setAttribute('id','start-button');
+            start_button.setAttribute('class','start-button noselect');
+            start_button.textContent = 'start';
+            start_button.addEventListener('click', start_session);
+            start_button.style.display = ""
+            document.body.appendChild(start_button);
 
             const shorter_button = document.createElement("button");
             shorter_button.setAttribute('id','shorter-button');
@@ -339,6 +370,7 @@
             longer_button.style.display = ""
             document.body.appendChild(longer_button);
 
+            set_theme()
 
             function go_longer() {
                 if (session_duration==30) {
@@ -388,12 +420,9 @@
                 duration.textContent = session_duration.toString() + " min"
             }
             
-            set_theme()
-
             function set_theme() {
-                const mode_text = document.getElementById("mode"); 
-                const timer_text = document.getElementById("timer"); 
                 const in_text1 = document.getElementById("instructions"); 
+                const in_text2 = document.getElementById("instructions2"); 
 
                 const db = document.getElementById('duration-button');
                 const shb = document.getElementById('shorter-button');
@@ -404,6 +433,7 @@
                 var circle_color2 = "white"
 
                 in_text1.style.color = "lightcyan"
+                in_text2.style.color = "lightcyan"
 
                 db.style.color = "rgb(30, 60, 160)"
                 shb.style.color = "navy"
@@ -421,7 +451,6 @@
         position: absolute;
         top:  150px;
         right:  calc(50% + 45px + 130px);
-        /* background-image: linear-gradient(to right, lightcyan  0%, rgb(110, 160, 236)  100%); */
         background: rgba(0,0,0,0);
         border: 1px rgb(0,0,0);
         border-top-left-radius: 5px;
@@ -430,11 +459,9 @@
         height:  45px;
         line-height: 0px;
         padding-bottom: 3px;
-        /* margin: 0px; */
         color: navy;
         font-size: 22px;
         font-weight: bold;
-        /* box-sizing: border-box; */
         cursor:  pointer;
     }
 
@@ -448,7 +475,6 @@
         position: absolute;
         top:  150px;
         right:  calc(50% - 85px + 130px);
-        /* background-image: linear-gradient(to right, lightcyan  0%, rgb(110, 160, 236)  100%); */
         background: rgba(0,0,0,0);
         border: 1px rgb(0,0,0);
         border-top-right-radius: 5px;
@@ -474,16 +500,9 @@
         top:  150px;
         left: calc(50% - 85px + 130px);
         background-image: linear-gradient(to right, lightcyan  0%, rgb(110, 160, 236)  100%);
-        /* margin: 10px; */
-        /* padding: 15px 45px; */
         border: none;
         text-align: center;
-        /* text-transform: uppercase; */
-        /* transition: 0.5s; */
-        /* background-size: 200% auto; */
         color: rgb(30, 60, 160);            
-        /* box-shadow: 0 0 20px #eee; */
-        /* border: 1px solid lightblue; */
         cursor:  pointer;
         border-radius: 7px;
         display: block;
@@ -499,9 +518,7 @@
         font-weight: 500;
         box-shadow:
         7px -4px 30px 0px mediumblue,
-        /* -4px -4px 5px 0px mediumblue, */
         -4px 2px 20px 0px #0002;
-        /* 4px 4px 5px 0px #0001; */
     }
 
 
@@ -510,10 +527,7 @@
         top:  150px;
         right: calc(50% - 85px + 130px);
         color: lightblue;
-        /* background: rgba(0,0,0,.4); */
         background-image: linear-gradient(to right, lightcyan  0%, rgb(110, 160, 236)  100%);
-        /* background-image: linear-gradient(to right, midnightblue 0%, rgb(11,88,189) 100%); */
-        /* opacity: 0.0; */
         width: 170px;
         height:  45px;
         border-radius: 5px;
@@ -522,7 +536,6 @@
         text-align: center;
         line-height: 45px;
         font-size: 26px;
-        /* color: gold; */
         text-decoration: none;
         font-family: poppins;
         font-weight: 400;
@@ -597,18 +610,21 @@
 
         <p class="noselect" id="mode" style=" position: absolute; bottom: 8px; right: calc(33% + 0.4em); width: 10em; text-align: right; font-size: 16px; font-family: poppins; color: rgb(70,70,70); display: none">simple mode</p>
 
-        <p class="noselect" id="instructions" style="position: absolute; top: 240px; left: calc(50% - 123px); width: 246px; text-align: center; font-size: 24px; line-height: 18px; font-family: poppins; font-weight: 400;text-shadow: 0 0 10px lightblue">
-        <a style = "font-size: 28px; font-weight: 500;">Instructions</a><br><br>Press as you inhale</p>
+        <p class="noselect" id="instructions" style="position: absolute; top: 240px; left: calc(50% - 133px); width: 266px; text-align: center; font-size: 24px; line-height: 18px; font-family: poppins; font-weight: 400;text-shadow: 0 0 10px lightblue">
+        <a style = "font-size: 28px; font-weight: 500;">Instructions</a><br><br><br>Press as you inhale</p>
+
+        <p class="noselect" id="instructions2" style="position: absolute; top: 240px; left: calc(50% - 133px); width: 266px; text-align: center; font-size: 24px; line-height: 18px; font-family: poppins; font-weight: 400;text-shadow: 0 0 10px lightblue; display: none">
+            <a style = "font-size: 28px; font-weight: 500;">Instructions</a><br><br><br>Release as you exhale</p>
         
         <img id="press" src="{{url_for('static', filename='press.png')}}" style=" position: absolute; top: 360px; left: calc(50% - 100px); width: 160px; height: 75px;" alt="inhale" />
+
+        <img id="release" src="{{url_for('static', filename='release.png')}}" style=" position: absolute; top: 360px; left: calc(50% - 100px); width: 160px; height: 75px; display: none;" alt="exhale" />
     
         <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: poppins; color: skyblue"></p>
 
         <p class="noselect prompt" id="breathe_in"></p> 
 
         <p class="noselect prompt" id="breathe_out"></p>
-
-    <a id = "start-button" class='start-button noselect'>start</a>
 
     <a id = "duration-button" class='duration-button noselect' style = "display: ''">2 min</a>
     
