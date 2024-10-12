@@ -71,6 +71,9 @@
             var speed_multiplier_client = 0;
 
             const ring_color = "rgba(255,255,255"
+
+            var circle_color1 = "rgb(11, 150, 230)";
+            var circle_color2 = "white"
             
             var time_in_session = -1;
             var timer_on = true;
@@ -159,8 +162,8 @@
                     meditationCanvas.width = window.innerWidth;
                     meditationCanvas.height = window.innerHeight;
                     const ctx = meditationCanvas.getContext('2d');
-                    ctx.fillStyle = "rgba(140,140,140,0.1)";
-                    ctx.fillRect(meditationCanvas.width / 2 - 320, 75, 320 * 2, window.innerHeight)
+                    ctx.fillStyle = "rgba(140,140,140,0.05)";
+                    ctx.fillRect(meditationCanvas.width / 2 - 320, 0, 320 * 2, window.innerHeight)
                 }
 
                 requestAnimationFrame(animate);
@@ -231,6 +234,8 @@
             function start_session() {
                 const instructions = document.getElementById("instructions"); 
                 instructions.style.display = "none"
+                const instructions2 = document.getElementById("instructions2"); 
+                instructions2.style.display = "none"
 
                 const header = document.getElementById("header"); 
                 header.style.display = "none"
@@ -240,6 +245,8 @@
 
                 const press = document.getElementById("press"); 
                 press.style.display = "none"
+                const release = document.getElementById("release"); 
+                release.style.display = "none"
 
                 const db = document.getElementById('duration-button');
                 db.style.display = "none"
@@ -307,14 +314,13 @@
                 const instructions2 = document.getElementById('instructions2');
 
                 cur_time = (new Date).getTime()
-                if ( (cur_time - start_time) > 2000) {
+                if ( ((cur_time - start_time) % 4000) < 2000) {
                     press.style.display = ""
                     release.style.display = "none"
 
                     instructions.style.display = ""
                     instructions2.style.display = "none"
-                }
-                if ( (cur_time - start_time) > 4000 ) {
+                } else {
                     press.style.display = "none"
                     release.style.display = ""
 
@@ -435,9 +441,9 @@
                 in_text1.style.color = "lightcyan"
                 in_text2.style.color = "lightcyan"
 
-                db.style.color = "rgb(30, 60, 160)"
-                shb.style.color = "navy"
-                lob.style.color = "navy"
+                db.style.color = "lightcyan" // "rgb(30, 60, 160)"
+                shb.style.color = "lightcyan"
+                lob.style.color = "lightcyan"
             }
 
             setInterval(update, 16);
@@ -449,14 +455,16 @@
 
     .shorter-button {
         position: absolute;
-        top:  150px;
-        right:  calc(50% + 45px + 130px);
+        top:  192px;
+        right:  calc(50% + 45px + 0px);
         background: rgba(0,0,0,0);
+        text-shadow: 0 0 10px lightblue;
         border: 1px rgb(0,0,0);
-        border-top-left-radius: 5px;
-        border-bottom-left-radius: 5px;
+        border-radius: 100%;
+        /* border-top-left-radius: 5px; */
+        /* border-bottom-left-radius: 5px; */
         width:  40px;
-        height:  45px;
+        height:  40px;
         line-height: 0px;
         padding-bottom: 3px;
         color: navy;
@@ -473,15 +481,17 @@
 
     .longer-button {
         position: absolute;
-        top:  150px;
-        right:  calc(50% - 85px + 130px);
+        top:  192px;
+        right:  calc(50% - 85px + 0px);
         background: rgba(0,0,0,0);
+        text-shadow: 0 0 10px lightblue;
         border: 1px rgb(0,0,0);
-        border-top-right-radius: 5px;
-        border-bottom-right-radius: 5px;
+        border-radius: 100%;
+        /* border-top-right-radius: 5px; */
+        /* border-bottom-right-radius: 5px; */
         width:  40px;
-        height:  45px;
-        line-height: 25px;
+        height:  40px;
+        line-height: 20px;
         margin: auto;
         color: navy;
         font-size: 22px;
@@ -493,12 +503,33 @@
         box-shadow:
         5px 0px 15px 0px mediumblue;
         font-weight: 700;
-    }                 
+    } 
+    
+
+    .duration-button {
+        position: absolute;
+        top:  190px;
+        right: calc(50% - 110px + 0px);
+        /* background-image: linear-gradient(to right, lightcyan  0%, rgb(110, 160, 236)  100%); */
+        background: rgba(0,0,0,0);
+        text-shadow: 0 0 10px lightblue;
+        width: 220px;
+        height:  45px;
+        border-radius: 5px;
+        box-sizing: border-box;
+        cursor:  pointer;
+        text-align: center;
+        line-height: 45px;
+        font-size: 26px;
+        text-decoration: none;
+        font-family: poppins;
+        font-weight: 400;
+    }
          
     .start-button {
         position: absolute;
-        top:  150px;
-        left: calc(50% - 85px + 130px);
+        top:  620px;
+        left: calc(50% - 85px 0px);
         background-image: linear-gradient(to right, lightcyan  0%, rgb(110, 160, 236)  100%);
         border: none;
         text-align: center;
@@ -521,25 +552,6 @@
         -4px 2px 20px 0px #0002;
     }
 
-
-    .duration-button {
-        position: absolute;
-        top:  150px;
-        right: calc(50% - 85px + 130px);
-        color: lightblue;
-        background-image: linear-gradient(to right, lightcyan  0%, rgb(110, 160, 236)  100%);
-        width: 170px;
-        height:  45px;
-        border-radius: 5px;
-        box-sizing: border-box;
-        cursor:  pointer;
-        text-align: center;
-        line-height: 45px;
-        font-size: 26px;
-        text-decoration: none;
-        font-family: poppins;
-        font-weight: 400;
-    }
 
 
     .button-style {
@@ -602,23 +614,20 @@
 
 <body>
 
-        <hr id = "line1" style="position: absolute; top: 62px; left: calc(50% - 320px); width: 638px; text-align: center; font-size: 24px; border-color: lightblue;">
+        <hr id = "line1" style="position: absolute; top: 62px; left: calc(50% - 320px); width: 638px; text-align: center; font-size: 24px; opacity: 0.5; border-color: lightblue;">
 
         <p class="noselect" id = "header" style="position: absolute; top: 18px; left: 0; width: 100%; text-align: center; font-size: 26px; color: palegoldenrod; font-family: poppins">daily meditation</p>
 
-        <p class="noselect" id="timer" style=" position: absolute; bottom: 8px; right: calc(50% - 0.2em); width: 10em; text-align: right; font-size: 16px; font-family: poppins; color: rgb(70,70,70); display: none"></p>
 
-        <p class="noselect" id="mode" style=" position: absolute; bottom: 8px; right: calc(33% + 0.4em); width: 10em; text-align: right; font-size: 16px; font-family: poppins; color: rgb(70,70,70); display: none">simple mode</p>
+        <p class="noselect" id="instructions" style="position: absolute; top: 305px; left: calc(50% - 183px); width: 366px; text-align: center; font-size: 28px; line-height: 18px; font-family: poppins; font-weight: 400;text-shadow: 0 0 10px lightblue"><a style = "font-weight:500">Instructions:</a><br><br>Press as you inhale</p>
 
-        <p class="noselect" id="instructions" style="position: absolute; top: 240px; left: calc(50% - 133px); width: 266px; text-align: center; font-size: 24px; line-height: 18px; font-family: poppins; font-weight: 400;text-shadow: 0 0 10px lightblue">
-        <a style = "font-size: 28px; font-weight: 500;">Instructions</a><br><br><br>Press as you inhale</p>
+        <p class="noselect" id="instructions2" style="position: absolute; top: 305px; left: calc(50% - 183px); width: 366px; text-align: center; font-size: 28px; line-height: 18px; font-family: poppins; font-weight: 400;text-shadow: 0 0 10px lightblue; display: none"><a style = "font-weight:500">Instructions:</a><br><br>Release as you exhale</p>
 
-        <p class="noselect" id="instructions2" style="position: absolute; top: 240px; left: calc(50% - 133px); width: 266px; text-align: center; font-size: 24px; line-height: 18px; font-family: poppins; font-weight: 400;text-shadow: 0 0 10px lightblue; display: none">
-            <a style = "font-size: 28px; font-weight: 500;">Instructions</a><br><br><br>Release as you exhale</p>
+        <p class="noselect" id="instructions2" style="position: absolute; top: 130px; left: calc(50% - 233px); width: 466px; text-align: center; font-size: 26px; line-height: 18px; color: lightcyan; font-family: poppins; font-weight: 500;text-shadow: 0 0 10px lightblue">How long do you want to meditate?</p>
         
-        <img id="press" src="{{url_for('static', filename='press.png')}}" style=" position: absolute; top: 360px; left: calc(50% - 100px); width: 160px; height: 75px;" alt="inhale" />
+        <img id="press" src="{{url_for('static', filename='press.png')}}" style=" position: absolute; top: 415px; left: calc(50% - 100px); width: 160px; height: 75px;" alt="inhale" />
 
-        <img id="release" src="{{url_for('static', filename='release.png')}}" style=" position: absolute; top: 360px; left: calc(50% - 100px); width: 160px; height: 75px; display: none;" alt="exhale" />
+        <img id="release" src="{{url_for('static', filename='release.png')}}" style=" position: absolute; top: 415px; left: calc(50% - 100px); width: 160px; height: 75px; display: none;" alt="exhale" />
     
         <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: poppins; color: skyblue"></p>
 
