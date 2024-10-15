@@ -314,7 +314,7 @@
                 const instructions2 = document.getElementById('instructions2');
 
                 cur_time = (new Date).getTime()
-                if ( ((cur_time - start_time) % 4000) < 2000) {
+                if ( ((cur_time - start_time) % 6000) < 3000) {
                     press.style.display = ""
                     release.style.display = "none"
 
@@ -337,9 +337,9 @@
                 update_inner_circle(circle_client, speed_multiplier_client)
                 update_outer_circle(circle_client)
                 
-                if (start_screen) {
-                    animate_instructions()
-                }
+                // if (start_screen) {
+                //     animate_instructions()
+                // }
             }
 
             function toggle_fullscreen(command) {
@@ -455,64 +455,68 @@
 
     .shorter-button {
         position: absolute;
-        top:  192px;
-        right:  calc(50% + 45px + 0px);
+        top:  210px;
+        right:  calc(50% + 45px + 54px);
         background: rgba(0,0,0,0);
-        text-shadow: 0 0 10px lightblue;
+        /* text-shadow: 0 0 5px lightblue; */
         border: 1px rgb(0,0,0);
-        border-radius: 100%;
+        border-radius: 7px;
         /* border-top-left-radius: 5px; */
         /* border-bottom-left-radius: 5px; */
-        width:  40px;
-        height:  40px;
-        line-height: 0px;
+        width:  25px;
+        height:  25px;
+        line-height: 10px;
         padding-bottom: 3px;
         color: navy;
         font-size: 22px;
         font-weight: bold;
         cursor:  pointer;
+        box-shadow:
+        -4px -2px 8px 0px mediumblue;
     }
 
     .shorter-button:hover {
         box-shadow:
-        -5px 0px 15px 0px mediumblue;
-        font-weight: 800;
+        -4px -2px 12px 0px mediumblue;
+        font-weight: 900;
     }
 
     .longer-button {
         position: absolute;
-        top:  192px;
-        right:  calc(50% - 85px + 0px);
+        top:  210px;
+        right:  calc(50% - 85px - 44px);
         background: rgba(0,0,0,0);
-        text-shadow: 0 0 10px lightblue;
+        /* text-shadow: 0 0 5px lightblue; */
         border: 1px rgb(0,0,0);
-        border-radius: 100%;
+        border-radius: 7px;
         /* border-top-right-radius: 5px; */
         /* border-bottom-right-radius: 5px; */
-        width:  40px;
-        height:  40px;
+        width:  25px;
+        height:  25px;
         line-height: 20px;
         margin: auto;
         color: navy;
         font-size: 22px;
         box-sizing: border-box;
         cursor:  pointer;
+        box-shadow:
+        -4px -2px 8px 0px mediumblue;
     }
 
     .longer-button:hover {
         box-shadow:
-        5px 0px 15px 0px mediumblue;
-        font-weight: 700;
+        -4px -2px 12px 0px mediumblue;
+        font-weight: 800;
     } 
     
 
     .duration-button {
         position: absolute;
-        top:  190px;
-        right: calc(50% - 110px + 0px);
+        top:  200px;
+        right: calc(50% - 110px - 2px);
         /* background-image: linear-gradient(to right, lightcyan  0%, rgb(110, 160, 236)  100%); */
         background: rgba(0,0,0,0);
-        text-shadow: 0 0 10px lightblue;
+        text-shadow: 0 0 3px lightblue;
         width: 220px;
         height:  45px;
         border-radius: 5px;
@@ -520,16 +524,16 @@
         cursor:  pointer;
         text-align: center;
         line-height: 45px;
-        font-size: 26px;
+        font-size: 24px;
         text-decoration: none;
         font-family: poppins;
-        font-weight: 400;
+        font-weight: 200;
     }
          
     .start-button {
         position: absolute;
-        top:  620px;
-        left: calc(50% - 85px 0px);
+        top:  530px;
+        left: calc(50% - 88px);
         background-image: linear-gradient(to right, lightcyan  0%, rgb(110, 160, 236)  100%);
         border: none;
         text-align: center;
@@ -537,40 +541,21 @@
         cursor:  pointer;
         border-radius: 7px;
         display: block;
-        width:  170px;
-        height:  45px;
-        line-height: 42px;
+        width:  178px;
+        height:  40px;
+        line-height: 0px;
         font-size: 28px;
         font-family: poppins;
-        font-weight: 400;
+        font-weight: 500;
     }
 
     .start-button:hover {
-        font-weight: 500;
+        font-weight: 600;
         box-shadow:
         7px -4px 30px 0px mediumblue,
         -4px 2px 20px 0px #0002;
     }
 
-
-
-    .button-style {
-        background: rgb(20, 20, 20);
-        opacity: 0.92;
-        border:  0px solid rgb(0, 0, 0);
-        width:  200px;
-        height:  30px;
-        border-radius: 0px;
-        box-sizing: border-box;
-        cursor:  pointer;
-        text-align: center;
-        line-height: 30px;
-        font-size: 14px;
-        left:  33%;
-        /* color: gold; */
-        text-decoration: none;
-        font-family: poppins;
-    }
 
     .prompt {
         position: absolute; 
@@ -614,20 +599,20 @@
 
 <body>
 
-        <hr id = "line1" style="position: absolute; top: 62px; left: calc(50% - 320px); width: 638px; text-align: center; font-size: 24px; opacity: 0.5; border-color: lightblue;">
+        <hr id = "line1" style="position: absolute; top: 75px; left: calc(50% - 320px); width: 638px; text-align: center; font-size: 24px; height: 1.5px; opacity: 0.5; border-color: lightblue;">
 
-        <p class="noselect" id = "header" style="position: absolute; top: 18px; left: 0; width: 100%; text-align: center; font-size: 26px; color: palegoldenrod; font-family: poppins">daily meditation</p>
+        <p class="noselect" id = "header" style="position: absolute; top: 14px; left: 0; width: 100%; text-align: center; font-size: 34px; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; font-family: poppins">breathing exercise</p>
 
 
-        <p class="noselect" id="instructions" style="position: absolute; top: 305px; left: calc(50% - 183px); width: 366px; text-align: center; font-size: 28px; line-height: 18px; font-family: poppins; font-weight: 400;text-shadow: 0 0 10px lightblue"><a style = "font-weight:500">Instructions:</a><br><br>Press as you inhale</p>
+        <p class="noselect" id="instructions" style="position: absolute; top: 140px; left: calc(50% - 253px); width: 506px; text-align: center; font-size: 23px; line-height: 25px; font-family: poppins; font-weight: 200;text-shadow: 0 0 0px lightblue"><a style="font-weight: 300; text-shadow: 0 0 3px lightblue">Instructions. &nbsp;</a>First, set your session duration.<br><br><br><br><br><br><br><br>On the next screen, press as you inhale. The orb will inflate. Then release as you exhale, and the orb will deflate.</p>
 
-        <p class="noselect" id="instructions2" style="position: absolute; top: 305px; left: calc(50% - 183px); width: 366px; text-align: center; font-size: 28px; line-height: 18px; font-family: poppins; font-weight: 400;text-shadow: 0 0 10px lightblue; display: none"><a style = "font-weight:500">Instructions:</a><br><br>Release as you exhale</p>
+        <p class="noselect" id="instructions2" style="position: absolute; top: 160px; left: calc(50% - 183px); width: 366px; text-align: center; font-size: 28px; line-height: 17px; font-family: poppins; font-weight: 400;text-shadow: 0 0 3px lightblue; display: none"><a style="font-weight: 500; text-shadow: 0 0 1px lightblue"> How to:</a><br><br><br>Release as you exhale</p>
 
-        <p class="noselect" id="instructions2" style="position: absolute; top: 130px; left: calc(50% - 233px); width: 466px; text-align: center; font-size: 26px; line-height: 18px; color: lightcyan; font-family: poppins; font-weight: 500;text-shadow: 0 0 10px lightblue">How long do you want to meditate?</p>
+        <p class="noselect" id="instructions2" style="position: absolute; top: 130px; left: calc(50% - 233px); width: 466px; text-align: center; font-size: 26px; line-height: 18px; color: lightcyan; font-family: poppins; font-weight: 500;text-shadow: 0 0 10px lightblue"></p>
         
-        <img id="press" src="{{url_for('static', filename='press.png')}}" style=" position: absolute; top: 415px; left: calc(50% - 100px); width: 160px; height: 75px;" alt="inhale" />
+        <img id="press" src="{{url_for('static', filename='press.png')}}" style=" position: absolute; top: 250px; left: calc(50% - 265px); width: 110px; height: 50px;" alt="inhale" />
 
-        <img id="release" src="{{url_for('static', filename='release.png')}}" style=" position: absolute; top: 415px; left: calc(50% - 100px); width: 160px; height: 75px; display: none;" alt="exhale" />
+        <img id="release" src="{{url_for('static', filename='release.png')}}" style=" position: absolute; top: 250px; left: calc(50%); width: 110px; height: 50px;" alt="exhale" />
     
         <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: poppins; color: skyblue"></p>
 
