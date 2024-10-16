@@ -355,7 +355,7 @@
             const start_button = document.createElement("button");
             start_button.setAttribute('id','start-button');
             start_button.setAttribute('class','start-button noselect');
-            start_button.textContent = 'start';
+            start_button.textContent = 'begin';
             start_button.addEventListener('click', start_session);
             start_button.style.display = ""
             document.body.appendChild(start_button);
@@ -455,8 +455,8 @@
 
     .shorter-button {
         position: absolute;
-        top:  228px;
-        right:  calc(50% + 45px - 30px - 120px);
+        top:  233px;
+        right:  calc(50% + 45px - 25px - 130px);
         background: rgba(0,0,0,0);
         /* text-shadow: 0 0 5px lightblue; */
         border: 1px rgb(0,0,0);
@@ -472,19 +472,19 @@
         font-weight: bold;
         cursor:  pointer;
         box-shadow:
-        -1px -1px 8px 0px mediumblue;
+        -1px -1px 10px 0px mediumblue;
     }
 
     .shorter-button:hover {
         box-shadow:
-        -1px -1px 12x 0px mediumblue;
-        font-weight: 900;
-    }
+        -2px -2px 16px 0px mediumblue;
+        /* font-weight: 800; */
+    } 
 
     .longer-button {
         position: absolute;
-        top:  229px;
-        right:  calc(50% - 113px - 120px);
+        top:  234px;
+        right:  calc(50% - 116px - 130px);
         background: rgba(0,0,0,0);
         /* text-shadow: 0 0 5px lightblue; */
         border: 1px rgb(0,0,0);
@@ -500,21 +500,20 @@
         box-sizing: border-box;
         cursor:  pointer;
         box-shadow:
-        -1px -1px 8px 0px mediumblue;
+        -1px -1px 10px 0px mediumblue;
     }
 
     .longer-button:hover {
         box-shadow:
-        -1px -1px 12px 0px mediumblue;
-        font-weight: 800;
+        -2px -2px 16px 0px mediumblue;
+        /* font-weight: 800; */
     } 
     
 
     .duration-button {
         position: absolute;
-        top:  214px;
-        right: calc(50% - 110px - 35px - 120px);
-        /* background-image: linear-gradient(to right, lightcyan  0%, rgb(110, 160, 236)  100%); */
+        top:  219px;
+        right: calc(50% - 110px - 35px - 130px);
         background: rgba(0,0,0,0);
         text-shadow: 0 0 2px lightblue;
         width: 220px;
@@ -534,7 +533,8 @@
         position: absolute;
         top:  440px;
         left: calc(50% - 88px);
-        background-image: linear-gradient(to right, lightcyan  0%, rgb(110, 160, 236)  100%);
+        background-image: linear-gradient(to right, lightcyan  0%,  skyblue 100%); 
+        /* rgb(110, 160, 236) */
         border: none;
         text-align: center;
         color: rgb(30, 60, 160);            
@@ -544,16 +544,18 @@
         width:  178px;
         height:  40px;
         line-height: 0px;
+        padding-bottom: 5px;
         font-size: 28px;
         font-family: poppins;
-        font-weight: 500;
+        font-weight: 300;
+        box-shadow:
+        -1px 1px 7px 0px mediumblue;
     }
 
     .start-button:hover {
-        font-weight: 600;
         box-shadow:
-        7px -4px 30px 0px mediumblue,
-        -4px 2px 20px 0px #0002;
+        -3px 3px 13px 0px mediumblue;
+        /* -4px 2px 20px 0px #0002; */
     }
 
 
@@ -604,11 +606,13 @@
         <p class="noselect" id = "header" style="position: absolute; top: 14px; left: 0; width: 100%; text-align: center; font-size: 34px; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; font-family: poppins">the breathing moon</p>
 
 
-        <p class="noselect" id="instructions" style="position: absolute; top: 120px; left: calc(50% - 293px); width: 586px; text-align: center; font-size: 22px; line-height: 37px; font-family: poppins; font-weight: 200;text-shadow: 0 0 0px lightblue"><a style="font-weight: 300; text-shadow: 0 0 3px lightblue; font-size: 26px">Instructions</a><br><br>First, set your session duration: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br> After starting, <a style="font-weight: 300; text-shadow: 0 0 3px lightblue">press as you inhale</a>. The orb will inflate. Then, <a style="font-weight: 300; text-shadow: 0 0 3px lightblue">release as you exhale</a> to make the orb deflate.</p>
+        <p class="noselect" id="instructions" style="position: absolute; top: 125px; left: calc(50% - 293px); width: 586px; text-align: center; font-size: 22px; line-height: 37px; font-family: poppins; font-weight: 200;text-shadow: 0 0 0px lightblue"><a style="font-weight: 300; text-shadow: 0 0 3px lightblue; font-size: 26px">Instructions</a><br><br>Set your meditation duration : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br> On the next page, <a style="font-weight: 300; text-shadow: 0 0 3px lightblue">press as you inhale</a> and then <a style="font-weight: 300; text-shadow: 0 0 3px lightblue">release as you exhale</a> to breathe with the moon</p>
 
         <p class="noselect" id="instructions2" style="position: absolute; top: 160px; left: calc(50% - 183px); width: 366px; text-align: center; font-size: 28px; line-height: 17px; font-family: poppins; font-weight: 400;text-shadow: 0 0 3px lightblue; display: none"><a style="font-weight: 500; text-shadow: 0 0 1px lightblue"> How to:</a><br><br><br>Release as you exhale</p>
 
         <p class="noselect" id="instructions2" style="position: absolute; top: 130px; left: calc(50% - 233px); width: 466px; text-align: center; font-size: 26px; line-height: 18px; color: lightcyan; font-family: poppins; font-weight: 500;text-shadow: 0 0 10px lightblue"></p>
+
+        <img id="press" src="{{url_for('static', filename='moon.png')}}" style=" position: absolute; top: 40px; left: calc(50% + 175px); width: 30px; height: 30px;" alt="moon" />
         
         <img id="press" src="{{url_for('static', filename='press.png')}}" style=" position: absolute; top: 250px; left: calc(50% - 265px); width: 110px; height: 50px; display: none" alt="inhale" />
 
