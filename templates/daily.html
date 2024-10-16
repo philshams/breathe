@@ -163,7 +163,7 @@
                     meditationCanvas.height = window.innerHeight;
                     const ctx = meditationCanvas.getContext('2d');
                     ctx.fillStyle = "rgba(140,140,140,0.05)";
-                    ctx.fillRect(meditationCanvas.width / 2 - 320, 0, 320 * 2, window.innerHeight)
+                    ctx.fillRect(meditationCanvas.width / 2 - 305, 0, 305 * 2, window.innerHeight)
                 }
 
                 requestAnimationFrame(animate);
@@ -442,8 +442,8 @@
                 in_text2.style.color = "lightcyan"
 
                 db.style.color = "lightcyan" // "rgb(30, 60, 160)"
-                shb.style.color = "lightcyan"
-                lob.style.color = "lightcyan"
+                shb.style.color = "navy"
+                lob.style.color = "navy"
             }
 
             setInterval(update, 16);
@@ -456,63 +456,66 @@
     .shorter-button {
         position: absolute;
         top:  233px;
-        right:  calc(50% + 45px - 25px - 130px);
-        background: rgba(0,0,0,0);
+        right:  calc(50% + 45px - 33px - 130px);
+        /* background: rgba(0,0,0,0); */
+        background-image: linear-gradient(to right, lightcyan  0%,  skyblue 100%);
         /* text-shadow: 0 0 5px lightblue; */
         border: 1px rgb(0,0,0);
-        border-radius: 7px;
+        border-radius: 5px;
         /* border-top-left-radius: 5px; */
         /* border-bottom-left-radius: 5px; */
-        width:  25px;
+        width:  30px;
         height:  18px;
         line-height: 10px;
         padding-bottom: 3px;
         color: navy;
         font-size: 22px;
-        font-weight: bold;
+        font-weight: 400;
         cursor:  pointer;
-        box-shadow:
-        -1px -1px 10px 0px mediumblue;
+        /* box-shadow:
+        -1px 1px 2px 0px blue; */
     }
 
     .shorter-button:hover {
         box-shadow:
-        -2px -2px 16px 0px mediumblue;
+        -2px 2px 10px 0px blue;
         /* font-weight: 800; */
     } 
 
     .longer-button {
         position: absolute;
         top:  234px;
-        right:  calc(50% - 116px - 130px);
-        background: rgba(0,0,0,0);
+        right:  calc(50% - 111px - 130px);
+        /* background: rgba(0,0,0,0); */
+        background-image: linear-gradient(to right, lightcyan  0%,  skyblue 100%);
         /* text-shadow: 0 0 5px lightblue; */
         border: 1px rgb(0,0,0);
-        border-radius: 7px;
+        border-radius: 5px;
         /* border-top-right-radius: 5px; */
         /* border-bottom-right-radius: 5px; */
-        width:  25px;
+        width:  30px;
         height:  18px;
         line-height: 10px;
+        font-weight: 200;
         margin: auto;
         color: navy;
-        font-size: 22px;
+        font-size: 18px;
         box-sizing: border-box;
         cursor:  pointer;
-        box-shadow:
-        -1px -1px 10px 0px mediumblue;
+        /* box-shadow:
+        -1px 1px 2px 0px blue; */
     }
 
     .longer-button:hover {
         box-shadow:
-        -2px -2px 16px 0px mediumblue;
+        -2px 2px 10px 0px blue;
         /* font-weight: 800; */
     } 
     
 
     .duration-button {
         position: absolute;
-        top:  219px;
+        top:  219.5px;
         right: calc(50% - 110px - 35px - 130px);
         background: rgba(0,0,0,0);
         text-shadow: 0 0 2px lightblue;
@@ -549,12 +552,12 @@
         font-family: poppins;
         font-weight: 300;
         box-shadow:
-        -1px 1px 7px 0px mediumblue;
+        -1px 1px 7px 0px blue;
     }
 
     .start-button:hover {
         box-shadow:
-        -3px 3px 13px 0px mediumblue;
+        -3px 3px 13px 0px blue;
         /* -4px 2px 20px 0px #0002; */
     }
 
@@ -601,12 +604,12 @@
 
 <body>
 
-        <hr id = "line1" style="position: absolute; top: 75px; left: calc(50% - 320px); width: 638px; text-align: center; font-size: 24px; height: 1.5px; opacity: 0.5; border-color: lightblue;">
+        <hr id = "line1" style="position: absolute; top: 75px; left: calc(50% - 305px); width: 608px; text-align: center; font-size: 24px; height: 1.5px; opacity: 0.5; border-color: lightblue;">
 
         <p class="noselect" id = "header" style="position: absolute; top: 14px; left: 0; width: 100%; text-align: center; font-size: 34px; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; font-family: poppins">the breathing moon</p>
 
 
-        <p class="noselect" id="instructions" style="position: absolute; top: 125px; left: calc(50% - 293px); width: 586px; text-align: center; font-size: 22px; line-height: 37px; font-family: poppins; font-weight: 200;text-shadow: 0 0 0px lightblue"><a style="font-weight: 300; text-shadow: 0 0 3px lightblue; font-size: 26px">Instructions</a><br><br>Set your meditation duration : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br> On the next page, <a style="font-weight: 300; text-shadow: 0 0 3px lightblue">press as you inhale</a> and then <a style="font-weight: 300; text-shadow: 0 0 3px lightblue">release as you exhale</a> to breathe with the moon</p>
+        <p class="noselect" id="instructions" style="position: absolute; top: 125px; left: calc(50% - 293px); width: 586px; text-align: center; font-size: 22px; line-height: 37px; font-family: poppins; font-weight: 200;text-shadow: 0 0 0px lightblue"><a style="font-weight: 300; text-shadow: 0 0 3px lightblue; font-size: 26px">Instructions</a><br><br>Set your meditation duration : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br> On the next page, <a style="font-weight: 300; text-shadow: 0 0 3px lightblue">press as you inhale</a> and then <a style="font-weight: 300; text-shadow: 0 0 3px lightblue">release as you exhale</a> to breathe with the moon</p>
 
         <p class="noselect" id="instructions2" style="position: absolute; top: 160px; left: calc(50% - 183px); width: 366px; text-align: center; font-size: 28px; line-height: 17px; font-family: poppins; font-weight: 400;text-shadow: 0 0 3px lightblue; display: none"><a style="font-weight: 500; text-shadow: 0 0 1px lightblue"> How to:</a><br><br><br>Release as you exhale</p>
 
