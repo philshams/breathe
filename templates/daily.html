@@ -8,7 +8,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
             background-color: #000000;
         }
 
@@ -69,7 +68,7 @@
             user_id = 0;
 
             const x_pos = meditationCanvas.width / 2;
-            const y_pos = meditationCanvas.height * 0.26;
+            const y_pos = meditationCanvas.height * 0.33;
 
             var circle_client = {
                 x: x_pos,
@@ -300,10 +299,10 @@
                 }
                 if (last_event == "exhale") {
                         if (speed > 0) {
-                            return Math.min(-0.5, -max_speed * Math.min(2, circle.radius / 65))
+                            return Math.min(-0.5, -max_speed * Math.min(1.25, circle.radius / 65))
                         }
                         if (circle.radius > 65){
-                            return Math.min(-max_speed, speed * .991)
+                            return Math.min(-max_speed, speed * .989)
                         }
                         return Math.min(-0.1 , speed * .989)
                 }
