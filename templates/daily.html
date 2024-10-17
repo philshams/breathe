@@ -51,7 +51,7 @@
             const color_change = 0.25;
             const radius_change = 0.6 * radius_scale;
 
-            const max_speed = 1.5;
+            const max_speed = 1.25;
             const acceleration_init = 0.025;
 
             var speed = 0;
@@ -174,12 +174,14 @@
 
             // Add event listener for the "keydown" event on the document object
             document.addEventListener('keydown', (event) => {
-                if (event.code === 'Space' || event.code === 'Tab') {
+                if (event.code === 'Space' || event.code === 'Tab' || event.altKey) {
                     // Prevent default behavior of the spacebar key
                     event.preventDefault();
                 }
                 if (event.code === 'Esc') {
                     toggle_fullscreen("off")
+                } else if (event.altKey) {
+                    
                 } else {
                     key_down_response(event)
                 }
@@ -209,6 +211,11 @@
             // Add event listener for the "keyup" event on the document object
             document.addEventListener('touchend', (event) => {
                 key_up_response(event)
+            });
+
+            // Add event listener for the "keyup" event on the document object
+            document.addEventListener('dblclick', (event) => {
+                toggle_fullscreen()
             });
 
             window.onbeforeunload = function () {
@@ -280,7 +287,7 @@
 
             function calculate_speed(last_event, circle) {
 
-                console.log(last_event)
+                console.log(circle.radius)
 
                 acceleration = acceleration_init
 
@@ -292,19 +299,22 @@
                         return speed + acceleration
                 }
                 if (last_event == "exhale") {
-                        if (speed >= 0) {
-                            return -max_speed
+                        if (speed > 0) {
+                            return Math.min(-0.5, -max_speed * Math.min(2, circle.radius / 65))
                         }
-                        return Math.min(-0.1 , speed * .993)
+                        if (circle.radius > 65){
+                            return Math.min(-max_speed, speed * .991)
+                        }
+                        return Math.min(-0.1 , speed * .989)
                 }
 
-                if (last_event.includes("phase 2") && counter < 40){
+                if (last_event.includes("phase 2") && counter < 50){
                     counter = counter + 1;
                     return speed
                 }
 
                 if (last_event == "inhale (phase 2)") {
-                        return Math.max(0.2, speed*.985)
+                        return Math.max(0.3, speed*.99)
                 }
 
                 if (last_event == "paused") {
@@ -329,7 +339,7 @@
             }
 
             function toggle_fullscreen(command) {
-                if (command == "on") {
+                if (command == "on" || (command != "off" && !document.fullscreenElement)) {
                     document.documentElement.requestFullscreen();
                     document.documentElement.setAttribute("fullscreen","");
                 } else {
