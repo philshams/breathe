@@ -51,8 +51,8 @@
             const color_change = 0.25;
             const radius_change = 0.6 * radius_scale;
 
-            const max_speed = 3;
-            const acceleration_init = 0.05;
+            const max_speed = 3.5;
+            const acceleration_init = 0.04;
 
             var speed = 0;
 
@@ -268,7 +268,7 @@
 
 
             function update_last_event() {
-                if (speed >= max_speed-1 && last_event == "inhale") {
+                if (speed >= max_speed && last_event == "inhale") {
                     return "inhale (phase 2)"
                 }
 
@@ -319,7 +319,7 @@
                 last_event = update_last_event()
                 speed = calculate_speed(last_event, circle_client)
                 speed = Math.max(speed, -max_speed)
-                speed = Math.min(speed, max_speed-1)
+                speed = Math.min(speed, max_speed)
 
                 console.log(speed)
                 
