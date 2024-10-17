@@ -43,18 +43,19 @@
             const ctx = meditationCanvas.getContext('2d');
 
             const radius_scale = 0.5;
-            const min_radius = 30 * radius_scale;
-            const start_radius = 100 * radius_scale;
-            const max_radius = 410 * radius_scale;
+            const min_radius = 10 * radius_scale;
+            const start_radius = 50 * radius_scale;
+            const max_radius = 390 * radius_scale;
 
             const max_ring_width = 166  * radius_scale
             const color_change = 0.25;
             const radius_change = 0.6 * radius_scale;
 
-            const max_speed = 3.5;
-            const acceleration_init = 0.04;
+            const max_speed = 1.5;
+            const acceleration_init = 0.025;
 
             var speed = 0;
+            var counter = 0;
 
             const ring_color = "rgba(255,255,255"
             const circle_color = "white"
@@ -68,7 +69,7 @@
             user_id = 0;
 
             const x_pos = meditationCanvas.width / 2;
-            const y_pos = meditationCanvas.height * 0.28;
+            const y_pos = meditationCanvas.height * 0.26;
 
             var circle_client = {
                 x: x_pos,
@@ -269,11 +270,8 @@
 
             function update_last_event() {
                 if (speed >= max_speed && last_event == "inhale") {
+                    counter = 0;
                     return "inhale (phase 2)"
-                }
-
-                if (speed <= -max_speed && last_event == "exhale") {
-                    return "exhale (phase 2)"
                 }
 
                 return last_event
@@ -288,23 +286,25 @@
 
                 if (last_event == "inhale") {
                         if (speed < 0) {
-                            acceleration = acceleration_init * 3
+                            acceleration = acceleration_init * 2
                         }
 
                         return speed + acceleration
                 }
                 if (last_event == "exhale") {
-                        if (speed > 0) {
-                                acceleration = acceleration_init * 3
+                        if (speed >= 0) {
+                            return -max_speed
                         }
-                        return speed - acceleration
+                        return Math.min(-0.1 , speed * .993)
+                }
+
+                if (last_event.includes("phase 2") && counter < 40){
+                    counter = counter + 1;
+                    return speed
                 }
 
                 if (last_event == "inhale (phase 2)") {
-                        return Math.max(0.2, speed*.99)
-                }
-                if (last_event == "exhale (phase 2)") {
-                        return Math.min(-0.2, speed*.99)
+                        return Math.max(0.2, speed*.985)
                 }
 
                 if (last_event == "paused") {
