@@ -44,17 +44,17 @@
 
             const radius_scale = 0.5;
             const min_radius = 30 * radius_scale;
-            const start_radius = 110 * radius_scale;
-            const max_radius = 380 * radius_scale;
+            const start_radius = 100 * radius_scale;
+            const max_radius = 410 * radius_scale;
 
             const max_ring_width = 166  * radius_scale
             const color_change = 0.25;
             const radius_change = 0.6 * radius_scale;
 
-            const max_speed = 2;
+            const max_speed = 3;
+            const acceleration_init = 0.05;
 
             var speed = 0;
-            var acceleration = 0;
 
             const ring_color = "rgba(255,255,255"
             const circle_color = "white"
@@ -68,7 +68,7 @@
             user_id = 0;
 
             const x_pos = meditationCanvas.width / 2;
-            const y_pos = meditationCanvas.height * 0.30;
+            const y_pos = meditationCanvas.height * 0.28;
 
             var circle_client = {
                 x: x_pos,
@@ -81,7 +81,7 @@
             var num_breaths = 0;
             const timeout_counter = 20000;
             var num_active;
-            var last_client_event = 'paused';
+            var last_event = 'paused';
 
             var start_screen = true;
             var paused = false;
@@ -135,7 +135,7 @@
             function animate() {
                 ctx.clearRect(0, 0, meditationCanvas.width, meditationCanvas.height);
 
-                if (num_breaths > 0) {
+                if (!start_screen) {
                     drawInnerCircle(circle_client)
                     drawOuterCircle(circle_client);
                 }
@@ -153,21 +153,21 @@
             }
 
             function key_down_response(event) {
-                if (last_client_event != 'inhale') {
+                if (!last_event.includes('inhale') && !start_screen) {
                     socket.emit('client_keydown');
                     num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter, num_breaths);
-                    last_client_event = 'inhale'
+                    last_event = 'inhale'
                     paused = false;                      
                 }
             }
 
             function key_up_response(event) {
-                if (last_client_event == 'inhale') {
+                if (!last_event.includes('exhale') && !start_screen) {
                     socket.emit('client_keyup');
                     num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter, num_breaths);
-                    last_client_event = 'exhale'   
+                    last_event = 'exhale'   
                 }
             }
 
@@ -267,68 +267,65 @@
             }
 
 
+            function update_last_event() {
+                if (speed >= max_speed-1 && last_event == "inhale") {
+                    return "inhale (phase 2)"
+                }
+
+                if (speed <= -max_speed && last_event == "exhale") {
+                    return "exhale (phase 2)"
+                }
+
+                return last_event
+            }
+
+
             function calculate_speed(last_event, circle) {
 
-                acceleration = 0.04 //Math.abs((40 - circle.radius)/10)
+                console.log(last_event)
+
+                acceleration = acceleration_init
 
                 if (last_event == "inhale") {
                         if (speed < 0) {
-                            acceleration = acceleration * 3
+                            acceleration = acceleration_init * 3
                         }
 
                         return speed + acceleration
                 }
                 if (last_event == "exhale") {
                         if (speed > 0) {
-                                acceleration = acceleration * 3
+                                acceleration = acceleration_init * 3
                         }
                         return speed - acceleration
                 }
+
+                if (last_event == "inhale (phase 2)") {
+                        return Math.max(0.2, speed*.99)
+                }
+                if (last_event == "exhale (phase 2)") {
+                        return Math.min(-0.2, speed*.99)
+                }
+
                 if (last_event == "paused") {
                     return 0
                 }
                 
             }
 
-            function animate_instructions() {
-                const press = document.getElementById('press');
-                const release = document.getElementById('release');
-
-                const instructions = document.getElementById('instructions');
-                const instructions2 = document.getElementById('instructions2');
-
-                cur_time = (new Date).getTime()
-                if ( ((cur_time - start_time) % 6000) < 3000) {
-                    press.style.display = ""
-                    release.style.display = "none"
-
-                    instructions.style.display = ""
-                    instructions2.style.display = "none"
-                } else {
-                    press.style.display = "none"
-                    release.style.display = ""
-
-                    instructions.style.display = "none"
-                    instructions2.style.display = ""
-                }
-                
-
-            }
 
             // Update the circle color on each frame
             function update() {
-                speed = calculate_speed(last_client_event, circle_client)
+                last_event = update_last_event()
+                speed = calculate_speed(last_event, circle_client)
                 speed = Math.max(speed, -max_speed)
-                speed = Math.min(speed, max_speed)
+                speed = Math.min(speed, max_speed-1)
 
                 console.log(speed)
                 
                 update_inner_circle(circle_client, speed)
                 update_outer_circle(circle_client)
                 
-                // if (start_screen) {
-                //     animate_instructions()
-                // }
             }
 
             function toggle_fullscreen(command) {
