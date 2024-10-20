@@ -42,8 +42,8 @@
             const ctx = meditationCanvas.getContext('2d');
 
             const radius_scale = 0.5;
-            const min_radius = 10 * radius_scale;
-            const start_radius = 50 * radius_scale;
+            const min_radius = 30 * radius_scale;
+            const start_radius = 80 * radius_scale;
             const max_radius = 390 * radius_scale;
 
             const max_ring_width = 125  * radius_scale
@@ -64,7 +64,8 @@
             var timer_on = true;
 
             var session_duration = 2;
-            var start_time = (new Date).getTime()
+            var start_time = (new Date).getTime();
+            var press_time = 0;
 
             user_id = 0;
 
@@ -80,11 +81,15 @@
             };
 
             var num_breaths = 0;
+            var num_breaths_at_marker1 = 9999999;
+            var num_breaths_at_marker2 = 9999999;
+            var num_breaths_at_marker3 = 9999999;
             const timeout_counter = 20000;
             var num_active;
             var last_event = 'paused';
 
             var start_screen = true;
+            var end_screen = false;
             var paused = false;
 
             // Connect to the Socket.IO server.
@@ -154,13 +159,75 @@
                 requestAnimationFrame(animate);
             }
 
+            function display_prompt() {
+                const instructions2 = document.getElementById("instructions2");
+                press_time = (new Date).getTime()
+                instructions2.style.display = ""
+                instructions2.style.opacity = 1.0
+                return (new Date).getTime()
+            }
+
+            function end_session() {
+                const instructions2 = document.getElementById("instructions2");
+                instructions2.style.display = ""
+                instructions2.style.opacity = 1.0
+                instructions2.textContent = session_duration + " min meditation complete!"
+                end_screen = true;
+            }
+
+            function verbal_prompt() {
+                const instructions2 = document.getElementById("instructions2");
+                
+                if (num_breaths == 1 || num_breaths == 2) {
+                    display_prompt()
+                    if (session_duration == 1) {
+                        min_str = ""
+                        start_str = "s"
+                    } else {
+                        min_str = "s"
+                        start_str = ""
+                    }
+                    instructions2.textContent = session_duration.toString() + " minute" + min_str + " of relaxation start" + start_str + " now"
+                }
+                if (num_breaths == 3 || num_breaths == 4) {
+                    display_prompt()
+                    instructions2.textContent = "I'll keep track of time..."
+                    }
+                if (num_breaths == 5 || num_breaths == 6) {
+                    display_prompt()
+                    instructions2.textContent = "...so just enjoy your meditation!"
+                }
+                if ((((new Date).getTime() - start_time) / 1000 / 60) > (0.25 * session_duration) && num_breaths < num_breaths_at_marker1) {
+                    display_prompt()
+                    num_breaths_at_marker1 = num_breaths
+                    instructions2.textContent = "25% done - you're doing great!"
+                }
+                if (((new Date).getTime() - start_time) / 1000 / 60 > 0.5 * session_duration && num_breaths < num_breaths_at_marker2) {
+                    display_prompt()
+                    num_breaths_at_marker2 = num_breaths
+                    instructions2.textContent = "Halfway done - "
+                }
+                if (((new Date).getTime() - start_time) / 1000 / 60 > 0.75 * session_duration && num_breaths < num_breaths_at_marker3) {
+                    display_prompt()
+                    num_breaths_at_marker3 = num_breaths
+                    instructions2.textContent = "75% done - almost there!"
+                }
+                if (((new Date).getTime() - start_time) / 1000 / 60 > session_duration) {
+                    end_session()
+                }
+            }
+
             function key_down_response(event) {
                 if (!last_event.includes('inhale') && !start_screen) {
                     socket.emit('client_keydown');
                     num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter, num_breaths);
                     last_event = 'inhale'
-                    paused = false;                      
+                    paused = false;
+                    
+                    verbal_prompt()
+                    
+                    
                 }
             }
 
@@ -226,8 +293,6 @@
             function start_session() {
                 const instructions = document.getElementById("instructions"); 
                 instructions.style.display = "none"
-                const instructions2 = document.getElementById("instructions2"); 
-                instructions2.style.display = "none"
 
                 const header = document.getElementById("header"); 
                 header.style.display = "none"
@@ -301,7 +366,7 @@
                         if (speed > 0) {
                             return Math.min(-0.5, -max_speed_exhale * Math.min(1, circle.radius / 60))
                         }
-                        if (circle.radius > 60){
+                        if (circle.radius > 70){
                             return -max_speed_exhale
                         }
                         return Math.min(-0.1 , speed * .99)
@@ -322,6 +387,16 @@
                 
             }
 
+            function update_text() {
+                const text = document.getElementById("instructions2");
+                if (text.style.display == "" && ((new Date).getTime() - press_time) > 2000 && !end_screen) {
+                    text.style.opacity = text.style.opacity - 0.005
+                    if (text.style.opacity < 0.01) {
+                        text.style.display = "none"
+                    }
+                }
+            }
+
 
             // Update the circle color on each frame
             function update() {
@@ -332,6 +407,8 @@
                 
                 update_inner_circle(circle_client, speed)
                 update_outer_circle(circle_client)
+
+                update_text()
                 
             }
 
@@ -602,9 +679,7 @@
 
         <p class="noselect" id="instructions" style="position: absolute; top: 125px; left: calc(50% - 293px); width: 586px; text-align: center; font-size: 22px; line-height: 37px; font-family: poppins; font-weight: 200;text-shadow: 0 0 0px lightblue"><a style="font-weight: 300; text-shadow: 0 0 3px lightblue; font-size: 26px">Instructions</a><br><br>Set your meditation duration : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br> On the next page, <a style="font-weight: 300; text-shadow: 0 0 3px lightblue">press as you inhale</a> and then <a style="font-weight: 300; text-shadow: 0 0 3px lightblue">release as you exhale</a> to breathe with the moon</p>
 
-        <p class="noselect" id="instructions2" style="position: absolute; top: 160px; left: calc(50% - 183px); width: 366px; text-align: center; font-size: 28px; line-height: 17px; font-family: poppins; font-weight: 400;text-shadow: 0 0 3px lightblue; display: none"><a style="font-weight: 500; text-shadow: 0 0 1px lightblue"> How to:</a><br><br><br>Release as you exhale</p>
-
-        <p class="noselect" id="instructions2" style="position: absolute; top: 130px; left: calc(50% - 233px); width: 466px; text-align: center; font-size: 26px; line-height: 18px; color: lightcyan; font-family: poppins; font-weight: 500;text-shadow: 0 0 10px lightblue"></p>
+        <p class="noselect" id="instructions2" style="position: absolute; top: 80px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 300;text-shadow: 0 0 4px lightblue; display: none"></p>
 
         <img id="moon" src="{{url_for('static', filename='moon.png')}}" style=" position: absolute; top: 40px; left: calc(50% + 175px); width: 30px; height: 30px;" alt="moon" />
     
