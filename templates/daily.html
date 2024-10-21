@@ -42,7 +42,7 @@
             const ctx = meditationCanvas.getContext('2d');
 
             const radius_scale = 0.5;
-            const min_radius = 30 * radius_scale;
+            const min_radius = 40 * radius_scale;
             const start_radius = 80 * radius_scale;
             const max_radius = 390 * radius_scale;
 
@@ -50,9 +50,9 @@
             const color_change = 0.25;
             const radius_change = 0.6 * radius_scale;
 
-            const max_speed = 1.25;
-            const max_speed_exhale = 1.15;
-            const acceleration_init = 0.025;
+            const max_speed = 1.8;
+            const max_speed_exhale = 1.6;
+            const acceleration_init = 0.04;
 
             var speed = 0;
             var counter = 0;
@@ -142,7 +142,7 @@
             function animate() {
                 ctx.clearRect(0, 0, meditationCanvas.width, meditationCanvas.height);
 
-                if (!start_screen) {
+                if (!start_screen && !end_screen) {
                     drawInnerCircle(circle_client)
                     drawOuterCircle(circle_client);
                 }
@@ -172,6 +172,7 @@
                 instructions2.style.display = ""
                 instructions2.style.opacity = 1.0
                 instructions2.textContent = session_duration + " min meditation complete!"
+                toggle_fullscreen("off")
                 end_screen = true;
             }
 
@@ -187,7 +188,7 @@
                         min_str = "s"
                         start_str = ""
                     }
-                    instructions2.textContent = session_duration.toString() + " minute" + min_str + " of relaxation start" + start_str + " now"
+                    instructions2.textContent = session_duration.toString() + " minute" + min_str + " of relaxation starting now"
                 }
                 if (num_breaths == 3 || num_breaths == 4) {
                     display_prompt()
@@ -197,17 +198,17 @@
                     display_prompt()
                     instructions2.textContent = "...so just enjoy your meditation!"
                 }
-                if ((((new Date).getTime() - start_time) / 1000 / 60) > (0.25 * session_duration) && num_breaths < num_breaths_at_marker1) {
+                if ((((new Date).getTime() - start_time) / 1000 / 60) > (0.25 * session_duration) && num_breaths < num_breaths_at_marker1 && session_duration > 5) {
                     display_prompt()
                     num_breaths_at_marker1 = num_breaths
                     instructions2.textContent = "25% done - you're doing great!"
                 }
-                if (((new Date).getTime() - start_time) / 1000 / 60 > 0.5 * session_duration && num_breaths < num_breaths_at_marker2) {
+                if (((new Date).getTime() - start_time) / 1000 / 60 > 0.5 * session_duration && num_breaths < num_breaths_at_marker2 && session_duration > 1) {
                     display_prompt()
                     num_breaths_at_marker2 = num_breaths
-                    instructions2.textContent = "Halfway done - "
+                    instructions2.textContent = "Halfway done"
                 }
-                if (((new Date).getTime() - start_time) / 1000 / 60 > 0.75 * session_duration && num_breaths < num_breaths_at_marker3) {
+                if (((new Date).getTime() - start_time) / 1000 / 60 > 0.75 * session_duration && num_breaths < num_breaths_at_marker3 && session_duration > 5) {
                     display_prompt()
                     num_breaths_at_marker3 = num_breaths
                     instructions2.textContent = "75% done - almost there!"
@@ -342,7 +343,7 @@
 
 
             function update_last_event() {
-                if (speed >= max_speed && last_event == "inhale") {
+                if (speed > (0.9*max_speed) && last_event == "inhale") {
                     counter = 0;
                     return "inhale (phase 2)"
                 }
@@ -353,32 +354,30 @@
 
             function calculate_speed(last_event, circle) {
 
-                acceleration = acceleration_init
-
                 if (last_event == "inhale") {
                         if (speed < 0) {
-                            acceleration = acceleration_init * 2
+                            return speed + acceleration_init * 4
                         }
 
-                        return speed + acceleration
+                        return speed + acceleration_init * Math.abs(1 - speed / max_speed)
                 }
                 if (last_event == "exhale") {
                         if (speed > 0) {
                             return Math.min(-0.5, -max_speed_exhale * Math.min(1, circle.radius / 60))
                         }
-                        if (circle.radius > 70){
+                        if (circle.radius > 90){
                             return -max_speed_exhale
                         }
                         return Math.min(-0.1 , speed * .99)
                 }
 
-                if (last_event.includes("phase 2") && counter < 60){
+                if (last_event.includes("phase 2") && counter < 20){
                     counter = counter + 1;
                     return speed
                 }
 
                 if (last_event == "inhale (phase 2)") {
-                        return Math.max(0.3, speed*.99)
+                        return Math.max(0.15, speed*.985)
                 }
 
                 if (last_event == "paused") {
