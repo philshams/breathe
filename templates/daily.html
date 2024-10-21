@@ -42,7 +42,7 @@
             const ctx = meditationCanvas.getContext('2d');
 
             const radius_scale = 0.5;
-            const min_radius = 40 * radius_scale;
+            const min_radius = 50 * radius_scale;
             const start_radius = 80 * radius_scale;
             const max_radius = 390 * radius_scale;
 
@@ -50,9 +50,9 @@
             const color_change = 0.25;
             const radius_change = 0.6 * radius_scale;
 
-            const max_speed = 1.8;
-            const max_speed_exhale = 1.6;
-            const acceleration_init = 0.04;
+            const max_speed = 2.0;
+            const max_speed_exhale = 1.75;
+            const acceleration_init = 0.06;
 
             var speed = 0;
             var counter = 0;
@@ -179,25 +179,18 @@
             function verbal_prompt() {
                 const instructions2 = document.getElementById("instructions2");
                 
-                if (num_breaths == 1 || num_breaths == 2) {
-                    display_prompt()
-                    if (session_duration == 1) {
-                        min_str = ""
-                        start_str = "s"
-                    } else {
-                        min_str = "s"
-                        start_str = ""
-                    }
-                    instructions2.textContent = session_duration.toString() + " minute" + min_str + " of relaxation starting now"
-                }
                 if (num_breaths == 3 || num_breaths == 4) {
                     display_prompt()
-                    instructions2.textContent = "I'll keep track of time..."
-                    }
-                if (num_breaths == 5 || num_breaths == 6) {
-                    display_prompt()
-                    instructions2.textContent = "...so just enjoy your meditation!"
+                    instructions2.textContent = "Enjoy your " + session_duration.toString() + " minute meditation!"
                 }
+                if (num_breaths == 1 || num_breaths == 2) {
+                    display_prompt()
+                    instructions2.textContent = "Take a deep breath"
+                    }
+                // if (num_breaths == 5 || num_breaths == 6) {
+                //     display_prompt()
+                //     instructions2.textContent = "...so just enjoy your meditation!"
+                // }
                 if ((((new Date).getTime() - start_time) / 1000 / 60) > (0.25 * session_duration) && num_breaths < num_breaths_at_marker1 && session_duration > 5) {
                     display_prompt()
                     num_breaths_at_marker1 = num_breaths
@@ -295,6 +288,9 @@
                 const instructions = document.getElementById("instructions"); 
                 instructions.style.display = "none"
 
+                const instructions2 = document.getElementById("instructions2"); 
+                instructions2.style.display = ""
+
                 const header = document.getElementById("header"); 
                 header.style.display = "none"
 
@@ -356,19 +352,19 @@
 
                 if (last_event == "inhale") {
                         if (speed < 0) {
-                            return speed + acceleration_init * 4
+                            return speed + acceleration_init * 1
                         }
 
                         return speed + acceleration_init * Math.abs(1 - speed / max_speed)
                 }
                 if (last_event == "exhale") {
                         if (speed > 0) {
-                            return Math.min(-0.5, -max_speed_exhale * Math.min(1, circle.radius / 60))
+                            return Math.min(-0.5, -max_speed_exhale * Math.min(1, circle.radius / 90))
                         }
-                        if (circle.radius > 90){
+                        if (circle.radius > 80){
                             return -max_speed_exhale
                         }
-                        return Math.min(-0.1 , speed * .99)
+                        return Math.min(-0.1 , speed * .985)
                 }
 
                 if (last_event.includes("phase 2") && counter < 20){
@@ -377,7 +373,7 @@
                 }
 
                 if (last_event == "inhale (phase 2)") {
-                        return Math.max(0.15, speed*.985)
+                        return Math.max(0.15, speed*.982)
                 }
 
                 if (last_event == "paused") {
@@ -388,7 +384,7 @@
 
             function update_text() {
                 const text = document.getElementById("instructions2");
-                if (text.style.display == "" && ((new Date).getTime() - press_time) > 2000 && !end_screen) {
+                if (text.style.display == "" && ((new Date).getTime() - press_time) > 2000 && !end_screen && num_breaths > 0) {
                     text.style.opacity = text.style.opacity - 0.005
                     if (text.style.opacity < 0.01) {
                         text.style.display = "none"
@@ -676,9 +672,9 @@
         <p class="noselect" id = "header" style="position: absolute; top: 14px; left: 0; width: 100%; text-align: center; font-size: 34px; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; font-family: poppins">the breathing moon</p>
 
 
-        <p class="noselect" id="instructions" style="position: absolute; top: 125px; left: calc(50% - 293px); width: 586px; text-align: center; font-size: 22px; line-height: 37px; font-family: poppins; font-weight: 200;text-shadow: 0 0 0px lightblue"><a style="font-weight: 300; text-shadow: 0 0 3px lightblue; font-size: 26px">Instructions</a><br><br>Set your meditation duration : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br> On the next page, <a style="font-weight: 300; text-shadow: 0 0 3px lightblue">press as you inhale</a> and then <a style="font-weight: 300; text-shadow: 0 0 3px lightblue">release as you exhale</a> to breathe with the moon</p>
+        <p class="noselect" id="instructions" style="position: absolute; top: 125px; left: calc(50% - 293px); width: 586px; text-align: center; font-size: 22px; line-height: 37px; font-family: poppins; font-weight: 200; text-shadow: 0 0 0px lightblue"><a style="font-weight: 300; text-shadow: 0 0 3px lightblue; font-size: 26px">Instructions</a><br><br>Set your meditation duration : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br> On the next page, <a style="font-weight: 300; text-shadow: 0 0 3px lightblue">press as you inhale</a> and then <a style="font-weight: 300; text-shadow: 0 0 3px lightblue">release as you exhale</a> to breathe with the moon.</p>
 
-        <p class="noselect" id="instructions2" style="position: absolute; top: 80px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 300;text-shadow: 0 0 4px lightblue; display: none"></p>
+        <p class="noselect" id="instructions2" style="position: absolute; top: 80px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; text-shadow: 0 0 3px lightblue; display: none">Take a deep breath</p>
 
         <img id="moon" src="{{url_for('static', filename='moon.png')}}" style=" position: absolute; top: 40px; left: calc(50% + 175px); width: 30px; height: 30px;" alt="moon" />
     
