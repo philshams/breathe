@@ -63,7 +63,7 @@
             var time_in_session = -1;
             var timer_on = true;
 
-            var session_duration = 2;
+            var session_duration = .1;
             var start_time = (new Date).getTime();
             var press_time = 0;
 
@@ -139,11 +139,18 @@
                 ctx.fill();
             }
 
+            function adjust_image() {
+                const zen = document.getElementById("zen");
+                zen.style.width = (2 * circle_client.radius).toString() + "px"
+                zen.style.left = "calc(50% - " + (circle_client.radius).toString() + "px)"
+                zen.style.top = (220 + (100 - circle_client.radius)).toString() + "px"
+            }
+
             function animate() {
                 ctx.clearRect(0, 0, meditationCanvas.width, meditationCanvas.height);
 
                 if (!start_screen && !end_screen) {
-                    drawInnerCircle(circle_client)
+                    drawInnerCircle(circle_client);
                     drawOuterCircle(circle_client);
                 }
 
@@ -154,6 +161,11 @@
                     const ctx = meditationCanvas.getContext('2d');
                     ctx.fillStyle = "rgba(140,140,140,0.05)";
                     ctx.fillRect(meditationCanvas.width / 2 - 305, 0, 305 * 2, window.innerHeight)
+                }
+
+                if (end_screen) {
+                    adjust_image()
+                    drawOuterCircle(circle_client);
                 }
 
                 requestAnimationFrame(animate);
@@ -171,9 +183,15 @@
                 const instructions2 = document.getElementById("instructions2");
                 instructions2.style.display = ""
                 instructions2.style.opacity = 1.0
-                instructions2.textContent = session_duration + " min meditation complete!"
+                // instructions2.style.fontWeight = "bold"
+                instructions2.textContent = "Meditation complete. You did it!"
+                // const instructions3 = document.getElementById("instructions3");
+                // instructions3.style.display = ""
+                // instructions3.textContent = session_duration + " min meditation complete"
                 toggle_fullscreen("off")
                 end_screen = true;
+                const zen = document.getElementById("zen");
+                zen.style.display = ""
             }
 
             function verbal_prompt() {
@@ -194,7 +212,7 @@
                 if ((((new Date).getTime() - start_time) / 1000 / 60) > (0.25 * session_duration) && num_breaths < num_breaths_at_marker1 && session_duration > 5) {
                     display_prompt()
                     num_breaths_at_marker1 = num_breaths
-                    instructions2.textContent = "25% done - you're doing great!"
+                    instructions2.textContent = "25% done"
                 }
                 if (((new Date).getTime() - start_time) / 1000 / 60 > 0.5 * session_duration && num_breaths < num_breaths_at_marker2 && session_duration > 1) {
                     display_prompt()
@@ -204,9 +222,9 @@
                 if (((new Date).getTime() - start_time) / 1000 / 60 > 0.75 * session_duration && num_breaths < num_breaths_at_marker3 && session_duration > 5) {
                     display_prompt()
                     num_breaths_at_marker3 = num_breaths
-                    instructions2.textContent = "75% done - almost there!"
+                    instructions2.textContent = "75% done"
                 }
-                if (((new Date).getTime() - start_time) / 1000 / 60 > session_duration) {
+                if (((new Date).getTime() - start_time) / 1000 / 60 > session_duration && !end_screen) {
                     end_session()
                 }
             }
@@ -277,7 +295,7 @@
 
             // Add event listener for the "keyup" event on the document object
             document.addEventListener('dblclick', (event) => {
-                toggle_fullscreen()
+                toggle_fullscreen("toggle")
             });
 
             window.onbeforeunload = function () {
@@ -367,7 +385,7 @@
                         return Math.min(-0.1 , speed * .985)
                 }
 
-                if (last_event.includes("phase 2") && counter < 20){
+                if (last_event.includes("phase 2") && counter < 10){
                     counter = counter + 1;
                     return speed
                 }
@@ -411,7 +429,7 @@
                 if (command == "on" || (command != "off" && !document.fullscreenElement)) {
                     document.documentElement.requestFullscreen();
                     document.documentElement.setAttribute("fullscreen","");
-                } else {
+                } else if (document.fullscreenElement){
                     document.exitFullscreen();
                     document.documentElement.removeAttribute("fullscreen"); 
                 }
@@ -671,12 +689,15 @@
 
         <p class="noselect" id = "header" style="position: absolute; top: 14px; left: 0; width: 100%; text-align: center; font-size: 34px; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; font-family: poppins">the breathing moon</p>
 
+        <img class="noselect" id="zen" src="{{url_for('static', filename='zengif.gif')}}" style=" position: absolute; top: 220px; left: calc(50% - 100px); width: 200px; text-align: center; height: auto; display: none" alt="zen" />
 
         <p class="noselect" id="instructions" style="position: absolute; top: 125px; left: calc(50% - 293px); width: 586px; text-align: center; font-size: 22px; line-height: 37px; font-family: poppins; font-weight: 200; text-shadow: 0 0 0px lightblue"><a style="font-weight: 300; text-shadow: 0 0 3px lightblue; font-size: 26px">Instructions</a><br><br>Set your meditation duration : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br> On the next page, <a style="font-weight: 300; text-shadow: 0 0 3px lightblue">press as you inhale</a> and then <a style="font-weight: 300; text-shadow: 0 0 3px lightblue">release as you exhale</a> to breathe with the moon.</p>
 
-        <p class="noselect" id="instructions2" style="position: absolute; top: 80px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; text-shadow: 0 0 3px lightblue; display: none">Take a deep breath</p>
+        <p class="noselect" id="instructions2" style="position: absolute; top: 80px; left: calc(50% - 330px); width: 660px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; text-shadow: 0 0 3px lightblue; display: none">Take a deep breath</p>
 
-        <img id="moon" src="{{url_for('static', filename='moon.png')}}" style=" position: absolute; top: 40px; left: calc(50% + 175px); width: 30px; height: 30px;" alt="moon" />
+        <p class="noselect" id="instructions3" style="position: absolute; top: 120px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; display: none"></p>
+
+        <img class="noselect" id="moon" src="{{url_for('static', filename='moon.png')}}" style=" position: absolute; top: 40px; left: calc(50% + 175px); width: 30px; height: 30px;" alt="moon" />
     
         <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: poppins; color: skyblue"></p>
 
