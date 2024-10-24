@@ -428,7 +428,7 @@
             const start_button = document.createElement("button");
             start_button.setAttribute('id','start-button');
             start_button.setAttribute('class','start-button noselect');
-            start_button.textContent = 'begin';
+            start_button.textContent = 'start';
             start_button.addEventListener('click', start_session);
             start_button.style.display = ""
             document.body.appendChild(start_button);
@@ -513,8 +513,8 @@
                 in_text2.style.color = "lightcyan"
 
                 db.style.color = "lightcyan" // "rgb(30, 60, 160)"
-                shb.style.color = "rgb(30, 60, 160)";  // "midnightblue"
-                lob.style.color = "rgb(30, 60, 160)";  //"midnightblue"
+                shb.style.color = "lightcyan" // "rgb(30, 60, 160)";  
+                lob.style.color = "lightcyan" // "rgb(30, 60, 160)";  
             }
 
             setInterval(update, 16);
@@ -526,70 +526,72 @@
 
     .shorter-button {
         position: absolute;
-        top:  5.67cm;
-        right:  calc(50% - 0.84cm);
-        background: lightcyan;
-        /* background-image: linear-gradient(to right, lightcyan  0%,  skyblue 100%); */
+        top:  8.47cm;
+        right:  calc(50% - 0.84cm + 2.1cm + 2.4cm - 4.9cm);
+        /* background: rgba(224,255,255,0.9); */
+        /* background: navy; */
+        background-image: linear-gradient(to right, rgb(0,0,20)  0%,  rgb(20,70,190) 100%);
         /* text-shadow: 0 0 5px lightblue; */
         border: 1px rgb(0,0,0);
-        border-radius: 20%;
+        border-radius: 8px;
         /* border-top-left-radius: 5px; */
         /* border-bottom-left-radius: 5px; */
-        width:  0.8cm;
-        height:  0.45cm;
+        width:  0.7cm;
+        height:  0.47cm;
         line-height: 0cm;
-        padding-bottom: .18cm;
+        padding-bottom: .12cm;
         color: blue;
-        font-size: 1.0cm;
-        font-weight: 300;
+        font-size: 0.6cm;
+        font-weight: 200;
         cursor:  pointer;
         box-shadow:
-        0px 0px 5px 0px lightcyan;
+        0px 0px 2px 0px steelblue;
     }
 
     .shorter-button:hover {
         box-shadow:
-        0px 0px 10px 0px lightcyan;
+        0px 0px 6px 0px lightblue;
         /* font-weight: 800; */
     } 
 
     .longer-button {
         position: absolute;
-        top:  5.67cm;
-        right:  calc(50% - 4.49cm);
-        background: lightcyan;
-        /* background-image: linear-gradient(to right, lightcyan  0%,  skyblue 100%); */
+        top:  8.47cm;
+        right:  calc(50% - 4.49cm + 2.4cm + 2.54cm - 3.91cm);
+        /* background: navy;  */
+        /* rgba(224,255,255,0.9); */
+        background-image: linear-gradient(to right, rgb(0,0,20)  0%,  rgb(20,70,190) 100%);
         /* text-shadow: 0 0 5px lightblue; */
         border: 1px rgb(0,0,0);
-        border-radius: 20%;
+        border-radius: 8px;
         /* border-top-right-radius: 5px; */
         /* border-bottom-right-radius: 5px; */
-        width:  0.8cm;
-        height:  0.45cm;
+        width:  0.7cm;
+        height:  0.47cm;
         line-height: 10px;
         font-weight: 600;
         margin: auto;
         color: blue;
-        font-size: 0.6cm;
+        font-size: 0.4cm;
         box-sizing: border-box;
         cursor:  pointer;
         box-shadow:
-        0px 0px 5px 0px lightcyan;
+        0px 0px 2px 0px steelblue;
     }
 
     .longer-button:hover {
         box-shadow:
-        0px 0px 10px 0px lightcyan;
+        0px 0px 6px 0px lightblue;
         /* font-weight: 800; */
     } 
     
 
     .duration-button {
         position: absolute;
-        top:  5.29cm;
-        right: calc(50% - 5.17cm);
+        top:  8.11cm;
+        right: calc(50% - 110px + 2.4cm - 4.4cm);
         background: rgba(0,0,0,0);
-        text-shadow: 0 0 3px lightblue;
+        /* text-shadow: 0 0 3px lightblue; */
         width: 220px;
         height:  45px;
         border-radius: 5px;
@@ -597,39 +599,41 @@
         cursor:  pointer;
         text-align: center;
         line-height: 45px;
-        font-size: 0.7cm;
+        font-size: 0.4cm;
         text-decoration: none;
         font-family: poppins;
-        font-weight: 500;
+        font-weight: 600;
     }
          
     .start-button {
         position: absolute;
-        top:  13.7cm;
-        left: calc(50% - 2.5cm);
+        top:  8.11cm;
+        left: calc(50% - 2.5cm + 3.2cm - 4.5cm);
         /* background: lightcyan; */
         background-image: linear-gradient(to right, rgb(250, 255, 255)  0%,  rgb(216, 255, 255) 80%); 
         /* rgb(110, 160, 236) */
         border: none;
+        opacity: 0.95;
         text-align: center;
         color: rgb(30, 60, 160);            
         cursor:  pointer;
-        border-radius: 7px;
+        border-radius: 14px;
         display: block;
-        width:  5cm;
-        height:  1.3cm;
+        width:  3.5cm;
+        height:  1.1cm;
         line-height: 0px;
         padding-bottom: 5px;
-        font-size: 1cm;
+        font-size: 0.8cm;
         font-family: poppins;
         font-weight: 500;
         box-shadow:
-        0px 0px 7px 0px lightcyan;
+        0px 0px 5px 0px lightcyan;
     }
 
     .start-button:hover {
         box-shadow:
-        0px 0px 15px 0px lightcyan;
+        0px 0px 10px 0px lightcyan;
+        opacity: 1.0;
     }
 
 
@@ -681,19 +685,19 @@
 
 <body>
 
-        <hr id = "line1" class="hr-style" style="position: absolute; top: 2.6cm; left: calc(50% - 5.9cm); width: 11.8cm; text-align: center;">
+        <hr id = "line1" class="hr-style" style="position: absolute; top: 2.345cm; left: calc(50% - 5.9cm); width: 11.8cm; text-align: center;">
 
-        <p class="noselect" id = "header" style="position: absolute; top: 0.655cm; left: 0; width: 100%; text-align: center; font-size: 1.0cm; font-weight: 400; color: lightcyan; text-shadow: 0 0 6px lightblue; font-family: poppins">the breathing moon</p>
+        <p class="noselect" id = "header" style="position: absolute; top: 0.4cm; left: 0; width: 100%; text-align: center; font-size: 1.0cm; font-weight: 400; color: lightcyan; text-shadow: 0 0 6px lightblue; font-family: poppins">the breathing moon</p>
 
         <img class="noselect" id="zen" src="{{url_for('static', filename='zengif.gif')}}" style=" position: absolute; top: 220px; left: calc(50% - 100px); width: 200px; text-align: center; height: auto; display: none" alt="zen" />
 
-        <p class="noselect" id="instructions" style="position: absolute; top: 4.58cm; left: calc(50% - 9cm); width: 18cm; text-align: center; font-size: .7cm; line-height: 1.2cm; font-family: poppins; font-weight: 300; text-shadow: 0 0 0px lightblue">Meditate for &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br><br>Simply <a style="font-weight: 500; text-shadow: 0 0 3px lightblue">press as you inhale</a><br>and <a style="font-weight: 500; text-shadow: 0 0 3px lightblue">release as you exhale</a></p>
+        <p class="noselect" id="instructions" style="position: absolute; top: 3.5cm; left: calc(50% - 9cm); width: 18cm; text-align: center; font-size: .7cm; line-height: 1.0cm; font-family: poppins; font-weight: 200; text-shadow: 0 0 0px lightblue">Simply <a style="font-weight: 400; text-shadow: 0 0 0px lightblue">press as you inhale</a><br>and <a style="font-weight: 400; text-shadow: 0 0 0px lightblue">release as you exhale</a></p>
 
         <p class="noselect" id="instructions2" style="position: absolute; top: 80px; left: calc(50% - 330px); width: 660px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; text-shadow: 0 0 3px lightblue; display: none">Take a deep breath</p>
 
         <p class="noselect" id="instructions3" style="position: absolute; top: 120px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; display: none"></p>
 
-        <img class="noselect" id="moon" src="{{url_for('static', filename='moon.png')}}" style=" position: absolute; top: 1.3cm; left: calc(50% + 5.15cm); width: 0.8cm; height: 0.8cm;" alt="moon" />
+        <img class="noselect" id="moon" src="{{url_for('static', filename='moon.png')}}" style=" position: absolute; top: 0.945cm; left: calc(50% + 5.15cm); width: 0.8cm; height: 0.8cm;" alt="moon" />
     
         <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: poppins; color: skyblue"></p>
 
