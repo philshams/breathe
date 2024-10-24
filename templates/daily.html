@@ -51,7 +51,7 @@
             const radius_change = 0.6 * radius_scale;
 
             const max_speed = 2.0;
-            const max_speed_exhale = 1.75;
+            const max_speed_exhale = 1.7;
             const acceleration_init = 0.06;
 
             var speed = 0;
@@ -63,8 +63,8 @@
             var time_in_session = -1;
             var timer_on = true;
 
-            var session_duration = .1;
-            var start_time = (new Date).getTime();
+            var session_duration = 2;
+            var start_time = 0;
             var press_time = 0;
 
             user_id = 0;
@@ -154,15 +154,6 @@
                     drawOuterCircle(circle_client);
                 }
 
-                if (start_screen){
-                    const meditationCanvas = document.getElementById('meditationCanvas');
-                    meditationCanvas.width = window.innerWidth;
-                    meditationCanvas.height = window.innerHeight;
-                    const ctx = meditationCanvas.getContext('2d');
-                    ctx.fillStyle = "rgba(140,140,140,0.05)";
-                    ctx.fillRect(meditationCanvas.width / 2 - 305, 0, 305 * 2, window.innerHeight)
-                }
-
                 if (end_screen) {
                     adjust_image()
                     drawOuterCircle(circle_client);
@@ -204,22 +195,19 @@
                 if (num_breaths == 1 || num_breaths == 2) {
                     display_prompt()
                     instructions2.textContent = "Take a deep breath"
+                    start_time = (new Date).getTime();
                     }
-                // if (num_breaths == 5 || num_breaths == 6) {
-                //     display_prompt()
-                //     instructions2.textContent = "...so just enjoy your meditation!"
-                // }
                 if ((((new Date).getTime() - start_time) / 1000 / 60) > (0.25 * session_duration) && num_breaths < num_breaths_at_marker1 && session_duration > 5) {
                     display_prompt()
                     num_breaths_at_marker1 = num_breaths
                     instructions2.textContent = "25% done"
                 }
-                if (((new Date).getTime() - start_time) / 1000 / 60 > 0.5 * session_duration && num_breaths < num_breaths_at_marker2 && session_duration > 1) {
+                if (((new Date).getTime() - start_time) / 1000 / 60 > 0.5 * session_duration && num_breaths < num_breaths_at_marker2 && session_duration > 1 && num_breaths > 4) {
                     display_prompt()
                     num_breaths_at_marker2 = num_breaths
                     instructions2.textContent = "Halfway done"
                 }
-                if (((new Date).getTime() - start_time) / 1000 / 60 > 0.75 * session_duration && num_breaths < num_breaths_at_marker3 && session_duration > 5) {
+                if (((new Date).getTime() - start_time) / 1000 / 60 > 0.75 * session_duration && num_breaths < num_breaths_at_marker3 && session_duration > 5 && num_breaths > 4) {
                     display_prompt()
                     num_breaths_at_marker3 = num_breaths
                     instructions2.textContent = "75% done"
@@ -295,7 +283,9 @@
 
             // Add event listener for the "keyup" event on the document object
             document.addEventListener('dblclick', (event) => {
-                toggle_fullscreen("toggle")
+                if (!start_screen) {
+                    toggle_fullscreen("toggle")
+                }
             });
 
             window.onbeforeunload = function () {
@@ -523,8 +513,8 @@
                 in_text2.style.color = "lightcyan"
 
                 db.style.color = "lightcyan" // "rgb(30, 60, 160)"
-                shb.style.color = "navy"
-                lob.style.color = "navy"
+                shb.style.color = "rgb(30, 60, 160)";  // "midnightblue"
+                lob.style.color = "rgb(30, 60, 160)";  //"midnightblue"
             }
 
             setInterval(update, 16);
@@ -536,70 +526,70 @@
 
     .shorter-button {
         position: absolute;
-        top:  233px;
-        right:  calc(50% + 45px - 33px - 130px);
-        /* background: rgba(0,0,0,0); */
-        background-image: linear-gradient(to right, lightcyan  0%,  skyblue 100%);
+        top:  5.67cm;
+        right:  calc(50% - 0.84cm);
+        background: lightcyan;
+        /* background-image: linear-gradient(to right, lightcyan  0%,  skyblue 100%); */
         /* text-shadow: 0 0 5px lightblue; */
         border: 1px rgb(0,0,0);
-        border-radius: 5px;
+        border-radius: 20%;
         /* border-top-left-radius: 5px; */
         /* border-bottom-left-radius: 5px; */
-        width:  30px;
-        height:  18px;
-        line-height: 10px;
-        padding-bottom: 3px;
-        color: navy;
-        font-size: 22px;
-        font-weight: 400;
+        width:  0.8cm;
+        height:  0.45cm;
+        line-height: 0cm;
+        padding-bottom: .18cm;
+        color: blue;
+        font-size: 1.0cm;
+        font-weight: 300;
         cursor:  pointer;
-        /* box-shadow:
-        -1px 1px 2px 0px blue; */
+        box-shadow:
+        0px 0px 5px 0px lightcyan;
     }
 
     .shorter-button:hover {
         box-shadow:
-        -2px 2px 10px 0px blue;
+        0px 0px 10px 0px lightcyan;
         /* font-weight: 800; */
     } 
 
     .longer-button {
         position: absolute;
-        top:  234px;
-        right:  calc(50% - 111px - 130px);
-        /* background: rgba(0,0,0,0); */
-        background-image: linear-gradient(to right, lightcyan  0%,  skyblue 100%);
+        top:  5.67cm;
+        right:  calc(50% - 4.56cm);
+        background: lightcyan;
+        /* background-image: linear-gradient(to right, lightcyan  0%,  skyblue 100%); */
         /* text-shadow: 0 0 5px lightblue; */
         border: 1px rgb(0,0,0);
-        border-radius: 5px;
+        border-radius: 20%;
         /* border-top-right-radius: 5px; */
         /* border-bottom-right-radius: 5px; */
-        width:  30px;
-        height:  18px;
+        width:  0.8cm;
+        height:  0.45cm;
         line-height: 10px;
-        font-weight: 200;
+        font-weight: 600;
         margin: auto;
-        color: navy;
-        font-size: 18px;
+        color: blue;
+        font-size: 0.6cm;
         box-sizing: border-box;
         cursor:  pointer;
-        /* box-shadow:
-        -1px 1px 2px 0px blue; */
+        box-shadow:
+        0px 0px 5px 0px lightcyan;
     }
 
     .longer-button:hover {
         box-shadow:
-        -2px 2px 10px 0px blue;
+        0px 0px 10px 0px lightcyan;
         /* font-weight: 800; */
     } 
     
 
     .duration-button {
         position: absolute;
-        top:  219.5px;
-        right: calc(50% - 110px - 35px - 130px);
+        top:  5.29cm;
+        right: calc(50% - 5.2cm);
         background: rgba(0,0,0,0);
-        text-shadow: 0 0 2px lightblue;
+        text-shadow: 0 0 3px lightblue;
         width: 220px;
         height:  45px;
         border-radius: 5px;
@@ -607,17 +597,18 @@
         cursor:  pointer;
         text-align: center;
         line-height: 45px;
-        font-size: 22px;
+        font-size: 0.7cm;
         text-decoration: none;
         font-family: poppins;
-        font-weight: 300;
+        font-weight: 500;
     }
          
     .start-button {
         position: absolute;
-        top:  440px;
-        left: calc(50% - 88px);
-        background-image: linear-gradient(to right, lightcyan  0%,  skyblue 100%); 
+        top:  13.7cm;
+        left: calc(50% - 2.5cm);
+        /* background: lightcyan; */
+        background-image: linear-gradient(to right, rgb(250, 255, 255)  0%,  rgb(216, 255, 255) 80%); 
         /* rgb(110, 160, 236) */
         border: none;
         text-align: center;
@@ -625,21 +616,20 @@
         cursor:  pointer;
         border-radius: 7px;
         display: block;
-        width:  178px;
-        height:  40px;
+        width:  5cm;
+        height:  1.3cm;
         line-height: 0px;
         padding-bottom: 5px;
-        font-size: 28px;
+        font-size: 1cm;
         font-family: poppins;
-        font-weight: 300;
+        font-weight: 500;
         box-shadow:
-        -1px 1px 7px 0px blue;
+        0px 0px 7px 0px lightcyan;
     }
 
     .start-button:hover {
         box-shadow:
-        -3px 3px 13px 0px blue;
-        /* -4px 2px 20px 0px #0002; */
+        0px 0px 15px 0px lightcyan;
     }
 
 
@@ -655,6 +645,12 @@
         font-family: Trebuchet MS; 
         color: midnightblue
     }
+
+    .hr-style {
+    border: 0;
+    height: 2px;
+    background-image: linear-gradient(to right, rgb(173, 216, 230, 0), rgba(173, 216, 230, 0.75), rgba(173, 216, 230, 0));
+}
 
 </style>
 <style> 
@@ -685,19 +681,19 @@
 
 <body>
 
-        <hr id = "line1" style="position: absolute; top: 75px; left: calc(50% - 305px); width: 608px; text-align: center; font-size: 24px; height: 1.5px; opacity: 0.5; border-color: lightblue;">
+        <hr id = "line1" class="hr-style" style="position: absolute; top: 2.6cm; left: calc(50% - 5.9cm); width: 11.8cm; text-align: center;">
 
-        <p class="noselect" id = "header" style="position: absolute; top: 14px; left: 0; width: 100%; text-align: center; font-size: 34px; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; font-family: poppins">the breathing moon</p>
+        <p class="noselect" id = "header" style="position: absolute; top: 0.655cm; left: 0; width: 100%; text-align: center; font-size: 1.0cm; font-weight: 400; color: lightcyan; text-shadow: 0 0 6px lightblue; font-family: poppins">the breathing moon</p>
 
         <img class="noselect" id="zen" src="{{url_for('static', filename='zengif.gif')}}" style=" position: absolute; top: 220px; left: calc(50% - 100px); width: 200px; text-align: center; height: auto; display: none" alt="zen" />
 
-        <p class="noselect" id="instructions" style="position: absolute; top: 125px; left: calc(50% - 293px); width: 586px; text-align: center; font-size: 22px; line-height: 37px; font-family: poppins; font-weight: 200; text-shadow: 0 0 0px lightblue"><a style="font-weight: 300; text-shadow: 0 0 3px lightblue; font-size: 26px">Instructions</a><br><br>Set your meditation duration : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br> On the next page, <a style="font-weight: 300; text-shadow: 0 0 3px lightblue">press as you inhale</a> and then <a style="font-weight: 300; text-shadow: 0 0 3px lightblue">release as you exhale</a> to breathe with the moon.</p>
+        <p class="noselect" id="instructions" style="position: absolute; top: 4.58cm; left: calc(50% - 9cm); width: 18cm; text-align: center; font-size: .7cm; line-height: 1.2cm; font-family: poppins; font-weight: 300; text-shadow: 0 0 0px lightblue">Meditate for &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br><br>Simply <a style="font-weight: 500; text-shadow: 0 0 3px lightblue">press as you inhale</a><br>and <a style="font-weight: 500; text-shadow: 0 0 3px lightblue">release as you exhale</a></p>
 
         <p class="noselect" id="instructions2" style="position: absolute; top: 80px; left: calc(50% - 330px); width: 660px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; text-shadow: 0 0 3px lightblue; display: none">Take a deep breath</p>
 
         <p class="noselect" id="instructions3" style="position: absolute; top: 120px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; display: none"></p>
 
-        <img class="noselect" id="moon" src="{{url_for('static', filename='moon.png')}}" style=" position: absolute; top: 40px; left: calc(50% + 175px); width: 30px; height: 30px;" alt="moon" />
+        <img class="noselect" id="moon" src="{{url_for('static', filename='moon.png')}}" style=" position: absolute; top: 1.3cm; left: calc(50% + 5.15cm); width: 0.8cm; height: 0.8cm;" alt="moon" />
     
         <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: poppins; color: skyblue"></p>
 
