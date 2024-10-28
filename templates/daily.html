@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-    <title>Daily meditation</title>
+    <title>Daily 2-min meditation</title>
     <style>
         body {
             margin: 0;
@@ -71,10 +71,10 @@
 
             user_id = 0;
 
-            const fulscreen_factor = 1.2;
+            const fullscreen_factor = 1.1;
 
             const x_pos = meditationCanvas.width / 2;
-            const y_pos = meditationCanvas.height * 0.35 / fulscreen_factor;
+            const y_pos = meditationCanvas.height * 0.35 / fullscreen_factor;
 
             var circle_client = {
                 x: x_pos,
@@ -305,20 +305,20 @@
 
                 const header = document.getElementById("header"); 
                 header.style.display = "none"
-                const header2 = document.getElementById("header2"); 
-                header2.style.display = "none"
+                // const header2 = document.getElementById("header2"); 
+                // header2.style.display = "none"
 
                 const line1 = document.getElementById("line1"); 
                 line1.style.display = "none"
                 const line2 = document.getElementById("line2"); 
                 line2.style.display = "none"
 
-                const db = document.getElementById('duration-button');
-                db.style.display = "none"
-                const shb = document.getElementById('shorter-button');
-                shb.style.display = "none"
-                const lob = document.getElementById('longer-button');
-                lob.style.display = "none"
+                // const db = document.getElementById('duration-button');
+                // db.style.display = "none"
+                // const shb = document.getElementById('shorter-button');
+                // shb.style.display = "none"
+                // const lob = document.getElementById('longer-button');
+                // lob.style.display = "none"
                 const stb = document.getElementById('start-button');
                 stb.style.display = "none"
 
@@ -424,38 +424,38 @@
                 if (command == "on" || (command != "off" && !document.fullscreenElement)) {
                     document.documentElement.requestFullscreen();
                     document.documentElement.setAttribute("fullscreen","");
-                    circle_client.y = circle_client.y  * fulscreen_factor
+                    circle_client.y = circle_client.y  * fullscreen_factor
 
                 } else if (document.fullscreenElement){
                     document.exitFullscreen();
                     document.documentElement.removeAttribute("fullscreen"); 
-                    circle_client.y = circle_client.y / fulscreen_factor
+                    circle_client.y = circle_client.y / fullscreen_factor
                 }
             }
 
             const start_button = document.createElement("button");
             start_button.setAttribute('id','start-button');
             start_button.setAttribute('class','start-button noselect');
-            start_button.textContent = 'start';
+            start_button.textContent = 'begin';
             start_button.addEventListener('click', start_session);
             start_button.style.display = ""
             document.body.appendChild(start_button);
 
-            const shorter_button = document.createElement("button");
-            shorter_button.setAttribute('id','shorter-button');
-            shorter_button.setAttribute('class','shorter-button noselect');
-            shorter_button.textContent = '-';
-            shorter_button.addEventListener('click', go_shorter);
-            shorter_button.style.display = ""
-            document.body.appendChild(shorter_button);
+            // const shorter_button = document.createElement("button");
+            // shorter_button.setAttribute('id','shorter-button');
+            // shorter_button.setAttribute('class','shorter-button noselect');
+            // shorter_button.textContent = '-';
+            // shorter_button.addEventListener('click', go_shorter);
+            // shorter_button.style.display = ""
+            // document.body.appendChild(shorter_button);
 
-            const longer_button = document.createElement("button");
-            longer_button.setAttribute('id','longer-button');
-            longer_button.setAttribute('class','longer-button noselect');
-            longer_button.textContent = '+';
-            longer_button.addEventListener('click', go_longer);
-            longer_button.style.display = ""
-            document.body.appendChild(longer_button);
+            // const longer_button = document.createElement("button");
+            // longer_button.setAttribute('id','longer-button');
+            // longer_button.setAttribute('class','longer-button noselect');
+            // longer_button.textContent = '+';
+            // longer_button.addEventListener('click', go_longer);
+            // longer_button.style.display = ""
+            // document.body.appendChild(longer_button);
 
             set_theme()
 
@@ -511,18 +511,18 @@
                 const in_text1 = document.getElementById("instructions"); 
                 const in_text2 = document.getElementById("instructions2"); 
 
-                const db = document.getElementById('duration-button');
-                const shb = document.getElementById('shorter-button');
-                const lob = document.getElementById('longer-button');
+                // const db = document.getElementById('duration-button');
+                // const shb = document.getElementById('shorter-button');
+                // const lob = document.getElementById('longer-button');
 
                 document.body.style.backgroundImage = `url("{{url_for('static', filename='dusk.png')}}")`;
 
-                in_text1.style.color = "rgb(255,255,240)" // "lightcyan"
+                // in_text1.style.color =  "rgb(255,255,240)" // 
                 in_text2.style.color = "lightcyan"
 
-                db.style.color =  "rgb(255,255,240)" //"lightcyan" // "rgb(255,255,210)" //"rgb(30, 60, 160)"
-                shb.style.color = "rgb(255,255,240)"  // "rgb(30, 60, 160)";  
-                lob.style.color = "rgb(255,255,240)" //"rgb(30, 60, 160)";  
+                // db.style.color =  "rgb(255,255,240)" //"lightcyan" // "rgb(255,255,210)" //"rgb(30, 60, 160)"
+                // shb.style.color = "rgb(255,255,240)"  // "rgb(30, 60, 160)";  
+                // lob.style.color = "rgb(255,255,240)" //"rgb(30, 60, 160)";  
             }
 
             setInterval(update, 16);
@@ -618,9 +618,10 @@
     .start-button {
         position: absolute;
         top:  38.75vh;
-        left: calc(50% - 2.5cm + 3.2cm - 3.5cm);
+        left: calc(50% - 8.5vh);
         /* background: lightcyan; */
-        background-image: linear-gradient(to right, rgb(255, 255, 245)  0%,  rgb(212, 253, 255) 65%); 
+        background-image: linear-gradient(to right, rgb(255,250,210) 0%, rgb(190, 245, 255) 75%);
+        /* background-image: linear-gradient(to right, rgb(255, 255, 245)  0%,  rgb(212, 253, 255) 65%);  */
         /* background-image: linear-gradient(to right, rgb(250, 255, 255)  0%,  rgb(216, 255, 255) 80%);  */
         /* rgb(110, 160, 236) */
         border: none;
@@ -630,13 +631,13 @@
         cursor:  pointer;
         border-radius: 10px;
         display: block;
-        width:  15vh;
-        height:  4.5vh;
+        width:  17vh;
+        height:  5vh;
         line-height: 0px;
         padding-bottom: 2px;
-        font-size: 3vh;
+        font-size: 3.2vh;
         font-family: poppins;
-        font-weight: 500;
+        font-weight: 600;
         /* box-shadow:
         0px 0px 2px 0px lightcyan; */
     }
@@ -663,8 +664,9 @@
 
     .hr-style {
     border: 0;
-    height: 1.75px;
-    background-image: linear-gradient(to right, rgb(173, 216, 230, 0), rgba(173, 216, 230, 0.75), rgba(173, 216, 230, 0));
+    height: 1.25px;
+    /* background-image: linear-gradient(to right, rgb(173, 216, 230, 0), rgba(173, 216, 230, 0.75), rgba(173, 216, 230, 0)); */
+    background-image: linear-gradient(to right, rgb(255,245,190, 0) 3%, rgba(218,250,223, 0.75) 50%, rgba(180, 240, 255, 0) 97%);
 }
 
 </style>
@@ -676,6 +678,17 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+.grad {
+    background-image: linear-gradient(to right, rgb(255,245,190) 0%, rgb(180, 240, 255) 55%);
+    color: transparent;
+    background-clip: text;
+}
+.grad2 {
+    /* background-image: linear-gradient(to right, rgb(255,245,150) 0%, rgb(170, 240, 255) 70%); */
+    background-image: linear-gradient(to right, rgb(255,250,190) 0%, rgb(200, 250, 255) 70%);
+    color: transparent;
+    background-clip: text;
 }
 </style> 
 <style>
@@ -696,15 +709,16 @@
 
 <body>
 
-        <hr id = "line1" class="hr-style" style="position: absolute; top: calc(1cm + 9.15vh); left: calc(50% - 5.25em); font-size: 5vh; width: 10.5em; text-align: center;">
-        <hr id = "line2" class="hr-style" style="position: absolute; top: calc(1.02cm + 9.15vh); left: calc(50% - 5.25em); font-size: 5vh; width: 10.5em; text-align: center;">
+        <hr id = "line1" class="hr-style" style="position: absolute; top: calc(.7cm + 9.15vh); left: calc(50% - 5.25em); font-size: 5vh; width: 10.5em; text-align: center;">
+        <hr id = "line2" class="hr-style" style="position: absolute; top: calc(.72cm + 9.15vh); left: calc(50% - 5.25em); font-size: 5vh; width: 10.5em; text-align: center;">
 
-        <p class="noselect" id = "header" style="position: absolute; top: 1cm; left: 0; width: 100%; text-align: center; font-size: 5.5vh; font-weight: 200; color: lightcyan; text-shadow: 0 0 4px lightblue; font-family: poppins">breathing moon</p>
-        <p class="noselect" id = "header2" style="position: absolute; top: 1cm; left: 0; width: 100%; text-align: center; font-size: 5.5vh; font-weight: 200; color: lightcyan; text-shadow: 0 0 4px lightblue; font-family: poppins">breathing moon</p>
+        <p class="noselect grad2" id = "header" style="position: absolute; top: .7cm; left: calc(50%-6em); width: 12em; text-align: center; font-size: 5.5vh; font-weight: 200; text-shadow: 0 0 2px lightblue; font-family: poppins">breathing moon</p>
+        <p class="noselect grad2" id = "header2" style="position: absolute; top: .7cm; left: calc(50%-6em); width: 12em; text-align: center; font-size: 5.5vh; font-weight: 200; text-shadow: 0 0 2px lightblue; font-family: poppins">breathing moon</p>
+        <!-- color: rgb(255,255,240);  -->
 
         <img class="noselect" id="zen" src="{{url_for('static', filename='zengif.gif')}}" style=" position: absolute; top: 220px; left: calc(50% - 100px); width: 200px; text-align: center; height: auto; display: none" alt="zen" />
 
-        <p class="noselect" id="instructions" style="position: absolute; top: 21.0vh; left: calc(50% - 9cm); width: 18cm; text-align: center; font-size: 3.2vh; line-height: 5vh; font-family: poppins; font-weight: 100;">Simply <a style="font-weight: 300;">press as you inhale</a><br>and <a style="font-weight: 300; ">release as you exhale</a></p>
+        <p class="noselect grad" id="instructions" style="position: absolute; top: 22.0vh; left: calc(50% - 7em); width: 14em; text-align: center; font-size: 3.2vh; line-height: 4.8vh; font-family: poppins; font-weight: 500;">Simply press as you inhale<br>and release as you exhale</p>
 
         <p class="noselect" id="instructions2" style="position: absolute; top: 6vh; left: calc(50% - 330px); width: 660px; text-align: center; font-size: 3.5vh; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; text-shadow: 0 0 3px lightblue; display: none">Take a deep breath</p>
 
@@ -716,7 +730,7 @@
 
         <p class="noselect prompt" id="breathe_out"></p>
 
-    <a id = "duration-button" class='duration-button noselect' style = "display: ''">2 min</a>
+    <!-- <a id = "duration-button" class='duration-button noselect' style = "display: ''">2 min</a> -->
     
 
 </body>
