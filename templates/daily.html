@@ -310,8 +310,8 @@
 
                 const line1 = document.getElementById("line1"); 
                 line1.style.display = "none"
-                const line2 = document.getElementById("line2"); 
-                line2.style.display = "none"
+                // const line2 = document.getElementById("line2"); 
+                // line2.style.display = "none"
 
                 // const db = document.getElementById('duration-button');
                 // db.style.display = "none"
@@ -664,7 +664,7 @@
 
     .hr-style {
     border: 0;
-    height: 1.25px;
+    height: 2px;
     /* background-image: linear-gradient(to right, rgb(173, 216, 230, 0), rgba(173, 216, 230, 0.75), rgba(173, 216, 230, 0)); */
     background-image: linear-gradient(to right, rgb(255,245,190, 0) 3%, rgba(218,250,223, 0.75) 50%, rgba(180, 240, 255, 0) 97%);
 }
@@ -709,11 +709,11 @@
 
 <body>
 
-        <hr id = "line1" class="hr-style" style="position: absolute; top: calc(.7cm + 9.15vh); left: calc(50% - 5.25em); font-size: 5vh; width: 10.5em; text-align: center;">
-        <hr id = "line2" class="hr-style" style="position: absolute; top: calc(.72cm + 9.15vh); left: calc(50% - 5.25em); font-size: 5vh; width: 10.5em; text-align: center;">
+        <hr id = "line1" class="hr-style" style="position: absolute; top: calc(.7cm + 9.3vh); left: calc(50% - 5.75em); font-size: 5vh; width: 11.5em; text-align: center;">
+        <!-- <hr id = "line2" class="hr-style" style="position: absolute; top: calc(.72cm + 9.16vh); left: calc(50% - 5.25em); font-size: 5vh; width: 10.5em; text-align: center;"> -->
 
-        <p class="noselect grad2" id = "header" style="position: absolute; top: .7cm; left: calc(50%-6em); width: 12em; text-align: center; font-size: 5.5vh; font-weight: 200; text-shadow: 0 0 2px lightblue; font-family: poppins">breathing moon</p>
-        <p class="noselect grad2" id = "header2" style="position: absolute; top: .7cm; left: calc(50%-6em); width: 12em; text-align: center; font-size: 5.5vh; font-weight: 200; text-shadow: 0 0 2px lightblue; font-family: poppins">breathing moon</p>
+        <p class="noselect grad2" id = "header" style="position: absolute; top: .5cm; left: calc(50%-6em); width: 12em; text-align: center; font-size: 6vh; font-weight: 200; text-shadow: 0 0 4px lightblue; font-family: poppins">breathing moon</p>
+        <!-- <p class="noselect grad2" id = "header2" style="position: absolute; top: .7cm; left: calc(50%-6em); width: 12em; text-align: center; font-size: 5.5vh; font-weight: 200; text-shadow: 0 0 2px lightblue; font-family: poppins">breathing moon</p> -->
         <!-- color: rgb(255,255,240);  -->
 
         <img class="noselect" id="zen" src="{{url_for('static', filename='zengif.gif')}}" style=" position: absolute; top: 220px; left: calc(50% - 100px); width: 200px; text-align: center; height: auto; display: none" alt="zen" />
