@@ -305,6 +305,8 @@
 
                 const header = document.getElementById("header"); 
                 header.style.display = "none"
+                const header2 = document.getElementById("header2"); 
+                header2.style.display = "none"
 
                 const line1 = document.getElementById("line1"); 
                 line1.style.display = "none"
@@ -515,12 +517,12 @@
 
                 document.body.style.backgroundImage = `url("{{url_for('static', filename='dusk.png')}}")`;
 
-                in_text1.style.color = "lightcyan"
+                in_text1.style.color = "rgb(255,255,240)" // "lightcyan"
                 in_text2.style.color = "lightcyan"
 
-                db.style.color = "lightcyan" // "rgb(30, 60, 160)"
-                shb.style.color = "lightcyan" // "rgb(30, 60, 160)";  
-                lob.style.color = "lightcyan" // "rgb(30, 60, 160)";  
+                db.style.color =  "rgb(255,255,240)" //"lightcyan" // "rgb(255,255,210)" //"rgb(30, 60, 160)"
+                shb.style.color = "rgb(255,255,240)"  // "rgb(30, 60, 160)";  
+                lob.style.color = "rgb(255,255,240)" //"rgb(30, 60, 160)";  
             }
 
             setInterval(update, 16);
@@ -533,7 +535,7 @@
     .shorter-button {
         position: absolute;
         top:  calc(37.45vh + 0.42cm);
-        right:  calc(50% - 0.84cm + 2.1cm + 2.4cm - 4.48cm);
+        right:  calc(50% - 0.84cm + 2.1cm + 2.4cm - 4.5cm);
         /* background: rgba(224,255,255,0.9); */
         /* background: navy; */
         background-image: linear-gradient(to right, rgb(0,0,20)  0%,  rgb(20,70,190) 100%);
@@ -543,7 +545,7 @@
         /* border-top-left-radius: 5px; */
         /* border-bottom-left-radius: 5px; */
         width:  0.57cm;
-        height:  0.33cm;
+        height:  0.37cm;
         line-height: 0cm;
         padding-bottom: .12cm;
         /* padding-right: .4cm; */
@@ -564,7 +566,7 @@
     .longer-button {
         position: absolute;
         top:  calc(37.45vh + 0.42cm);
-        right:  calc(50% - 4.49cm + 2.4cm + 2.54cm - 3.09cm);
+        right:  calc(50% - 4.49cm + 2.4cm + 2.54cm - 3.27cm);
         /* background: navy;  */
         /* rgba(224,255,255,0.9); */
         background-image: linear-gradient(to right, rgb(0,0,20)  0%,  rgb(20,70,190) 100%);
@@ -574,7 +576,7 @@
         /* border-top-right-radius: 5px; */
         /* border-bottom-right-radius: 5px; */
         width:  0.5cm;
-        height:  0.33cm;
+        height:  0.37cm;
         line-height: 10px;
         font-weight: 600;
         margin: auto;
@@ -597,7 +599,7 @@
     .duration-button {
         position: absolute;
         top:  37.45vh;
-        right: calc(50% - 110px + 2.4cm - 3.85cm);
+        right: calc(50% - 110px + 2.4cm - 3.95cm);
         background: rgba(0,0,0,0);
         /* text-shadow: 0 0 3px lightblue; */
         width: 220px;
@@ -607,10 +609,10 @@
         cursor:  pointer;
         text-align: center;
         line-height: 45px;
-        font-size: 0.35cm;
+        font-size: 0.4cm;
         text-decoration: none;
         font-family: poppins;
-        font-weight: 600;
+        font-weight: 400;
     }
          
     .start-button {
@@ -618,10 +620,11 @@
         top:  38.75vh;
         left: calc(50% - 2.5cm + 3.2cm - 3.5cm);
         /* background: lightcyan; */
-        background-image: linear-gradient(to right, rgb(250, 255, 255)  0%,  rgb(216, 255, 255) 80%); 
+        background-image: linear-gradient(to right, rgb(255, 255, 245)  0%,  rgb(212, 253, 255) 65%); 
+        /* background-image: linear-gradient(to right, rgb(250, 255, 255)  0%,  rgb(216, 255, 255) 80%);  */
         /* rgb(110, 160, 236) */
         border: none;
-        opacity: 0.95;
+        opacity: 0.98;
         text-align: center;
         color: rgb(30, 60, 160);            
         cursor:  pointer;
@@ -660,7 +663,7 @@
 
     .hr-style {
     border: 0;
-    height: 2px;
+    height: 1.75px;
     background-image: linear-gradient(to right, rgb(173, 216, 230, 0), rgba(173, 216, 230, 0.75), rgba(173, 216, 230, 0));
 }
 
@@ -696,11 +699,12 @@
         <hr id = "line1" class="hr-style" style="position: absolute; top: calc(1cm + 9.15vh); left: calc(50% - 5.25em); font-size: 5vh; width: 10.5em; text-align: center;">
         <hr id = "line2" class="hr-style" style="position: absolute; top: calc(1.02cm + 9.15vh); left: calc(50% - 5.25em); font-size: 5vh; width: 10.5em; text-align: center;">
 
-        <p class="noselect" id = "header" style="position: absolute; top: 1cm; left: 0; width: 100%; text-align: center; font-size: 5.5vh; font-weight: 400; color: lightcyan; text-shadow: 0 0 6px lightblue; font-family: poppins">breathing moon</p>
+        <p class="noselect" id = "header" style="position: absolute; top: 1cm; left: 0; width: 100%; text-align: center; font-size: 5.5vh; font-weight: 200; color: lightcyan; text-shadow: 0 0 4px lightblue; font-family: poppins">breathing moon</p>
+        <p class="noselect" id = "header2" style="position: absolute; top: 1cm; left: 0; width: 100%; text-align: center; font-size: 5.5vh; font-weight: 200; color: lightcyan; text-shadow: 0 0 4px lightblue; font-family: poppins">breathing moon</p>
 
         <img class="noselect" id="zen" src="{{url_for('static', filename='zengif.gif')}}" style=" position: absolute; top: 220px; left: calc(50% - 100px); width: 200px; text-align: center; height: auto; display: none" alt="zen" />
 
-        <p class="noselect" id="instructions" style="position: absolute; top: 22.5vh; left: calc(50% - 9cm); width: 18cm; text-align: center; font-size: 3.2vh; line-height: 5vh; font-family: poppins; font-weight: 200; text-shadow: 0 0 0px lightblue">Simply <a style="font-weight: 400; text-shadow: 0 0 0px lightblue">press as you inhale</a><br>and <a style="font-weight: 400; text-shadow: 0 0 0px lightblue">release as you exhale</a></p>
+        <p class="noselect" id="instructions" style="position: absolute; top: 21.0vh; left: calc(50% - 9cm); width: 18cm; text-align: center; font-size: 3.2vh; line-height: 5vh; font-family: poppins; font-weight: 100;">Simply <a style="font-weight: 300;">press as you inhale</a><br>and <a style="font-weight: 300; ">release as you exhale</a></p>
 
         <p class="noselect" id="instructions2" style="position: absolute; top: 6vh; left: calc(50% - 330px); width: 660px; text-align: center; font-size: 3.5vh; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; text-shadow: 0 0 3px lightblue; display: none">Take a deep breath</p>
 
