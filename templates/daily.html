@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-    <title>Daily 2-min meditation</title>
+    <title>Daily 2 min meditation</title>
     <style>
         body {
             margin: 0;
@@ -617,25 +617,27 @@
          
     .start-button {
         position: absolute;
-        top:  38.75vh;
-        left: calc(50% - 8.5vh);
+        top:  42.5vh;
+        left: calc(50% - 12vh);
         /* background: lightcyan; */
-        background-image: linear-gradient(to right, rgb(255,250,210) 0%, rgb(190, 245, 255) 75%);
+        /* background-image: linear-gradient(to right, rgb(255,230,200) 0%, rgb(180, 230, 255) 70%); */
+        background-image: linear-gradient(to right, rgb(255,230,220) 0%, white 80%);
         /* background-image: linear-gradient(to right, rgb(255, 255, 245)  0%,  rgb(212, 253, 255) 65%);  */
         /* background-image: linear-gradient(to right, rgb(250, 255, 255)  0%,  rgb(216, 255, 255) 80%);  */
         /* rgb(110, 160, 236) */
         border: none;
         opacity: 0.98;
         text-align: center;
-        color: rgb(30, 60, 160);            
+        color: royalblue; 
+        /* //rgb(30, 60, 160);             */
         cursor:  pointer;
         border-radius: 10px;
         display: block;
-        width:  17vh;
-        height:  5vh;
+        width:  24vh;
+        height:  6vh;
         line-height: 0px;
         padding-bottom: 2px;
-        font-size: 3.2vh;
+        font-size: 3.8vh;
         font-family: poppins;
         font-weight: 600;
         /* box-shadow:
@@ -680,13 +682,13 @@
     user-select: none;
 }
 .grad {
-    background-image: linear-gradient(to right, rgb(255,245,190) 0%, rgb(180, 240, 255) 55%);
+    /* background-image: linear-gradient(to right, rgb(255,245,190) 0%, rgb(180, 240, 255) 55%); */
+    background-image: linear-gradient(to right, rgb(255,230,190) 10%, white 70%);
     color: transparent;
     background-clip: text;
 }
 .grad2 {
-    /* background-image: linear-gradient(to right, rgb(255,245,150) 0%, rgb(170, 240, 255) 70%); */
-    background-image: linear-gradient(to right, rgb(255,250,190) 0%, rgb(200, 250, 255) 70%);
+    background-image: linear-gradient(to right, rgb(242,200,180) 0%, white 100%);
     color: transparent;
     background-clip: text;
 }
@@ -709,16 +711,18 @@
 
 <body>
 
-        <hr id = "line1" class="hr-style" style="position: absolute; top: calc(.7cm + 9.3vh); left: calc(50% - 5.75em); font-size: 5vh; width: 11.5em; text-align: center;">
+        <hr id = "line1" class="hr-style" style="position: absolute; top: calc(.1cm + 9.8vh); left: calc(50% - 5.75em); font-size: 5vh; width: 11.5em; text-align: center;">
         <!-- <hr id = "line2" class="hr-style" style="position: absolute; top: calc(.72cm + 9.16vh); left: calc(50% - 5.25em); font-size: 5vh; width: 10.5em; text-align: center;"> -->
 
-        <p class="noselect grad2" id = "header" style="position: absolute; top: .5cm; left: calc(50%-6em); width: 12em; text-align: center; font-size: 6vh; font-weight: 200; text-shadow: 0 0 4px lightblue; font-family: poppins">breathing moon</p>
+        <p class="noselect grad2" id = "header" style="position: absolute; top: .1cm; left: calc(50%-5em); width: 10em; text-align: center; font-size: 5.7vh; font-weight: 800; font-family: poppins;">breathing moon</p>
+
+        <!-- text-shadow: 0 0 0px lightblue;  -->
         <!-- <p class="noselect grad2" id = "header2" style="position: absolute; top: .7cm; left: calc(50%-6em); width: 12em; text-align: center; font-size: 5.5vh; font-weight: 200; text-shadow: 0 0 2px lightblue; font-family: poppins">breathing moon</p> -->
         <!-- color: rgb(255,255,240);  -->
 
         <img class="noselect" id="zen" src="{{url_for('static', filename='zengif.gif')}}" style=" position: absolute; top: 220px; left: calc(50% - 100px); width: 200px; text-align: center; height: auto; display: none" alt="zen" />
 
-        <p class="noselect grad" id="instructions" style="position: absolute; top: 22.0vh; left: calc(50% - 7em); width: 14em; text-align: center; font-size: 3.2vh; line-height: 4.8vh; font-family: poppins; font-weight: 500;">Simply press as you inhale<br>and release as you exhale</p>
+        <p class="noselect grad" id="instructions" style="position: absolute; top: 19.5vh; left: calc(50% - 7em); width: 14em; text-align: center; font-size: 3.0vh; line-height: 4.6vh; font-family: poppins; font-weight: 600;"><a style = "font-weight: 800; font-style: italic;">two-minute meditation</a><br>press as you inhale &nbsp;+<br>release as you exhale</p>
 
         <p class="noselect" id="instructions2" style="position: absolute; top: 6vh; left: calc(50% - 330px); width: 660px; text-align: center; font-size: 3.5vh; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; text-shadow: 0 0 3px lightblue; display: none">Take a deep breath</p>
 
