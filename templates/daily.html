@@ -621,7 +621,10 @@
         left: calc(50% - 12vh);
         /* background: lightcyan; */
         /* background-image: linear-gradient(to right, rgb(255,230,200) 0%, rgb(180, 230, 255) 70%); */
-        background-image: linear-gradient(to right, rgb(255,230,220) 0%, white 80%);
+        
+        background-image: linear-gradient(to right, rgb(255,240,230) 0%, white 60%);
+        /* background-image: linear-gradient(to right, rgb(230,220,255) 0%, rgb(210,245,255) 80%); */
+
         /* background-image: linear-gradient(to right, rgb(255, 255, 245)  0%,  rgb(212, 253, 255) 65%);  */
         /* background-image: linear-gradient(to right, rgb(250, 255, 255)  0%,  rgb(216, 255, 255) 80%);  */
         /* rgb(110, 160, 236) */
@@ -668,7 +671,7 @@
     border: 0;
     height: 2px;
     /* background-image: linear-gradient(to right, rgb(173, 216, 230, 0), rgba(173, 216, 230, 0.75), rgba(173, 216, 230, 0)); */
-    background-image: linear-gradient(to right, rgb(255,245,190, 0) 3%, rgba(218,250,223, 0.75) 50%, rgba(180, 240, 255, 0) 97%);
+    background-image: linear-gradient(to right, rgb(255,240,200, 0) 3%, rgba(220,235,255, 0.85) 50%, rgba(255,240,200, 0) 97%);
 }
 
 </style>
@@ -683,12 +686,13 @@
 }
 .grad {
     /* background-image: linear-gradient(to right, rgb(255,245,190) 0%, rgb(180, 240, 255) 55%); */
-    background-image: linear-gradient(to right, rgb(255,230,190) 10%, white 70%);
+    background-image: linear-gradient(to right, rgb(235,220,255) 0%, rgb(210,250,255) 90%);
     color: transparent;
     background-clip: text;
 }
 .grad2 {
-    background-image: linear-gradient(to right, rgb(242,200,180) 0%, white 100%);
+    background-image: linear-gradient(to right, rgb(220,195,255) 10%, rgb(190,250,255) 90%);
+    /* linear-gradient(to right, rgb(242,200,180) 0%, white 100%); */
     color: transparent;
     background-clip: text;
 }
@@ -722,7 +726,7 @@
 
         <img class="noselect" id="zen" src="{{url_for('static', filename='zengif.gif')}}" style=" position: absolute; top: 220px; left: calc(50% - 100px); width: 200px; text-align: center; height: auto; display: none" alt="zen" />
 
-        <p class="noselect grad" id="instructions" style="position: absolute; top: 19.5vh; left: calc(50% - 7em); width: 14em; text-align: center; font-size: 3.0vh; line-height: 4.6vh; font-family: poppins; font-weight: 600;"><a style = "font-weight: 800; font-style: italic;">two-minute meditation</a><br>press as you inhale &nbsp;+<br>release as you exhale</p>
+        <p class="noselect grad" id="instructions" style="position: absolute; top: 19.5vh; left: calc(50% - 7em); width: 14em; text-align: center; font-size: 3.0vh; line-height: 4.6vh; font-family: poppins; font-weight: 600;"><a style = "font-weight: 800; font-style: normal;">Two-minute meditation : </a>Press as you inhale and release as you exhale</p>
 
         <p class="noselect" id="instructions2" style="position: absolute; top: 6vh; left: calc(50% - 330px); width: 660px; text-align: center; font-size: 3.5vh; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; text-shadow: 0 0 3px lightblue; display: none">Take a deep breath</p>
 
