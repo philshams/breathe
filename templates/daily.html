@@ -622,7 +622,8 @@
         /* background: lightcyan; */
         /* background-image: linear-gradient(to right, rgb(255,230,200) 0%, rgb(180, 230, 255) 70%); */
         
-        background-image: linear-gradient(to right, rgb(255,240,230) 0%, white 60%);
+        /* background-image: linear-gradient(to right, rgb(255,240,230) 0%, white 60%); */
+        background-image: linear-gradient(to right, rgb(255,237,240) 0%, rgb(235,254,255) 60%);
         /* background-image: linear-gradient(to right, rgb(230,220,255) 0%, rgb(210,245,255) 80%); */
 
         /* background-image: linear-gradient(to right, rgb(255, 255, 245)  0%,  rgb(212, 253, 255) 65%);  */
@@ -640,16 +641,16 @@
         height:  6vh;
         line-height: 0px;
         padding-bottom: 2px;
-        font-size: 3.8vh;
+        font-size: 3.9vh;
         font-family: poppins;
         font-weight: 600;
-        /* box-shadow:
-        0px 0px 2px 0px lightcyan; */
+        box-shadow:
+        0px 0px 2px 0px lightcyan;
     }
 
     .start-button:hover {
         box-shadow:
-        0px 0px 10px 0px lightcyan;
+        0px 0px 7px 0px lightcyan;
         opacity: 1.0;
     }
 
@@ -671,7 +672,7 @@
     border: 0;
     height: 2px;
     /* background-image: linear-gradient(to right, rgb(173, 216, 230, 0), rgba(173, 216, 230, 0.75), rgba(173, 216, 230, 0)); */
-    background-image: linear-gradient(to right, rgb(255,240,200, 0) 3%, rgba(220,235,255, 0.85) 50%, rgba(255,240,200, 0) 97%);
+    background-image: linear-gradient(to right, rgb(255,240,200, 0) 3%, rgba(210,230,255, 0.9) 50%, rgba(255,240,200, 0) 97%);
 }
 
 </style>
@@ -686,7 +687,7 @@
 }
 .grad {
     /* background-image: linear-gradient(to right, rgb(255,245,190) 0%, rgb(180, 240, 255) 55%); */
-    background-image: linear-gradient(to right, rgb(235,220,255) 0%, rgb(210,250,255) 90%);
+    background-image: linear-gradient(to right, rgb(255,220,255) 0%, rgb(230,252,255) 90%);
     color: transparent;
     background-clip: text;
 }
@@ -726,7 +727,7 @@
 
         <img class="noselect" id="zen" src="{{url_for('static', filename='zengif.gif')}}" style=" position: absolute; top: 220px; left: calc(50% - 100px); width: 200px; text-align: center; height: auto; display: none" alt="zen" />
 
-        <p class="noselect grad" id="instructions" style="position: absolute; top: 19.5vh; left: calc(50% - 7em); width: 14em; text-align: center; font-size: 3.0vh; line-height: 4.6vh; font-family: poppins; font-weight: 600;"><a style = "font-weight: 800; font-style: normal;">Two-minute meditation : </a>Press as you inhale and release as you exhale</p>
+        <p class="noselect grad" id="instructions" style="position: absolute; top: 19.5vh; left: calc(50% - 9em); width: 18em; text-align: center; font-size: 2.6vh; line-height: 4.5vh; font-family: poppins; font-weight: 400;"><a style = "font-weight: 700;">A relaxing two minute meditation. </a> Press and hold as you inhale and then release as you exhale. Enjoy!</p>
 
         <p class="noselect" id="instructions2" style="position: absolute; top: 6vh; left: calc(50% - 330px); width: 660px; text-align: center; font-size: 3.5vh; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; text-shadow: 0 0 3px lightblue; display: none">Take a deep breath</p>
 
