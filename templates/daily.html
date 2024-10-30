@@ -65,7 +65,7 @@
             var time_in_session = -1;
             var timer_on = true;
 
-            var session_duration = 2;
+            var session_duration = .01;
             var start_time = 0;
             var press_time = 0;
 
@@ -147,7 +147,9 @@
                 const zen = document.getElementById("zen");
                 zen.style.width = (2 * circle_client.radius * screen_size_factor).toString() + "px"
                 zen.style.left = "calc(50% - " + (circle_client.radius * screen_size_factor).toString() + "px)"
-                zen.style.top = (220 + (100 - circle_client.radius * screen_size_factor)).toString() + "px"
+                zen.style.top = (circle_client.y - circle_client.radius * screen_size_factor).toString() + "px"
+                console.log(zen.style.top)
+                // 
             }
 
             function animate() {
@@ -178,11 +180,7 @@
                 const instructions2 = document.getElementById("instructions2");
                 instructions2.style.display = ""
                 instructions2.style.opacity = 1.0
-                // instructions2.style.fontWeight = "bold"
-                instructions2.textContent = "Meditation complete. You did it!"
-                // const instructions3 = document.getElementById("instructions3");
-                // instructions3.style.display = ""
-                // instructions3.textContent = session_duration + " min meditation complete"
+                instructions2.textContent = "Meditation complete!"
                 toggle_fullscreen("off")
                 end_screen = true;
                 const zen = document.getElementById("zen");
@@ -201,20 +199,10 @@
                     instructions2.textContent = "Take a deep breath"
                     start_time = (new Date).getTime();
                     }
-                if ((((new Date).getTime() - start_time) / 1000 / 60) > (0.25 * session_duration) && num_breaths < num_breaths_at_marker1 && session_duration > 5) {
-                    display_prompt()
-                    num_breaths_at_marker1 = num_breaths
-                    instructions2.textContent = "25% done"
-                }
-                if (((new Date).getTime() - start_time) / 1000 / 60 > 0.5 * session_duration && num_breaths < num_breaths_at_marker2 && session_duration > 1 && num_breaths > 4) {
+                if (((new Date).getTime() - start_time) / 1000 / 60 > 0.5 * session_duration && num_breaths < num_breaths_at_marker2 && num_breaths > 4) {
                     display_prompt()
                     num_breaths_at_marker2 = num_breaths
                     instructions2.textContent = "Halfway done"
-                }
-                if (((new Date).getTime() - start_time) / 1000 / 60 > 0.75 * session_duration && num_breaths < num_breaths_at_marker3 && session_duration > 5 && num_breaths > 4) {
-                    display_prompt()
-                    num_breaths_at_marker3 = num_breaths
-                    instructions2.textContent = "75% done"
                 }
                 if (((new Date).getTime() - start_time) / 1000 / 60 > session_duration && !end_screen) {
                     end_session()
@@ -305,20 +293,10 @@
 
                 const header = document.getElementById("header"); 
                 header.style.display = "none"
-                // const header2 = document.getElementById("header2"); 
-                // header2.style.display = "none"
 
                 const line1 = document.getElementById("line1"); 
                 line1.style.display = "none"
-                // const line2 = document.getElementById("line2"); 
-                // line2.style.display = "none"
 
-                // const db = document.getElementById('duration-button');
-                // db.style.display = "none"
-                // const shb = document.getElementById('shorter-button');
-                // shb.style.display = "none"
-                // const lob = document.getElementById('longer-button');
-                // lob.style.display = "none"
                 const stb = document.getElementById('start-button');
                 stb.style.display = "none"
 
@@ -441,89 +419,7 @@
             start_button.style.display = ""
             document.body.appendChild(start_button);
 
-            // const shorter_button = document.createElement("button");
-            // shorter_button.setAttribute('id','shorter-button');
-            // shorter_button.setAttribute('class','shorter-button noselect');
-            // shorter_button.textContent = '-';
-            // shorter_button.addEventListener('click', go_shorter);
-            // shorter_button.style.display = ""
-            // document.body.appendChild(shorter_button);
-
-            // const longer_button = document.createElement("button");
-            // longer_button.setAttribute('id','longer-button');
-            // longer_button.setAttribute('class','longer-button noselect');
-            // longer_button.textContent = '+';
-            // longer_button.addEventListener('click', go_longer);
-            // longer_button.style.display = ""
-            // document.body.appendChild(longer_button);
-
-            set_theme()
-
-            function go_longer() {
-                if (session_duration==30) {
-                    session_duration = 60
-                }
-                if (session_duration==20) {
-                    session_duration = 30
-                }
-                if (session_duration==10) {
-                    session_duration = 20
-                }
-                if (session_duration==5) {
-                    session_duration = 10
-                }
-                if (session_duration==2) {
-                    session_duration = 5
-                }
-                if (session_duration==1) {
-                    session_duration = 2
-                }
-                
-                const duration = document.getElementById('duration-button');
-                duration.textContent = session_duration.toString() + " min"
-            }
-
-            function go_shorter() {
-                if (session_duration==2) {
-                    session_duration = 1
-                }
-                if (session_duration==5) {
-                    session_duration = 2
-                }
-                if (session_duration==10) {
-                    session_duration = 5
-                }
-                if (session_duration==20) {
-                    session_duration = 10
-                }
-                if (session_duration==30) {
-                    session_duration = 20
-                }
-                if (session_duration==60) {
-                    session_duration = 30
-                }
-                
-                const duration = document.getElementById('duration-button');
-                duration.textContent = session_duration.toString() + " min"
-            }
-            
-            function set_theme() {
-                const in_text1 = document.getElementById("instructions"); 
-                const in_text2 = document.getElementById("instructions2"); 
-
-                // const db = document.getElementById('duration-button');
-                // const shb = document.getElementById('shorter-button');
-                // const lob = document.getElementById('longer-button');
-
-                document.body.style.backgroundImage = `url("{{url_for('static', filename='dusk.png')}}")`;
-
-                // in_text1.style.color =  "rgb(255,255,240)" // 
-                in_text2.style.color = "lightcyan"
-
-                // db.style.color =  "rgb(255,255,240)" //"lightcyan" // "rgb(255,255,210)" //"rgb(30, 60, 160)"
-                // shb.style.color = "rgb(255,255,240)"  // "rgb(30, 60, 160)";  
-                // lob.style.color = "rgb(255,255,240)" //"rgb(30, 60, 160)";  
-            }
+            document.body.style.backgroundImage = `url("{{url_for('static', filename='dusk.png')}}")`;
 
             setInterval(update, 16);
 
@@ -536,19 +432,13 @@
         position: absolute;
         top:  calc(37.45vh + 0.42cm);
         right:  calc(50% - 0.84cm + 2.1cm + 2.4cm - 4.5cm);
-        /* background: rgba(224,255,255,0.9); */
-        /* background: navy; */
         background-image: linear-gradient(to right, rgb(0,0,20)  0%,  rgb(20,70,190) 100%);
-        /* text-shadow: 0 0 5px lightblue; */
         border: 1px rgb(0,0,0);
         border-radius: 5px;
-        /* border-top-left-radius: 5px; */
-        /* border-bottom-left-radius: 5px; */
         width:  0.57cm;
         height:  0.37cm;
         line-height: 0cm;
         padding-bottom: .12cm;
-        /* padding-right: .4cm; */
         color: blue;
         font-size: 0.6cm;
         font-weight: 200;
@@ -560,21 +450,15 @@
     .shorter-button:hover {
         box-shadow:
         0px 0px 5px 0px skyblue;
-        /* font-weight: 800; */
     } 
 
     .longer-button {
         position: absolute;
         top:  calc(37.45vh + 0.42cm);
         right:  calc(50% - 4.49cm + 2.4cm + 2.54cm - 3.27cm);
-        /* background: navy;  */
-        /* rgba(224,255,255,0.9); */
         background-image: linear-gradient(to right, rgb(0,0,20)  0%,  rgb(20,70,190) 100%);
-        /* text-shadow: 0 0 5px lightblue; */
         border: 1px rgb(0,0,0);
         border-radius: 5px;
-        /* border-top-right-radius: 5px; */
-        /* border-bottom-right-radius: 5px; */
         width:  0.5cm;
         height:  0.37cm;
         line-height: 10px;
@@ -592,7 +476,6 @@
     .longer-button:hover {
         box-shadow:
         0px 0px 5px 0px skyblue;
-        /* font-weight: 800; */
     } 
     
 
@@ -601,7 +484,6 @@
         top:  37.45vh;
         right: calc(50% - 110px + 2.4cm - 3.95cm);
         background: rgba(0,0,0,0);
-        /* text-shadow: 0 0 3px lightblue; */
         width: 220px;
         height:  45px;
         border-radius: 5px;
@@ -617,23 +499,13 @@
          
     .start-button {
         position: absolute;
-        top:  42.5vh;
+        top:  40.5vh;
         left: calc(50% - 12vh);
-        /* background: lightcyan; */
-        /* background-image: linear-gradient(to right, rgb(255,230,200) 0%, rgb(180, 230, 255) 70%); */
-        
-        /* background-image: linear-gradient(to right, rgb(255,240,230) 0%, white 60%); */
         background-image: linear-gradient(to right, rgb(255,237,240) 0%, rgb(235,254,255) 60%);
-        /* background-image: linear-gradient(to right, rgb(230,220,255) 0%, rgb(210,245,255) 80%); */
-
-        /* background-image: linear-gradient(to right, rgb(255, 255, 245)  0%,  rgb(212, 253, 255) 65%);  */
-        /* background-image: linear-gradient(to right, rgb(250, 255, 255)  0%,  rgb(216, 255, 255) 80%);  */
-        /* rgb(110, 160, 236) */
         border: none;
         opacity: 0.98;
         text-align: center;
         color: royalblue; 
-        /* //rgb(30, 60, 160);             */
         cursor:  pointer;
         border-radius: 10px;
         display: block;
@@ -671,7 +543,6 @@
     .hr-style {
     border: 0;
     height: 2px;
-    /* background-image: linear-gradient(to right, rgb(173, 216, 230, 0), rgba(173, 216, 230, 0.75), rgba(173, 216, 230, 0)); */
     background-image: linear-gradient(to right, rgb(255,240,200, 0) 3%, rgba(210,230,255, 0.9) 50%, rgba(255,240,200, 0) 97%);
 }
 
@@ -686,14 +557,12 @@
     user-select: none;
 }
 .grad {
-    /* background-image: linear-gradient(to right, rgb(255,245,190) 0%, rgb(180, 240, 255) 55%); */
     background-image: linear-gradient(to right, rgb(255,220,255) 0%, rgb(230,252,255) 90%);
     color: transparent;
     background-clip: text;
 }
 .grad2 {
     background-image: linear-gradient(to right, rgb(220,195,255) 10%, rgb(190,250,255) 90%);
-    /* linear-gradient(to right, rgb(242,200,180) 0%, white 100%); */
     color: transparent;
     background-clip: text;
 }
@@ -716,20 +585,15 @@
 
 <body>
 
-        <hr id = "line1" class="hr-style" style="position: absolute; top: calc(.1cm + 9.8vh); left: calc(50% - 5.75em); font-size: 5vh; width: 11.5em; text-align: center;">
-        <!-- <hr id = "line2" class="hr-style" style="position: absolute; top: calc(.72cm + 9.16vh); left: calc(50% - 5.25em); font-size: 5vh; width: 10.5em; text-align: center;"> -->
+        <hr id = "line1" class="hr-style" style="position: absolute; top: calc(.1cm + 11.8vh); left: calc(50% - 5.75em); font-size: 5vh; width: 11.5em; text-align: center;">
 
-        <p class="noselect grad2" id = "header" style="position: absolute; top: .1cm; left: calc(50%-5em); width: 10em; text-align: center; font-size: 5.7vh; font-weight: 800; font-family: poppins;">breathing moon</p>
-
-        <!-- text-shadow: 0 0 0px lightblue;  -->
-        <!-- <p class="noselect grad2" id = "header2" style="position: absolute; top: .7cm; left: calc(50%-6em); width: 12em; text-align: center; font-size: 5.5vh; font-weight: 200; text-shadow: 0 0 2px lightblue; font-family: poppins">breathing moon</p> -->
-        <!-- color: rgb(255,255,240);  -->
+        <p class="noselect grad2" id = "header" style="position: absolute; top: calc(2vh + .1cm); left: calc(50%-5em); width: 10em; text-align: center; font-size: 5.7vh; font-weight: 800; font-family: poppins;">breathing moon</p>
 
         <img class="noselect" id="zen" src="{{url_for('static', filename='zengif.gif')}}" style=" position: absolute; top: 220px; left: calc(50% - 100px); width: 200px; text-align: center; height: auto; display: none" alt="zen" />
 
-        <p class="noselect grad" id="instructions" style="position: absolute; top: 19.5vh; left: calc(50% - 9em); width: 18em; text-align: center; font-size: 2.6vh; line-height: 4.5vh; font-family: poppins; font-weight: 400;"><a style = "font-weight: 700;">A relaxing two minute meditation. </a> Press and hold as you inhale and then release as you exhale. Enjoy!</p>
+        <p class="noselect grad" id="instructions" style="position: absolute; top: 17vh; left: calc(50% - 9em); width: 18em; text-align: center; font-size: 2.6vh; line-height: 4.5vh; font-family: poppins; font-weight: 400;"><a style = "font-weight: 700;">A relaxing two minute meditation. </a> Press and hold as you inhale and then release as you exhale. Enjoy!</p>
 
-        <p class="noselect" id="instructions2" style="position: absolute; top: 6vh; left: calc(50% - 330px); width: 660px; text-align: center; font-size: 3.5vh; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; text-shadow: 0 0 3px lightblue; display: none">Take a deep breath</p>
+        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 6vh; left: calc(50% - 250px); width: 500px; text-align: center; font-size: 3.5vh; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 400; display: none">Take a deep breath</p>
 
         <p class="noselect" id="instructions3" style="position: absolute; top: 120px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; display: none"></p>
     
@@ -738,8 +602,6 @@
         <p class="noselect prompt" id="breathe_in"></p> 
 
         <p class="noselect prompt" id="breathe_out"></p>
-
-    <!-- <a id = "duration-button" class='duration-button noselect' style = "display: ''">2 min</a> -->
     
 
 </body>
