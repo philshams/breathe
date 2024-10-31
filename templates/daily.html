@@ -74,7 +74,7 @@
             var fullscreen = false;
 
             const x_pos = meditationCanvas.width / 2;
-            const y_pos = meditationCanvas.height * 0.44;
+            const y_pos = meditationCanvas.height * 0.38;
             const y_pos_non_fullscreen = y_pos / fullscreen_factor;
 
             var circle_client = {
@@ -160,6 +160,8 @@
             }
 
             function end_session() {
+                const moon = document.getElementById("moon"); 
+                moon.style.display = "none"
                 const instructions2 = document.getElementById("instructions2");
                 instructions2.style.display = ""
                 instructions2.style.opacity = 1.0
@@ -425,75 +427,6 @@
 </script>
 <style>
 
-    .shorter-button {
-        position: absolute;
-        top:  calc(37.45vh + 0.42cm);
-        right:  calc(50% - 0.84cm + 2.1cm + 2.4cm - 4.5cm);
-        background-image: linear-gradient(to right, rgb(0,0,20)  0%,  rgb(20,70,190) 100%);
-        border: 1px rgb(0,0,0);
-        border-radius: 5px;
-        width:  0.57cm;
-        height:  0.37cm;
-        line-height: 0cm;
-        padding-bottom: .12cm;
-        color: blue;
-        font-size: 0.6cm;
-        font-weight: 200;
-        cursor:  pointer;
-        box-shadow:
-        0px 0px 2px 0px steelblue;
-    }
-
-    .shorter-button:hover {
-        box-shadow:
-        0px 0px 5px 0px skyblue;
-    } 
-
-    .longer-button {
-        position: absolute;
-        top:  calc(37.45vh + 0.42cm);
-        right:  calc(50% - 4.49cm + 2.4cm + 2.54cm - 3.27cm);
-        background-image: linear-gradient(to right, rgb(0,0,20)  0%,  rgb(20,70,190) 100%);
-        border: 1px rgb(0,0,0);
-        border-radius: 5px;
-        width:  0.5cm;
-        height:  0.37cm;
-        line-height: 10px;
-        font-weight: 600;
-        margin: auto;
-        padding-right: .4cm;
-        color: blue;
-        font-size: 0.4cm;
-        box-sizing: border-box;
-        cursor:  pointer;
-        box-shadow:
-        0px 0px 2px 0px steelblue;
-    }
-
-    .longer-button:hover {
-        box-shadow:
-        0px 0px 5px 0px skyblue;
-    } 
-    
-
-    .duration-button {
-        position: absolute;
-        top:  37.45vh;
-        right: calc(50% - 110px + 2.4cm - 3.95cm);
-        background: rgba(0,0,0,0);
-        width: 220px;
-        height:  45px;
-        border-radius: 5px;
-        box-sizing: border-box;
-        cursor:  pointer;
-        text-align: center;
-        line-height: 45px;
-        font-size: 0.4cm;
-        text-decoration: none;
-        font-family: poppins;
-        font-weight: 400;
-    }
-         
     .start-button {
         position: absolute;
         top:  39.5vh;
@@ -523,19 +456,6 @@
         opacity: 1.0;
     }
 
-
-    .prompt {
-        position: absolute; 
-        left: 0px; 
-        width: 100%; 
-        top: 29.3%;
-        text-align: center; 
-        font-size: 18px; 
-        font-weight: normal; 
-        line-height: 30px; 
-        font-family: Trebuchet MS; 
-        color: midnightblue
-    }
 
     .hr-style {
     border: 0;
@@ -597,10 +517,6 @@
         <p class="noselect" id="instructions3" style="position: absolute; top: 120px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; display: none"></p>
     
         <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: poppins; color: skyblue"></p>
-
-        <p class="noselect prompt" id="breathe_in"></p> 
-
-        <p class="noselect prompt" id="breathe_out"></p>
     
 
 </body>
