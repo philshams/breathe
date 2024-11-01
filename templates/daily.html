@@ -112,6 +112,9 @@
                 const gradient2 = ctx.createRadialGradient(circle.x, circle.y, 0, circle.x, circle.y, circle.outer_radius * screen_size_factor);
                 
                 alpha = Math.max(0.0, Math.min(0.18, 0.09 * (circle.radius / start_radius - 1)))
+                if (end_screen) {
+                    alpha = 0.2
+                }
                 gradient2.addColorStop(0, ring_color + ', 0)');
                 gradient2.addColorStop(circle.radius / circle.outer_radius, ring_color + ', ' + alpha.toString() + ')');
                 gradient2.addColorStop(1, ring_color + ', 0)');
@@ -143,9 +146,8 @@
                 }
 
                 if (end_screen) {
-                    const zen = document.getElementById("zen");
-                    adjust_image(zen)
                     drawOuterCircle(circle_client);
+                    adjust_image(zen);
                 }
 
                 requestAnimationFrame(animate);
@@ -170,12 +172,15 @@
                 end_screen = true;
                 const zen = document.getElementById("zen");
                 zen.style.display = ""
+
+                circle_client.radius = (3 * start_radius + max_radius) / 4
+                adjust_image(zen)  
             }
 
             function verbal_prompt() {
                 const instructions2 = document.getElementById("instructions2");
                 
-                if (num_breaths == 3 || num_breaths == 4) {
+                if (num_breaths == 3 || num_breaths == 4 && !end_screen) {
                     display_prompt()
                     instructions2.textContent = "Enjoy your " + session_duration.toString() + " minute meditation!"
                 }
@@ -184,7 +189,7 @@
                     instructions2.textContent = "Take a deep breath"
                     start_time = (new Date).getTime();
                     }
-                if (((new Date).getTime() - start_time) / 1000 / 60 > 0.5 * session_duration && num_breaths < num_breaths_at_marker2 && num_breaths > 4) {
+                if (((new Date).getTime() - start_time) / 1000 / 60 > 0.5 * session_duration && num_breaths < num_breaths_at_marker2 && num_breaths > 4 && !end_screen) {
                     display_prompt()
                     num_breaths_at_marker2 = num_breaths
                     instructions2.textContent = "Halfway done"
@@ -311,12 +316,6 @@
                 check_value_limits(circle)
             }
 
-
-            // function update_outer_circle(circle) {
-            //     circle.outer_radius = circle.radius + circle.ring_width * Math.min(4.5, (circle.radius / min_radius)**2)
-            // }
-
-
             function update_last_event() {
                 if (speed > (0.9*max_speed) && last_event == "inhale") {
                     counter = 0;
@@ -385,17 +384,17 @@
 
             // Update the circle color on each frame
             function update() {
-                last_event = update_last_event()
-                speed = calculate_speed(last_event, circle_client)
-                speed = Math.max(speed, -max_speed)
-                speed = Math.min(speed, max_speed)
-                
-                update_inner_circle(circle_client, speed)
-                // update_outer_circle(circle_client)
 
+                if (!end_screen) {
+                    last_event = update_last_event()
+                    speed = calculate_speed(last_event, circle_client)
+                    speed = Math.max(speed, -max_speed)
+                    speed = Math.min(speed, max_speed)
+                    
+                    update_inner_circle(circle_client, speed)
+                    update_text()
+                }
                 update_position()
-
-                update_text()
                 
             }
 
