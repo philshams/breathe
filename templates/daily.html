@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <title>Breathing Moon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <style>
         body {
             margin: 0;
@@ -9,6 +10,8 @@
             justify-content: center;
             align-items: center;
             background-color: #000000;
+            overflow-y: hidden;
+            overflow-x: hidden;
         }
 
         #container {
@@ -64,7 +67,7 @@
             var time_in_session = -1;
             var timer_on = true;
 
-            var session_duration = 4;
+            var session_duration = .04;
             var start_time = 0;
             var press_time = 0;
 
@@ -111,9 +114,9 @@
             function createOuterCircle(circle){
                 const gradient2 = ctx.createRadialGradient(circle.x, circle.y, 0, circle.x, circle.y, circle.outer_radius * screen_size_factor);
                 
-                alpha = Math.max(0.0, Math.min(0.18, 0.09 * (circle.radius / start_radius - 1)))
+                alpha = Math.max(0.0, Math.min(0.32, 0.16 * (circle.radius / start_radius - 1)))
                 if (end_screen) {
-                    alpha = 0.2
+                    alpha = 0.24
                 }
                 gradient2.addColorStop(0, ring_color + ', 0)');
                 gradient2.addColorStop(circle.radius / circle.outer_radius, ring_color + ', ' + alpha.toString() + ')');
@@ -167,7 +170,7 @@
                 const instructions2 = document.getElementById("instructions2");
                 instructions2.style.display = ""
                 instructions2.style.opacity = 1.0
-                instructions2.textContent = "Meditation complete. Well done!"
+                instructions2.textContent = "Meditation complete!"
                 toggle_fullscreen("off")
                 end_screen = true;
                 const zen = document.getElementById("zen");
@@ -182,7 +185,7 @@
                 
                 if (num_breaths == 3 || num_breaths == 4 && !end_screen) {
                     display_prompt()
-                    instructions2.textContent = "Enjoy your " + session_duration.toString() + " minute meditation!"
+                    instructions2.textContent = "Enjoy your meditation!"
                 }
                 if (num_breaths == 1 || num_breaths == 2) {
                     display_prompt()
@@ -430,7 +433,7 @@
         position: absolute;
         top:  39.5vh;
         left: calc(50% - 12vh);
-        background-image: linear-gradient(to right, rgb(255,237,240) 0%, rgb(235,254,255) 60%);
+        background-image: linear-gradient(to right, rgb(255,220,240) 0%, rgb(230,254,255) 80%);
         border: none;
         opacity: 0.98;
         text-align: center;
@@ -458,8 +461,8 @@
 
     .hr-style {
     border: 0;
-    height: 0.45vh;
-    background-image: linear-gradient(to right, rgb(255,240,200, 0) 3%, rgba(210,230,255, 0.9) 50%, rgba(255,240,200, 0) 97%);
+    height: 0.2vh;
+    background-image: linear-gradient(to right, rgb(255,255,255, 0.2) 0%, rgba(240,255,255, 0.5) 12%, rgba(240,255,255, 0.8) 40%, rgba(230,220,255, 0.8) 50%,rgba(230,220,255, 0.8) 60%, rgba(247,242,255, 0.5) 88%, rgba(255,255,255, 0.2) 100%);
 }
 
 </style>
@@ -473,7 +476,7 @@
     user-select: none;
 }
 .grad {
-    background-image: linear-gradient(to right, rgb(255,220,255) 0%, rgb(230,252,255) 90%);
+    background-image: linear-gradient(to right, rgb(255,220,255) 0%, rgb(220,252,255) 90%);
     color: transparent;
     background-clip: text;
 }
@@ -501,17 +504,17 @@
 
 <body>
 
-        <hr id = "line1" class="hr-style" style="position: absolute; top: calc(.1cm + 11.3vh); left: calc(50% - 5.75em); font-size: 5vh; width: 11.5em; text-align: center;">
+        <hr id = "line1" class="hr-style" style="position: absolute; top: calc(.1cm + 9.78vh); left: calc(50% - 4.4em); font-size: 5vh; width: 8.8em; text-align: center;">
 
-        <p class="noselect grad2" id = "header" style="position: absolute; top: calc(0.9vh + .1cm); left: calc(50%-5em); width: 10em; text-align: center; font-size: 6vh; font-weight: 800; font-family: poppins;">breathing moon</p>
+        <p class="noselect grad2" id = "header" style="position: absolute; top: calc(1.2vh + .1cm); left: calc(50%-5em); width: 10em; text-align: center; font-size: 5.25vh; font-weight: 600; font-family: poppins;">breathing moon</p>
 
         <img class="noselect" id="zen" src="{{url_for('static', filename='zengif.gif')}}" style=" position: absolute; top: 220px; left: calc(50% - 100px); width: 200px; text-align: center; height: auto; display: none" alt="zen" />
 
         <img class="noselect" id="moon" src="{{url_for('static', filename='moon.png')}}" style=" position: absolute; top: 220px; left: calc(50% - 100px); width: 200px; text-align: center; height: auto; display: none" alt="moon" />
 
-        <p class="noselect grad" id="instructions" style="position: absolute; top: 17vh; left: calc(50% - 9em); width: 18em; text-align: justify; text-align-last: justify; font-size: 2.4vh; line-height: 4.0vh; font-family: poppins; font-weight: 400;"><a style = "font-weight: 700;">A relaxing four minute meditation</a> Press and hold as you inhale, and then release as you exhale. Enjoy!</p>
+        <p class="noselect grad" id="instructions" style="position: absolute; top: 17vh; left: calc(50% - 8.4em); width: 16.8em; text-align: justify; text-align-last: justify; font-size: 2.3vh; line-height: 3.9vh; font-family: poppins; font-weight: 400;"><a style = "font-weight: 700;">A relaxing 4-minute meditation</a> Press and hold as you inhale, and then release as you exhale. Enjoy!</p>
 
-        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 7vh; left: calc(50% - 9em); width: 18em; text-align: center; font-size: 3.5vh; opacity: 1.0; font-family: poppins; font-weight: 400; display: none">Take a deep breath</p>
+        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 7vh; left: calc(50% - 9em); width: 18em; text-align: center; font-size: 3.4vh; opacity: 1.0; font-family: poppins; font-weight: 400; display: none">Take a deep breath</p>
 
         <p class="noselect" id="instructions3" style="position: absolute; top: 120px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; display: none"></p>
     
