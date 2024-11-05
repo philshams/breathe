@@ -139,6 +139,16 @@
                 image.style.top = (circle_client.y - circle_client.radius * screen_size_factor).toString() + "px"
             }
 
+            function drawRects() {
+                const meditationCanvas = document.getElementById('meditationCanvas');
+                meditationCanvas.width = window.innerWidth;
+                meditationCanvas.height = window.innerHeight;
+                const ctx = meditationCanvas.getContext('2d');
+                ctx.fillStyle = "rgba(140,140,140,.1)";
+                ctx.fillRect(0, 0, window.innerWidth / 2 - window.innerHeight / 3, window.innerHeight)
+                ctx.fillRect(window.innerWidth / 2 + window.innerHeight / 3, 0, window.innerWidth / 2 - window.innerHeight / 3, window.innerHeight)
+            }
+
             function animate() {
                 ctx.clearRect(0, 0, meditationCanvas.width, meditationCanvas.height);
 
@@ -146,6 +156,10 @@
                     const moon = document.getElementById("moon");
                     adjust_image(moon)
                     drawOuterCircle(circle_client);
+                }
+
+                if (start_screen) {
+                    drawRects()
                 }
 
                 if (end_screen) {
@@ -512,7 +526,7 @@
 
         <img class="noselect" id="moon" src="{{url_for('static', filename='moon.png')}}" style=" position: absolute; top: 220px; left: calc(50% - 100px); width: 200px; text-align: center; height: auto; display: none" alt="moon" />
 
-        <p class="noselect grad" id="instructions" style="position: absolute; top: 17vh; left: calc(50% - 8.4em); width: 16.8em; text-align: justify; text-align-last: justify; font-size: 2.3vh; line-height: 3.9vh; font-family: poppins; font-weight: 400;"><a style = "font-weight: 700;">A relaxing 4-minute meditation</a> Press and hold as you inhale, and then release as you exhale. Enjoy!</p>
+        <p class="noselect grad" id="instructions" style="position: absolute; top: 17vh; left: calc(50% - 8.4em); width: 16.8em; text-align: justify; text-align-last: justify; font-size: 2.3vh; line-height: 3.8vh; font-family: poppins; font-weight: 400;"><a style = "font-weight: 700;">A relaxing 4-minute meditation</a> Press and hold as you inhale, and then release as you exhale. Enjoy!</p>
 
         <p class="noselect grad2" id="instructions2" style="position: absolute; top: 7vh; left: calc(50% - 9em); width: 18em; text-align: center; font-size: 3.4vh; opacity: 1.0; font-family: poppins; font-weight: 400; display: none">Take a deep breath</p>
 
