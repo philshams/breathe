@@ -67,7 +67,7 @@
             var time_in_session = -1;
             var timer_on = true;
 
-            var session_duration = .04;
+            var session_duration = 4;
             var start_time = 0;
             var press_time = 0;
 
@@ -356,7 +356,7 @@
                         if (speed > 0) {
                             return Math.min(-0.5, -max_speed_exhale * Math.min(1, circle.radius / 90))
                         }
-                        if (circle.radius > 80){
+                        if (circle.radius > 77){
                             return -max_speed_exhale
                         }
                         return Math.min(-0.1 , speed * .985)
