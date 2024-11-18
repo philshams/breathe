@@ -50,8 +50,8 @@
             const start_radius = 70 * radius_scale;
             const max_radius = 390 * radius_scale;
 
-            // const max_ring_width = 200  * radius_scale
             const max_ring_width = 700  * radius_scale
+            const min_ring_width = 200  * radius_scale
             const color_change = 0.25;
             const radius_change = 0.6 * radius_scale;
 
@@ -68,7 +68,7 @@
             var time_in_session = -1;
             var timer_on = true;
 
-            var session_duration = 4;
+            var session_duration = .04;
             var start_time = 0;
             var press_time = 0;
 
@@ -117,7 +117,7 @@
                 
                 alpha = Math.max(0.0, Math.min(0.15, 0.075 * (circle.radius / start_radius - 1)))
                 if (end_screen) {
-                    alpha = 0.08
+                    alpha = 0.04
                 }
                 gradient2.addColorStop(0, ring_color + ', 0)');
                 gradient2.addColorStop(circle.radius / circle.outer_radius, ring_color + ', ' + alpha.toString() + ')');
@@ -154,7 +154,7 @@
             function animate() {
                 ctx.clearRect(0, 0, meditationCanvas.width, meditationCanvas.height);
 
-                if (!start_screen && !end_screen) {
+                if (!start_screen) {
                     const moon = document.getElementById("moon");
                     adjust_image(moon)
                     drawOuterCircle(circle_client);
@@ -181,18 +181,13 @@
             }
 
             function end_session() {
-                const moon = document.getElementById("moon"); 
-                moon.style.display = "none"
                 const instructions2 = document.getElementById("instructions2");
                 instructions2.style.display = ""
                 instructions2.style.opacity = 1.0
                 instructions2.textContent = "Meditation complete!"
                 toggle_fullscreen("off")
                 end_screen = true;
-                const zen = document.getElementById("zen");
-                zen.style.display = ""
 
-                circle_client.radius = (3 * start_radius + max_radius) / 4
                 adjust_image(zen)  
             }
 
