@@ -59,6 +59,7 @@
             const acceleration_init = 0.06;
 
             var speed = 0;
+            var speed_server = 0;
             var counter = 0;
 
             const ring_color = "rgba(255,255,255"
@@ -97,13 +98,13 @@
             var num_breaths_at_marker3 = 9999999;
             var num_active;
             var last_event = 'paused';
+            var last_event_server = 'paused';
 
             var mode = 'solo';
             var partner_id = 0
 
             var start_screen = true;
             var end_screen = false;
-            var paused = false;
 
             // Connect to the Socket.IO server.
             var socket = io("/");
@@ -231,7 +232,6 @@
                     socket.emit('client_keydown', circle_client.radius);
                     num_breaths = num_breaths + 1;
                     last_event = 'inhale'
-                    paused = false;
                     
                     verbal_prompt()
                     
@@ -312,6 +312,7 @@
 
             socket.on('partner_state', function (radius, direction) {
                 circle_server.radius = radius
+                last_event_server = direction
                 console.log(direction);
             });
 
@@ -379,7 +380,7 @@
                 check_value_limits(circle)
             }
 
-            function update_last_event() {
+            function update_last_event(speed, last_event) {
                 if (speed > (0.9*max_speed) && last_event == "inhale") {
                     counter = 0;
                     return "inhale (phase 2)"
@@ -389,7 +390,7 @@
             }
 
 
-            function calculate_speed(last_event, circle) {
+            function calculate_speed(last_event, circle, speed) {
 
                 if (last_event == "inhale") {
                         if (speed < 0) {
@@ -447,8 +448,8 @@
             function update() {
 
                 if (!end_screen) {
-                    last_event = update_last_event()
-                    speed = calculate_speed(last_event, circle_client)
+                    last_event = update_last_event(speed, last_event)
+                    speed = calculate_speed(last_event, circle_client, speed)
                     speed = Math.max(speed, -max_speed)
                     speed = Math.min(speed, max_speed)
                     
@@ -456,7 +457,13 @@
                     update_text()
 
                     if (mode=="pair"){
-
+                        last_event_server = update_last_event(speed_server, last_event_server)
+                        speed_server = calculate_speed(last_event_server, circle_server, speed_server)
+                        speed_server = Math.max(speed_server, -max_speed)
+                        speed_server = Math.min(speed_server, max_speed)
+                        console.log(speed_server)
+                    
+                        update_inner_circle(circle_server, speed_server)
                     }
                 }
                 update_position()
