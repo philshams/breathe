@@ -58,7 +58,7 @@
             const max_speed_exhale = 1.6;
             const acceleration_init = 0.06;
 
-            var speed = 0;
+            var speed_client = 0;
             var speed_server = 0;
             var counter = 0;
 
@@ -203,6 +203,9 @@
                 instructions2.textContent = "Meditation complete!"
                 toggle_fullscreen("off")
                 end_screen = true;
+                if (mode == "pair"){
+                    socket.emit('leave_room');
+                }
             }
 
             function verbal_prompt() {
@@ -313,7 +316,6 @@
             socket.on('partner_state', function (radius, direction) {
                 circle_server.radius = radius
                 last_event_server = direction
-                console.log(direction);
             });
 
             function start_session() {
@@ -348,6 +350,8 @@
 
             function start_session_pair() {
 
+                socket.emit('join_room');
+
                 start_session()
 
                 const moon = document.getElementById("moon"); 
@@ -367,17 +371,17 @@
                 user_id = msg;
             });
 
-            function check_value_limits(circle) {
+            function check_value_limits(circle, speed) {
                 if (circle.radius > max_radius || circle.radius < min_radius) {
                     speed = 0
                 }
                 circle.radius = Math.min(circle.radius, max_radius)
                 circle.radius = Math.max(circle.radius, min_radius)
+                return speed
             }
 
             function update_inner_circle(circle, speed) {
                 circle.radius += radius_change * speed;
-                check_value_limits(circle)
             }
 
             function update_last_event(speed, last_event) {
@@ -448,12 +452,14 @@
             function update() {
 
                 if (!end_screen) {
-                    last_event = update_last_event(speed, last_event)
-                    speed = calculate_speed(last_event, circle_client, speed)
-                    speed = Math.max(speed, -max_speed)
-                    speed = Math.min(speed, max_speed)
+                    last_event = update_last_event(speed_client, last_event)
+                    speed_client = calculate_speed(last_event, circle_client, speed_client)
+                    speed_client = Math.max(speed_client, -max_speed)
+                    speed_client = Math.min(speed_client, max_speed)
                     
-                    update_inner_circle(circle_client, speed)
+                    console.log(speed_client)
+                    update_inner_circle(circle_client, speed_client)
+                    speed_client = check_value_limits(circle_client, speed_client)
                     update_text()
 
                     if (mode=="pair"){
@@ -461,9 +467,9 @@
                         speed_server = calculate_speed(last_event_server, circle_server, speed_server)
                         speed_server = Math.max(speed_server, -max_speed)
                         speed_server = Math.min(speed_server, max_speed)
-                        console.log(speed_server)
                     
                         update_inner_circle(circle_server, speed_server)
+                        speed_server = check_value_limits(circle_server, speed_server)
                     }
                 }
                 update_position()
