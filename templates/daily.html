@@ -95,7 +95,6 @@
             var num_breaths_at_marker1 = 9999999;
             var num_breaths_at_marker2 = 9999999;
             var num_breaths_at_marker3 = 9999999;
-            const timeout_counter = 20000;
             var num_active;
             var last_event = 'paused';
 
@@ -109,13 +108,6 @@
             // Connect to the Socket.IO server.
             var socket = io("/");
             console.log(socket)
-
-            function timeout(prev_num_breaths) {
-                if (prev_num_breaths == num_breaths) {
-                    socket.emit('timeout');
-                    paused = true;
-                }
-            }
 
             function createOuterCircle(circle){
                 const gradient2 = ctx.createRadialGradient(circle.x, circle.y - circle_client.radius * screen_size_factor * 2, 0, circle.x, circle.y - circle_client.radius * screen_size_factor * 2, circle.outer_radius * screen_size_factor);
@@ -238,7 +230,6 @@
                 if (!last_event.includes('inhale') && !start_screen) {
                     socket.emit('client_keydown', circle_client.radius);
                     num_breaths = num_breaths + 1;
-                    setTimeout(timeout, timeout_counter, num_breaths);
                     last_event = 'inhale'
                     paused = false;
                     
@@ -251,7 +242,6 @@
                 if (!last_event.includes('exhale') && !start_screen) {
                     socket.emit('client_keyup', circle_client.radius);
                     num_breaths = num_breaths + 1;
-                    setTimeout(timeout, timeout_counter, num_breaths);
                     last_event = 'exhale'   
                 }
             }
@@ -320,12 +310,9 @@
                 console.log(msg)
             });
 
-            socket.on('partner_state', function (msg) {
-                console.log(msg);
-            });
-
-            socket.on('update_state', function (msg) {
-                console.log(msg);
+            socket.on('partner_state', function (radius, direction) {
+                circle_server.radius = radius
+                console.log(direction);
             });
 
             function start_session() {

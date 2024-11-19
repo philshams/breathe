@@ -74,8 +74,6 @@ def disconnect():
     if alone_user and request.sid == alone_user[-1]:
         alone_user.pop()
 
-
-
 # when a client presses a key
 @socketio.event
 def client_keydown(radius):
