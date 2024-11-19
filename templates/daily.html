@@ -83,6 +83,14 @@
                 ring_width: max_ring_width,
             };
 
+            var circle_server = {
+                x: x_pos,
+                y: 0,
+                radius: start_radius,
+                outer_radius: start_radius + max_ring_width,
+                ring_width: max_ring_width,
+            };
+
             var num_breaths = 0;
             var num_breaths_at_marker1 = 9999999;
             var num_breaths_at_marker2 = 9999999;
@@ -92,6 +100,7 @@
             var last_event = 'paused';
 
             var mode = 'solo';
+            var partner_id = 0
 
             var start_screen = true;
             var end_screen = false;
@@ -130,20 +139,20 @@
                 ctx.fill();
             }
 
-            function adjust_image(image, translation_factor, scale_factor = 1) {
-                image.style.width = (2 * circle_client.radius * screen_size_factor * scale_factor).toString() + "px"
-                image.style.height = (2 * circle_client.radius * screen_size_factor * scale_factor).toString() + "px"
+            function adjust_image(image, circle, translation_factor, scale_factor = 1) {
+                image.style.width = (2 * circle.radius * screen_size_factor * scale_factor).toString() + "px"
+                image.style.height = (2 * circle.radius * screen_size_factor * scale_factor).toString() + "px"
                 if (mode == "solo") {
-                    image.style.left = "calc(50% - " + (circle_client.radius * screen_size_factor).toString() + "px)"
+                    image.style.left = "calc(50% - " + (circle.radius * screen_size_factor).toString() + "px)"
                 }
                 if (mode == "pair") {
                     if (Math.sign(translation_factor) > 0) {
-                        image.style.left = "calc(50% - " + (circle_client.radius * screen_size_factor + translation_factor * start_radius * screen_size_factor + Math.sign(translation_factor) * 2 /4 * circle_client.radius).toString() + "px)"
+                        image.style.left = "calc(50% - " + (circle.radius * screen_size_factor + translation_factor * start_radius * screen_size_factor + Math.sign(translation_factor) * 2 /4 * circle.radius).toString() + "px)"
                     } else {
-                        image.style.left = "calc(50% - " + (circle_client.radius * screen_size_factor + translation_factor * start_radius * screen_size_factor).toString() + "px)"
+                        image.style.left = "calc(50% - " + (circle.radius * screen_size_factor + translation_factor * start_radius * screen_size_factor).toString() + "px)"
                     }
                 }
-                image.style.top = (circle_client.y - (2 + scale_factor) * circle_client.radius * screen_size_factor).toString() + "px"
+                image.style.top = (circle.y - (2 + scale_factor) * circle.radius * screen_size_factor).toString() + "px"
             }
 
             function drawRects() {
@@ -163,14 +172,14 @@
                     
                     if (mode == "solo") {
                         const moon = document.getElementById("moon");
-                        adjust_image(moon)
+                        adjust_image(moon, circle_client)
                         drawOuterCircle(circle_client);
                     }
                     if (mode == "pair") {
-                        const moon_me = document.getElementById("moon_me");
-                        const moon_you = document.getElementById("moon_you");
-                        adjust_image(moon_me, 3.5, 1.2)
-                        adjust_image(moon_you, -4, 1.1)
+                        const sun_server = document.getElementById("sun_server");
+                        const moon_client = document.getElementById("moon_client");
+                        adjust_image(sun_server, circle_server, 3.5, 1.2)
+                        adjust_image(moon_client, circle_client, -4, 1.1)
                     }
                     
                 }
@@ -227,7 +236,7 @@
 
             function key_down_response(event) {
                 if (!last_event.includes('inhale') && !start_screen) {
-                    socket.emit('client_keydown');
+                    socket.emit('client_keydown', circle_client.radius);
                     num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter, num_breaths);
                     last_event = 'inhale'
@@ -235,13 +244,12 @@
                     
                     verbal_prompt()
                     
-                    
                 }
             }
 
             function key_up_response(event) {
                 if (!last_event.includes('exhale') && !start_screen) {
-                    socket.emit('client_keyup');
+                    socket.emit('client_keyup', circle_client.radius);
                     num_breaths = num_breaths + 1;
                     setTimeout(timeout, timeout_counter, num_breaths);
                     last_event = 'exhale'   
@@ -300,6 +308,26 @@
                 socket.emit('leave');
             }
 
+            socket.on('assign_user_id', function (msg) {
+                user_id = msg;
+                console.log("user id")
+                console.log(msg)
+            });
+
+            socket.on('assign_partner', function (msg) {
+                partner_id = msg;
+                console.log("partner")
+                console.log(msg)
+            });
+
+            socket.on('partner_state', function (msg) {
+                console.log(msg);
+            });
+
+            socket.on('update_state', function (msg) {
+                console.log(msg);
+            });
+
             function start_session() {
                 const instructions = document.getElementById("instructions"); 
                 instructions.style.display = "none"
@@ -337,11 +365,11 @@
                 const moon = document.getElementById("moon"); 
                 moon.style.display = "none"
 
-                const moon_me = document.getElementById("moon_me"); 
-                moon_me.style.display = ""
+                const sun_server = document.getElementById("sun_server"); 
+                sun_server.style.display = ""
 
-                const moon_you = document.getElementById("moon_you"); 
-                moon_you.style.display = ""
+                const moon_client = document.getElementById("moon_client"); 
+                moon_client.style.display = ""
 
                 mode = "pair"
                 
@@ -423,6 +451,7 @@
                     circle_client.y = window.innerHeight * 0.44 - 0.2 * circle_client.radius * screen_size_factor
                 } else {
                     circle_client.y = window.innerHeight * 0.52 - 0.65 * circle_client.radius * screen_size_factor
+                    circle_server.y = window.innerHeight * 0.52 - 0.65 * circle_server.radius * screen_size_factor
                 }
             }
 
@@ -438,6 +467,10 @@
                     
                     update_inner_circle(circle_client, speed)
                     update_text()
+
+                    if (mode=="pair"){
+
+                    }
                 }
                 update_position()
                 
@@ -591,9 +624,9 @@
 
         <img class="noselect" id="moon" src="{{url_for('static', filename='moon.png')}}" style=" position: absolute; top: 220px; width: 200px; text-align: center; height: auto; display: none" alt="moon" />
 
-        <img class="noselect" id="moon_me" src="{{url_for('static', filename='sun.png')}}" style=" position: absolute; top: 220px; width: 200px; text-align: center; height: auto; display: none" alt="moon_me" />
+        <img class="noselect" id="sun_server" src="{{url_for('static', filename='sun.png')}}" style=" position: absolute; top: 220px; width: 200px; text-align: center; height: auto; display: none" alt="sun_server" />
 
-        <img class="noselect" id="moon_you" src="{{url_for('static', filename='moon.png')}}" style=" position: absolute; top: 220px; width: 200px; text-align: center; height: auto; display: none" alt="moon_you" />
+        <img class="noselect" id="moon_client" src="{{url_for('static', filename='moon.png')}}" style=" position: absolute; top: 220px; width: 200px; text-align: center; height: auto; display: none" alt="moon_client" />
 
         <p class="noselect grad" id="instructions" style="position: absolute; top: 18vh; left: calc(50% - 8.4em); width: 16.8em; text-align: justify; text-align-last: justify; font-size: 2.3vh; line-height: 3.6vh; font-family: poppins; font-weight: 400;"><a style = "font-weight: 700;">A relaxing 4-minute meditation</a> Press and hold as you inhale, and then release as you exhale. Enjoy!</p>
 
