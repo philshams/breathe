@@ -47,10 +47,10 @@
             const radius_scale = 0.5;
             const screen_size_factor = (meditationCanvas.height / 2100) / 0.5;
             const min_radius = 55 * radius_scale;
-            const start_radius = 100 * radius_scale; //80
+            var start_radius = 80 * radius_scale; //80
             const max_radius = 300 * radius_scale;
 
-            const max_ring_width = 50  * radius_scale
+            const max_ring_width = 1600  * radius_scale
             const color_change = 0.25;
             const radius_change = 0.6 * radius_scale;
 
@@ -68,9 +68,12 @@
             var time_in_session = -1;
             var timer_on = true;
 
-            var session_duration = 4;
+            var session_duration = 40;
             var start_time = 0;
             var press_time = 0;
+
+            var fullscreen = true;
+            var fullscreen_factor = 1;
 
             user_id = 0;
 
@@ -80,7 +83,6 @@
                 x: x_pos,
                 y: 0,
                 radius: start_radius,
-                outer_radius: start_radius + max_ring_width,
                 ring_width: max_ring_width,
             };
 
@@ -88,7 +90,6 @@
                 x: x_pos,
                 y: 0,
                 radius: start_radius,
-                outer_radius: start_radius + max_ring_width,
                 ring_width: max_ring_width,
             };
 
@@ -98,7 +99,7 @@
             var num_breaths_at_marker3 = 9999999;
             var num_active;
             var last_event = 'paused';
-            var last_event_server = 'inhale';
+            var last_event_server = 'paused';
 
             var mode = 'solo';
             var partner_id = 0
@@ -111,25 +112,42 @@
             console.log(socket)
 
             function createOuterCircle(circle){
-                const gradient2 = ctx.createRadialGradient(circle.x, circle.y - circle.radius * screen_size_factor * 2, 0, circle.x, circle.y - circle.radius * screen_size_factor * 2, (circle.radius * 30) * screen_size_factor);
-                
-                // alpha = Math.max(0.02, Math.min(0.12, 0.06 * (circle.radius / start_radius - 1.5)))
-                alpha = 0.08 //36
-                if (end_screen) {
-                    alpha = 0.04
-                }
-                gradient2.addColorStop(0, ring_color + ', 0)');
-                gradient2.addColorStop(1 / 20, ring_color + ', 0)');
-                gradient2.addColorStop(1 / 19.9, ring_color + ', ' + alpha.toString() + ')');
-                gradient2.addColorStop(1, ring_color + ', ' + alpha.toString() + ')');
+                if (mode=="guided" || mode =="solo") {
+                    const gradient2 = ctx.createRadialGradient(circle.x, circle.y - circle.radius * screen_size_factor * 2, 0, circle.x, circle.y - circle.radius * screen_size_factor * 2, (circle.radius * 30) * screen_size_factor);
+                    if (mode=="guided") {
+                        alpha = 0.08
+                    } if (mode == "solo"){
+                        alpha = 0.05
+                    }
+                    gradient2.addColorStop(0, ring_color + ', 0)');
+                    gradient2.addColorStop(1 / 20, ring_color + ', 0)');
+                    gradient2.addColorStop(1 / 19.9, ring_color + ', ' + alpha.toString() + ')');
+                    gradient2.addColorStop(1, ring_color + ', ' + alpha.toString() + ')');
+                    return gradient2
+                } else {
+                    const gradient2 = ctx.createRadialGradient(circle.x, circle.y - circle.radius * screen_size_factor * 2, 0, circle.x, circle.y - circle.radius * screen_size_factor * 2, (max_ring_width) * (circle.radius / 150)**2.5 * screen_size_factor);
 
-                return gradient2;
+                    alpha = Math.max(0.002, Math.min(0.14, 0.03 * (circle.radius / 40 - 1.2)))*1.5
+                    if (end_screen) {
+                        alpha = 0.04
+                    }
+                    // gradient2.addColorStop(0, ring_color + ', ' + Math.max(0, Math.min(alpha, (alpha * (30 / (circle.radius - start_radius + 1))))).toString() + ')');
+                    gradient2.addColorStop(0, ring_color + ', ' + alpha.toString() + ')');
+                    gradient2.addColorStop(1, ring_color + ', 0)');
+                    return gradient2;
+                    
+                }
+                
             }
 
             function drawOuterCircle(circle) {
                 const gradient = createOuterCircle(circle);
                 ctx.beginPath();
-                ctx.arc(circle.x, circle.y - circle.radius * screen_size_factor * 2, (circle.radius * 30) * screen_size_factor, 0, 2 * Math.PI);
+                if (mode=="guided" || mode =="solo") {
+                    ctx.arc(circle.x, circle.y - circle.radius * screen_size_factor * 2, (circle.radius * 30) * screen_size_factor, 0, 2 * Math.PI);
+                } else {
+                    ctx.arc(circle.x, circle.y - circle.radius * screen_size_factor * 2, (max_ring_width) * (circle.radius / 150)**2.5 * screen_size_factor, 0, 2 * Math.PI);
+                }
                 ctx.fillStyle = gradient;
                 ctx.fill();
             }
@@ -143,8 +161,10 @@
                 if (mode == "pair") {
                     if (Math.sign(translation_factor) > 0) {
                         image.style.left = "calc(50% - " + (circle.radius * screen_size_factor + translation_factor * start_radius * screen_size_factor + Math.sign(translation_factor) * 2 /4 * circle.radius).toString() + "px)"
+                        circle.x = x_pos - translation_factor * start_radius * screen_size_factor - Math.sign(translation_factor) * 2 /4 * circle.radius
                     } else {
                         image.style.left = "calc(50% - " + (circle.radius * screen_size_factor + translation_factor * start_radius * screen_size_factor).toString() + "px)"
+                        circle.x = x_pos - translation_factor * start_radius * screen_size_factor
                     }
                 }
                 image.style.top = (circle.y - (2 + scale_factor) * circle.radius * screen_size_factor).toString() + "px"
@@ -167,8 +187,12 @@
                     
                     if (mode == "solo") {
                         const moon_client = document.getElementById("moon_client");
+                        adjust_image(moon_client, circle_client)
+                        drawOuterCircle(circle_client);
+                    }
+                    if (mode=="guided") {
+                        const moon_client = document.getElementById("moon_client");
                         const moon2 = document.getElementById("moon2");
-                        // const moon_robot = document.getElementById("moon_robot");
 
                         if (Math.abs(circle_client.radius - circle_server.radius) < 15) {
                             moon2.style.display = "none"
@@ -181,9 +205,6 @@
                             ring_color = "rgba(180,140,180"
                             adjust_image(moon2, circle_client)
                         }
-                        
-                        // adjust_image(moon_robot, circle_server)
-                        // drawOuterCircle(circle_client);
                         drawOuterCircle(circle_server);
                     }
                     if (mode == "pair") {
@@ -191,6 +212,9 @@
                         const moon_client = document.getElementById("moon_client");
                         adjust_image(moon_client, circle_client, 3.5, 1.0)
                         adjust_image(sun_server, circle_server, -4, 1.1)
+
+                        drawOuterCircle(circle_client);
+                        drawOuterCircle(circle_server);
                     }
                     
                 }
@@ -252,9 +276,14 @@
                 if (!last_event.includes('inhale') && !start_screen) {
                     socket.emit('client_keydown', circle_client.radius);
                     num_breaths = num_breaths + 1;
-                    last_event = 'inhale'
+                    last_event = 'inhale'   
                     
-                    verbal_prompt()
+                    if (mode != "guided"){
+                        verbal_prompt()
+                    }
+                    if (num_breaths==1 && mode=="guided"){
+                        last_event_server = "inhale"
+                    }
                     
                 }
             }
@@ -352,23 +381,40 @@
                 const stb = document.getElementById('start-button');
                 stb.style.display = "none"
 
+                const gtb = document.getElementById('guided-button');
+                gtb.style.display = "none"
+
                 const ttb = document.getElementById('together-button');
                 ttb.style.display = "none"
 
                 const moon_client = document.getElementById("moon_client"); 
                 moon_client.style.display = ""
 
-                const moon2 = document.getElementById("moon2"); 
-                moon2.style.display = ""
-
-                // const moon_robot = document.getElementById("moon_robot"); 
-                // moon_robot.style.display = ""
-
                 toggle_fullscreen("on")
 
                 start_screen = false;
 
+                start_radius = 100 * radius_scale
+                circle_client.radius = start_radius
+                circle_server.radius = start_radius
+
                 mode = "solo"
+
+            }
+
+            function start_session_guided() {
+
+                start_session()
+
+                start_radius = 100 * radius_scale
+                circle_client.radius = start_radius
+                circle_server.radius = start_radius
+
+                const instructions2 = document.getElementById("instructions2"); 
+                instructions2.textContent = "breathe in"
+                instructions2.style.top = "8vh"
+
+                mode = "guided"
 
             }
 
@@ -378,11 +424,12 @@
 
                 start_session()
 
+                start_radius = 80 * radius_scale
+                circle_client.radius = start_radius
+                circle_server.radius = start_radius
+
                 const sun_server = document.getElementById("sun_server"); 
                 sun_server.style.display = ""
-
-                // const moon_robot = document.getElementById("moon_robot"); 
-                // moon_client.style.display = "none"
 
                 mode = "pair"
                 
@@ -402,6 +449,7 @@
             }
 
             function update_inner_circle(circle, speed) {
+                console.log(speed)
                 circle.radius += radius_change * speed;
             }
 
@@ -431,7 +479,7 @@
                         if (circle.radius > 77){
                             return -max_speed_exhale
                         }
-                        return Math.min(-0.1 , speed * .985)
+                        return Math.min(-0.08, speed * .987)
                 }
 
                 if (last_event.includes("phase 2") && counter < 10){
@@ -440,7 +488,7 @@
                 }
 
                 if (last_event == "inhale (phase 2)") {
-                        return Math.max(0.15, speed*.982)
+                        return Math.max(0.12, speed*.982)
                 }
 
                 if (last_event == "paused") {
@@ -460,10 +508,21 @@
             }
 
             function update_position() {
-                circle_client.y = window.innerHeight * 0.66 - 1.8 * circle_client.radius * screen_size_factor
-                circle_server.y = window.innerHeight * 0.66 - 1.8 * circle_server.radius * screen_size_factor
+                if (fullscreen && !document.fullscreenElement) {
+                    fullscreen = false;
+                    fullscreen_factor = 1.1
+                }
+                if (!fullscreen && document.fullscreenElement) {
+                    fullscreen = true;
+                    fullscreen_factor = 1
+                }
+
+                circle_client.y = fullscreen_factor * window.innerHeight * 0.71 - 2.2 * circle_client.radius * screen_size_factor / fullscreen_factor
+                if (mode=="guided"){
+                    circle_server.y = fullscreen_factor * window.innerHeight * 0.71 - 2.2 * circle_server.radius * screen_size_factor / fullscreen_factor
+                }
                 if (mode == "pair") {
-                    circle_server.y = window.innerHeight * 0.66 - 1.8 * circle_server.radius * screen_size_factor
+                    circle_server.y = fullscreen_factor * window.innerHeight * 0.71 - 2.2 * circle_server.radius * screen_size_factor / fullscreen_factor
                 }
             }
 
@@ -471,9 +530,27 @@
                 if (circle.radius < start_radius) {
                     return "inhale"
                 }
-                if (circle.radius > max_radius * 0.76) {
+                if (circle.radius > max_radius * 0.755) {
                     return "exhale"
                 }
+
+                const instructions2 = document.getElementById("instructions2");
+                
+                if (circle.radius < start_radius * 1.03 && instructions2.textContent != "breathe in") {
+                    display_prompt()
+                    instructions2.textContent = "breathe in"
+                }
+
+                if (circle.radius > max_radius * 0.755 * 0.90 && instructions2.textContent == "breathe in") {
+                    display_prompt()
+                    instructions2.textContent = "hold"
+                }
+
+                if (circle.radius > max_radius * 0.755 * 0.991 && instructions2.textContent != "breathe out") {
+                    display_prompt()
+                    instructions2.textContent = "breathe out"
+                }
+
                 return last_event_server
             }
 
@@ -491,15 +568,17 @@
                     speed_client = check_value_limits(circle_client, speed_client)
                     update_text()
 
-                    last_event_server = get_robot_event(circle_server, last_event_server)
-                    last_event_server = update_last_event(speed_server, last_event_server)
-                    speed_server = calculate_speed(last_event_server, circle_server, speed_server)
-                    speed_server = Math.max(speed_server, -max_speed)
-                    speed_server = Math.min(speed_server, max_speed)
-                    // console.log(last_event_server)
-                
-                    update_inner_circle(circle_server, speed_server)
-                    speed_server = check_value_limits(circle_server, speed_server)
+                    if (mode=="guided") {
+                        console.log(last_event_server)
+                        last_event_server = get_robot_event(circle_server, last_event_server)
+                        last_event_server = update_last_event(speed_server, last_event_server)
+                        speed_server = calculate_speed(last_event_server, circle_server, speed_server)
+                        speed_server = Math.max(speed_server, -max_speed)
+                        speed_server = Math.min(speed_server, max_speed)
+                    
+                        update_inner_circle(circle_server, speed_server)
+                        speed_server = check_value_limits(circle_server, speed_server)
+                    }
 
                     if (mode=="pair"){
                         last_event_server = update_last_event(speed_server, last_event_server)
@@ -542,6 +621,14 @@
             together_button.style.display = ""
             document.body.appendChild(together_button);
 
+            const guided_button = document.createElement("button");
+            guided_button.setAttribute('id','guided-button');
+            guided_button.setAttribute('class','guided-button noselect');
+            guided_button.textContent = 'guided';
+            guided_button.addEventListener('click', start_session_guided);
+            guided_button.style.display = ""
+            document.body.appendChild(guided_button);
+
             document.body.style.backgroundImage = `url("{{url_for('static', filename='dusky.jpg')}}")`;
 
             setInterval(update, 16);
@@ -565,10 +652,10 @@
         border-radius: 5px;
         display: block;
         width:  16vh;
-        height:  5vh;
+        height:  5.1vh;
         line-height: 0px;
         padding-bottom: 2px;
-        font-size: 3.5vh;
+        font-size: 3.3vh;
         font-family: poppins;
         font-weight: 700;
         box-shadow:
@@ -595,10 +682,10 @@
         border-radius: 5px;
         display: block;
         width:  16vh;
-        height:  5vh;
+        height:  5.1vh;
         line-height: 0px;
         padding-bottom: 2px;
-        font-size: 3.5vh;
+        font-size: 3.3vh;
         font-family: poppins;
         font-weight: 700;
         box-shadow:
@@ -606,6 +693,36 @@
     }
 
     .together-button:hover {
+        box-shadow:
+        0px 0px 10px 0px lightcyan;
+        opacity: 1.0;
+    }
+
+    .guided-button {
+        position: absolute;
+        top:  48.0vh;
+        left: calc(50% - 9.5vh);
+        background-image: linear-gradient(to right, rgb(220,222,255) 0%, rgb(210,232,255) 90%);
+        border: none;
+        opacity: 0.98;
+        text-align: center;
+        color: rgb(55,70,160);
+        /* color: royalblue;  */
+        cursor:  pointer;
+        border-radius: 5px;
+        display: block;
+        width:  19vh;
+        height:  5.3vh;
+        line-height: 0px;
+        padding-bottom: 2px;
+        font-size: 3.1vh;
+        font-family: poppins;
+        font-weight: 700;
+        box-shadow:
+        0px 0px 4px 0px lightcyan;
+    }
+
+    .guided-button:hover {
         box-shadow:
         0px 0px 10px 0px lightcyan;
         opacity: 1.0;
@@ -671,7 +788,7 @@
 
         <p class="noselect grad" id="instructions" style="position: absolute; top: 18vh; left: calc(50% - 8.4em); width: 16.8em; text-align: justify; text-align-last: justify; font-size: 2.3vh; line-height: 3.6vh; font-family: poppins; font-weight: 400;"><a style = "font-weight: 700;">A relaxing 4-minute meditation</a> Press and hold as you inhale, and then release as you exhale. Enjoy!</p>
 
-        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 9vh; left: calc(50% - 9em); width: 18em; text-align: center; font-size: 3.4vh; opacity: 1.0; font-family: poppins; font-weight: 400; display: none">Take a deep breath</p>
+        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 10vh; left: calc(50% - 9em); width: 18em; text-align: center; font-size: 3.4vh; opacity: 1.0; font-family: poppins; font-weight: 400; display: none">Take a deep breath</p>
 
         <p class="noselect" id="instructions3" style="position: absolute; top: 120px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; display: none"></p>
     
