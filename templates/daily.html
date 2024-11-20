@@ -47,22 +47,22 @@
             const radius_scale = 0.5;
             const screen_size_factor = (meditationCanvas.height / 2100) / 0.5;
             const min_radius = 55 * radius_scale;
-            const start_radius = 80 * radius_scale;
+            const start_radius = 100 * radius_scale; //80
             const max_radius = 300 * radius_scale;
 
-            const max_ring_width = 700  * radius_scale
+            const max_ring_width = 50  * radius_scale
             const color_change = 0.25;
             const radius_change = 0.6 * radius_scale;
 
             const max_speed = 2.0;
-            const max_speed_exhale = 1.6;
+            const max_speed_exhale = 1.3;
             const acceleration_init = 0.06;
 
             var speed_client = 0;
             var speed_server = 0;
             var counter = 0;
 
-            const ring_color = "rgba(255,255,255"
+            var ring_color = "rgba(255,255,255"
             const circle_color = "white"
             
             var time_in_session = -1;
@@ -98,7 +98,7 @@
             var num_breaths_at_marker3 = 9999999;
             var num_active;
             var last_event = 'paused';
-            var last_event_server = 'paused';
+            var last_event_server = 'inhale';
 
             var mode = 'solo';
             var partner_id = 0
@@ -111,15 +111,17 @@
             console.log(socket)
 
             function createOuterCircle(circle){
-                const gradient2 = ctx.createRadialGradient(circle.x, circle.y - circle_client.radius * screen_size_factor * 2, 0, circle.x, circle.y - circle_client.radius * screen_size_factor * 2, circle.outer_radius * screen_size_factor);
+                const gradient2 = ctx.createRadialGradient(circle.x, circle.y - circle.radius * screen_size_factor * 2, 0, circle.x, circle.y - circle.radius * screen_size_factor * 2, (circle.radius * 30) * screen_size_factor);
                 
-                alpha = Math.max(0.02, Math.min(0.12, 0.06 * (circle.radius / start_radius - 1.5)))
+                // alpha = Math.max(0.02, Math.min(0.12, 0.06 * (circle.radius / start_radius - 1.5)))
+                alpha = 0.08 //36
                 if (end_screen) {
                     alpha = 0.04
                 }
                 gradient2.addColorStop(0, ring_color + ', 0)');
-                gradient2.addColorStop(circle.radius / circle.outer_radius, ring_color + ', ' + alpha.toString() + ')');
-                gradient2.addColorStop(1, ring_color + ', 0)');
+                gradient2.addColorStop(1 / 20, ring_color + ', 0)');
+                gradient2.addColorStop(1 / 19.9, ring_color + ', ' + alpha.toString() + ')');
+                gradient2.addColorStop(1, ring_color + ', ' + alpha.toString() + ')');
 
                 return gradient2;
             }
@@ -127,7 +129,7 @@
             function drawOuterCircle(circle) {
                 const gradient = createOuterCircle(circle);
                 ctx.beginPath();
-                ctx.arc(circle.x, circle.y - circle_client.radius * screen_size_factor * 2, circle.outer_radius * screen_size_factor, 0, 2 * Math.PI);
+                ctx.arc(circle.x, circle.y - circle.radius * screen_size_factor * 2, (circle.radius * 30) * screen_size_factor, 0, 2 * Math.PI);
                 ctx.fillStyle = gradient;
                 ctx.fill();
             }
@@ -164,9 +166,25 @@
                 if (!start_screen) {
                     
                     if (mode == "solo") {
-                        const moon = document.getElementById("moon");
-                        adjust_image(moon, circle_client)
-                        drawOuterCircle(circle_client);
+                        const moon_client = document.getElementById("moon_client");
+                        const moon2 = document.getElementById("moon2");
+                        // const moon_robot = document.getElementById("moon_robot");
+
+                        if (Math.abs(circle_client.radius - circle_server.radius) < 15) {
+                            moon2.style.display = "none"
+                            moon_client.style.display = ""
+                            ring_color = "rgba(180,140,180"
+                            adjust_image(moon_client, circle_client)
+                        } else {
+                            moon_client.style.display = "none"
+                            moon2.style.display = ""
+                            ring_color = "rgba(180,140,180"
+                            adjust_image(moon2, circle_client)
+                        }
+                        
+                        // adjust_image(moon_robot, circle_server)
+                        // drawOuterCircle(circle_client);
+                        drawOuterCircle(circle_server);
                     }
                     if (mode == "pair") {
                         const sun_server = document.getElementById("sun_server");
@@ -337,8 +355,14 @@
                 const ttb = document.getElementById('together-button');
                 ttb.style.display = "none"
 
-                const moon = document.getElementById("moon"); 
-                moon.style.display = ""
+                const moon_client = document.getElementById("moon_client"); 
+                moon_client.style.display = ""
+
+                const moon2 = document.getElementById("moon2"); 
+                moon2.style.display = ""
+
+                // const moon_robot = document.getElementById("moon_robot"); 
+                // moon_robot.style.display = ""
 
                 toggle_fullscreen("on")
 
@@ -354,14 +378,11 @@
 
                 start_session()
 
-                const moon = document.getElementById("moon"); 
-                moon.style.display = "none"
-
                 const sun_server = document.getElementById("sun_server"); 
                 sun_server.style.display = ""
 
-                const moon_client = document.getElementById("moon_client"); 
-                moon_client.style.display = ""
+                // const moon_robot = document.getElementById("moon_robot"); 
+                // moon_client.style.display = "none"
 
                 mode = "pair"
                 
@@ -440,16 +461,27 @@
 
             function update_position() {
                 circle_client.y = window.innerHeight * 0.66 - 1.8 * circle_client.radius * screen_size_factor
+                circle_server.y = window.innerHeight * 0.66 - 1.8 * circle_server.radius * screen_size_factor
                 if (mode == "pair") {
                     circle_server.y = window.innerHeight * 0.66 - 1.8 * circle_server.radius * screen_size_factor
                 }
+            }
+
+            function get_robot_event(circle, last_event_server) {
+                if (circle.radius < start_radius) {
+                    return "inhale"
+                }
+                if (circle.radius > max_radius * 0.76) {
+                    return "exhale"
+                }
+                return last_event_server
             }
 
 
             // Update the circle color on each frame
             function update() {
 
-                if (!end_screen) {
+                if (!end_screen && !start_screen) {
                     last_event = update_last_event(speed_client, last_event)
                     speed_client = calculate_speed(last_event, circle_client, speed_client)
                     speed_client = Math.max(speed_client, -max_speed)
@@ -458,6 +490,16 @@
                     update_inner_circle(circle_client, speed_client)
                     speed_client = check_value_limits(circle_client, speed_client)
                     update_text()
+
+                    last_event_server = get_robot_event(circle_server, last_event_server)
+                    last_event_server = update_last_event(speed_server, last_event_server)
+                    speed_server = calculate_speed(last_event_server, circle_server, speed_server)
+                    speed_server = Math.max(speed_server, -max_speed)
+                    speed_server = Math.min(speed_server, max_speed)
+                    // console.log(last_event_server)
+                
+                    update_inner_circle(circle_server, speed_server)
+                    speed_server = check_value_limits(circle_server, speed_server)
 
                     if (mode=="pair"){
                         last_event_server = update_last_event(speed_server, last_event_server)
@@ -619,7 +661,9 @@
 
         <p class="noselect grad2" id = "header" style="position: absolute; top: calc(1.2vh + .1cm); left: calc(50%-5em); width: 10em; text-align: center; font-size: 5.25vh; font-weight: 600; font-family: poppins;">breathing moon</p>
 
-        <img class="noselect" id="moon" src="{{url_for('static', filename='moon.png')}}" style=" position: absolute; top: 220px; width: 200px; text-align: center; height: auto; display: none" alt="moon" />
+        <!-- <img class="noselect" id="moon_robot" src="{{url_for('static', filename='moon.png')}}" style=" position: absolute; top: 220px; width: 200px; text-align: center; height: auto; display: none" alt="moon_robot" /> -->
+
+        <img class="noselect" id="moon2" src="{{url_for('static', filename='moon2.png')}}" style=" position: absolute; top: 220px; width: 200px; text-align: center; height: auto; display: none" alt="moon" />
 
         <img class="noselect" id="sun_server" src="{{url_for('static', filename='titan.png')}}" style=" position: absolute; top: 220px; width: 200px; text-align: center; height: auto; display: none" alt="sun_server" />
 
@@ -627,7 +671,7 @@
 
         <p class="noselect grad" id="instructions" style="position: absolute; top: 18vh; left: calc(50% - 8.4em); width: 16.8em; text-align: justify; text-align-last: justify; font-size: 2.3vh; line-height: 3.6vh; font-family: poppins; font-weight: 400;"><a style = "font-weight: 700;">A relaxing 4-minute meditation</a> Press and hold as you inhale, and then release as you exhale. Enjoy!</p>
 
-        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 8vh; left: calc(50% - 9em); width: 18em; text-align: center; font-size: 3.4vh; opacity: 1.0; font-family: poppins; font-weight: 400; display: none">Take a deep breath</p>
+        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 9vh; left: calc(50% - 9em); width: 18em; text-align: center; font-size: 3.4vh; opacity: 1.0; font-family: poppins; font-weight: 400; display: none">Take a deep breath</p>
 
         <p class="noselect" id="instructions3" style="position: absolute; top: 120px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; display: none"></p>
     
