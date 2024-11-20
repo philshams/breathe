@@ -249,19 +249,25 @@
                 }
             }
 
+            function partner_prompt() {
+                const instructions2 = document.getElementById("instructions2");
+                display_prompt()
+                instructions2.textContent = "Someone is here!"
+            }
+
             function verbal_prompt() {
                 const instructions2 = document.getElementById("instructions2");
                 
-                if (num_breaths == 3 || num_breaths == 4 && !end_screen) {
+                if (num_breaths == 3 || num_breaths == 4 && !end_screen && mode=="solo") {
                     display_prompt()
                     instructions2.textContent = "Enjoy your meditation!"
                 }
-                if (num_breaths == 1 || num_breaths == 2) {
+                if (num_breaths == 1 || num_breaths == 2 && mode=="solo") {
                     display_prompt()
                     instructions2.textContent = "Take a deep breath"
                     start_time = (new Date).getTime();
                     }
-                if (((new Date).getTime() - start_time) / 1000 / 60 > 0.5 * session_duration && num_breaths < num_breaths_at_marker2 && num_breaths > 4 && !end_screen) {
+                if (((new Date).getTime() - start_time) / 1000 / 60 > 0.5 * session_duration && num_breaths < num_breaths_at_marker2 && num_breaths > 4 && !end_screen && mode=="solo") {
                     display_prompt()
                     num_breaths_at_marker2 = num_breaths
                     instructions2.textContent = "Halfway done"
@@ -277,7 +283,7 @@
                     num_breaths = num_breaths + 1;
                     last_event = 'inhale'   
                     
-                    if (mode != "guided"){
+                    if (mode == "solo" || mode == "guided"){
                         verbal_prompt()
                     }
                     if (num_breaths==1 && mode=="guided"){
@@ -355,6 +361,7 @@
 
             socket.on('assign_partner', function (msg) {
                 partner_id = msg;
+                partner_prompt()
                 console.log("partner")
                 console.log(msg)
             });
@@ -430,6 +437,9 @@
                 const sun_server = document.getElementById("sun_server"); 
                 sun_server.style.display = ""
 
+                const instructions2 = document.getElementById("instructions2"); 
+                instructions2.textContent = "Waiting for someone to join..."
+
                 mode = "pair"
                 
             }
@@ -498,7 +508,7 @@
 
             function update_text() {
                 const text = document.getElementById("instructions2");
-                if (text.style.display == "" && ((new Date).getTime() - press_time) > 2000 && !end_screen && num_breaths > 0) {
+                if (text.style.display == "" && ((new Date).getTime() - press_time) > 2000 && !end_screen && num_breaths > 0 && text.textContent != "Waiting for someone to join...") {
                     text.style.opacity = text.style.opacity - 0.005
                     if (text.style.opacity < 0.01) {
                         text.style.display = "none"
