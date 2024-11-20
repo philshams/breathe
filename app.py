@@ -79,17 +79,16 @@ def join_room():
         partners[partner_id] = request.sid
         partners[request.sid] = partner_id
 
-
 # when a client presses a key
 @socketio.event
 def client_keydown(radius):
-    if partners[request.sid] is not None:
+    if request.sid in partners and partners[request.sid] is not None:
         emit('partner_state', (radius, "inhale"), room=partners[request.sid])
 
 # when a client releases a key
 @socketio.event
 def client_keyup(radius):
-    if partners[request.sid] is not None:
+    if request.sid in partners and partners[request.sid] is not None:
         emit('partner_state', (radius, "exhale"), room=partners[request.sid])
 
 

@@ -171,8 +171,8 @@
                     if (mode == "pair") {
                         const sun_server = document.getElementById("sun_server");
                         const moon_client = document.getElementById("moon_client");
-                        adjust_image(sun_server, circle_server, 3.5, 1.2)
-                        adjust_image(moon_client, circle_client, -4, 1.1)
+                        adjust_image(moon_client, circle_client, 3.5, 1.0)
+                        adjust_image(sun_server, circle_server, -4, 1.1)
                     }
                     
                 }
@@ -439,11 +439,9 @@
             }
 
             function update_position() {
-                if (mode == "solo") {
-                    circle_client.y = window.innerHeight * 0.44 - 0.2 * circle_client.radius * screen_size_factor
-                } else {
-                    circle_client.y = window.innerHeight * 0.52 - 0.65 * circle_client.radius * screen_size_factor
-                    circle_server.y = window.innerHeight * 0.52 - 0.65 * circle_server.radius * screen_size_factor
+                circle_client.y = window.innerHeight * 0.66 - 1.8 * circle_client.radius * screen_size_factor
+                if (mode == "pair") {
+                    circle_server.y = window.innerHeight * 0.66 - 1.8 * circle_server.radius * screen_size_factor
                 }
             }
 
@@ -457,7 +455,6 @@
                     speed_client = Math.max(speed_client, -max_speed)
                     speed_client = Math.min(speed_client, max_speed)
                     
-                    console.log(speed_client)
                     update_inner_circle(circle_client, speed_client)
                     speed_client = check_value_limits(circle_client, speed_client)
                     update_text()
@@ -520,13 +517,13 @@
         border: none;
         opacity: 0.98;
         text-align: center;
-        color: rgb(97,105,186);
+        color: rgb(55,70,160);
         /* color: royalblue;  */
         cursor:  pointer;
         border-radius: 5px;
         display: block;
         width:  16vh;
-        height:  5.1vh;
+        height:  5vh;
         line-height: 0px;
         padding-bottom: 2px;
         font-size: 3.5vh;
@@ -550,13 +547,13 @@
         border: none;
         opacity: 0.98;
         text-align: center;
-        color: rgb(97,105,186);
+        color: rgb(55,70,160);
         /* color: royalblue;  */
         cursor:  pointer;
         border-radius: 5px;
         display: block;
         width:  16vh;
-        height:  5.1vh;
+        height:  5vh;
         line-height: 0px;
         padding-bottom: 2px;
         font-size: 3.5vh;
@@ -624,13 +621,13 @@
 
         <img class="noselect" id="moon" src="{{url_for('static', filename='moon.png')}}" style=" position: absolute; top: 220px; width: 200px; text-align: center; height: auto; display: none" alt="moon" />
 
-        <img class="noselect" id="sun_server" src="{{url_for('static', filename='sun.png')}}" style=" position: absolute; top: 220px; width: 200px; text-align: center; height: auto; display: none" alt="sun_server" />
+        <img class="noselect" id="sun_server" src="{{url_for('static', filename='titan.png')}}" style=" position: absolute; top: 220px; width: 200px; text-align: center; height: auto; display: none" alt="sun_server" />
 
         <img class="noselect" id="moon_client" src="{{url_for('static', filename='moon.png')}}" style=" position: absolute; top: 220px; width: 200px; text-align: center; height: auto; display: none" alt="moon_client" />
 
         <p class="noselect grad" id="instructions" style="position: absolute; top: 18vh; left: calc(50% - 8.4em); width: 16.8em; text-align: justify; text-align-last: justify; font-size: 2.3vh; line-height: 3.6vh; font-family: poppins; font-weight: 400;"><a style = "font-weight: 700;">A relaxing 4-minute meditation</a> Press and hold as you inhale, and then release as you exhale. Enjoy!</p>
 
-        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 7vh; left: calc(50% - 9em); width: 18em; text-align: center; font-size: 3.4vh; opacity: 1.0; font-family: poppins; font-weight: 400; display: none">Take a deep breath</p>
+        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 8vh; left: calc(50% - 9em); width: 18em; text-align: center; font-size: 3.4vh; opacity: 1.0; font-family: poppins; font-weight: 400; display: none">Take a deep breath</p>
 
         <p class="noselect" id="instructions3" style="position: absolute; top: 120px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; display: none"></p>
     
