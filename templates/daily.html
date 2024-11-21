@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <style>
         body {
-            margin: 0;
+            margin: 0 !important;
+            padding: 0 !important;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -46,8 +47,8 @@
 
             const radius_scale = 0.5;
             const screen_size_factor = (meditationCanvas.height / 2100) / 0.5;
-            const min_radius = 55 * radius_scale;
-            var start_radius = 80 * radius_scale; //80
+            const min_radius = 65 * radius_scale;
+            var start_radius = 100 * radius_scale;
             const max_radius = 300 * radius_scale;
 
             const max_ring_width = 1600  * radius_scale
@@ -62,7 +63,7 @@
             var speed_server = 0;
             var counter = 0;
 
-            var ring_color = "rgba(255,255,255"
+            var ring_color = "rgba(255,200,255"
             const circle_color = "white"
             
             var time_in_session = -1;
@@ -77,7 +78,7 @@
 
             user_id = 0;
 
-            const x_pos = meditationCanvas.width / 2;
+            var x_pos = meditationCanvas.width / 2;
 
             var circle_client = {
                 x: x_pos,
@@ -111,13 +112,23 @@
             var socket = io("/");
             console.log(socket)
 
+            function resizeCanvas() {
+                meditationCanvas.width = window.innerWidth;
+                meditationCanvas.height = window.innerHeight;
+                x_pos = meditationCanvas.width / 2;
+                circle_client.x = x_pos;
+                circle_server.x = x_pos;
+            }
+
+            window.addEventListener('resize', resizeCanvas); 
+
             function createOuterCircle(circle){
                 if (mode=="guided" || mode =="solo") {
                     const gradient2 = ctx.createRadialGradient(circle.x, circle.y - circle.radius * screen_size_factor * 2, 0, circle.x, circle.y - circle.radius * screen_size_factor * 2, (circle.radius * 30) * screen_size_factor);
                     if (mode=="guided") {
-                        alpha = 0.08
+                        alpha = 0.04
                     } if (mode == "solo"){
-                        alpha = 0.05
+                        alpha = 0.04
                     }
                     gradient2.addColorStop(0, ring_color + ', 0)');
                     gradient2.addColorStop(1 / 20, ring_color + ', 0)');
@@ -196,12 +207,10 @@
                         if (Math.abs(circle_client.radius - circle_server.radius) < 15) {
                             moon2.style.display = "none"
                             moon_client.style.display = ""
-                            ring_color = "rgba(180,140,180"
                             adjust_image(moon_client, circle_client)
                         } else {
                             moon_client.style.display = "none"
                             moon2.style.display = ""
-                            ring_color = "rgba(180,140,180"
                             adjust_image(moon2, circle_client)
                         }
                         drawOuterCircle(circle_server);
@@ -209,8 +218,8 @@
                     if (mode == "pair") {
                         const sun_server = document.getElementById("sun_server");
                         const moon_client = document.getElementById("moon_client");
-                        adjust_image(moon_client, circle_client, 3.5, 1.0)
-                        adjust_image(sun_server, circle_server, -4, 1.1)
+                        adjust_image(moon_client, circle_client, 1.5, 1.0)
+                        adjust_image(sun_server, circle_server, -2, 1.1)
 
                         drawOuterCircle(circle_client);
                         drawOuterCircle(circle_server);
@@ -252,20 +261,23 @@
             function partner_prompt() {
                 const instructions2 = document.getElementById("instructions2");
                 display_prompt()
-                instructions2.textContent = "Someone is here!"
+                if (partner_id == 0){
+                    instructions2.textContent = "Waiting for someone to join..."
+                } else {
+                    instructions2.textContent = "Someone is here!"
+                }
             }
 
             function verbal_prompt() {
                 const instructions2 = document.getElementById("instructions2");
                 
-                if (num_breaths == 3 || num_breaths == 4 && !end_screen && mode=="solo") {
+                if ((num_breaths == 3 || num_breaths == 4) && !end_screen && mode=="solo") {
                     display_prompt()
                     instructions2.textContent = "Enjoy your meditation!"
                 }
-                if (num_breaths == 1 || num_breaths == 2 && mode=="solo") {
+                if ((num_breaths == 1 || num_breaths == 2) && mode=="solo") {
                     display_prompt()
                     instructions2.textContent = "Take a deep breath"
-                    start_time = (new Date).getTime();
                     }
                 if (((new Date).getTime() - start_time) / 1000 / 60 > 0.5 * session_duration && num_breaths < num_breaths_at_marker2 && num_breaths > 4 && !end_screen && mode=="solo") {
                     display_prompt()
@@ -281,7 +293,11 @@
                 if (!last_event.includes('inhale') && !start_screen) {
                     socket.emit('client_keydown', circle_client.radius);
                     num_breaths = num_breaths + 1;
-                    last_event = 'inhale'   
+                    last_event = 'inhale'  
+                    
+                    if (num_breaths==1 || num_breaths==2) {
+                        start_time = (new Date).getTime();
+                    }
                     
                     if (mode == "solo" || mode == "guided"){
                         verbal_prompt()
@@ -289,6 +305,7 @@
                     if (num_breaths==1 && mode=="guided"){
                         last_event_server = "inhale"
                     }
+                    
                     
                 }
             }
@@ -400,10 +417,6 @@
 
                 start_screen = false;
 
-                start_radius = 100 * radius_scale
-                circle_client.radius = start_radius
-                circle_server.radius = start_radius
-
                 mode = "solo"
 
             }
@@ -411,10 +424,6 @@
             function start_session_guided() {
 
                 start_session()
-
-                start_radius = 100 * radius_scale
-                circle_client.radius = start_radius
-                circle_server.radius = start_radius
 
                 const instructions2 = document.getElementById("instructions2"); 
                 instructions2.textContent = "breathe in"
@@ -429,10 +438,6 @@
                 socket.emit('join_room');
 
                 start_session()
-
-                start_radius = 80 * radius_scale
-                circle_client.radius = start_radius
-                circle_server.radius = start_radius
 
                 const sun_server = document.getElementById("sun_server"); 
                 sun_server.style.display = ""
@@ -458,7 +463,6 @@
             }
 
             function update_inner_circle(circle, speed) {
-                console.log(speed)
                 circle.radius += radius_change * speed;
             }
 
@@ -578,7 +582,6 @@
                     update_text()
 
                     if (mode=="guided") {
-                        console.log(last_event_server)
                         last_event_server = get_robot_event(circle_server, last_event_server)
                         last_event_server = update_last_event(speed_server, last_event_server)
                         speed_server = calculate_speed(last_event_server, circle_server, speed_server)

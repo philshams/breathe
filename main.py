@@ -1,6 +1,7 @@
 from threading import Lock
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
+import os
 
 # Set this variable to "threading", "eventlet" or "gevent" to test the
 # different async modes, or leave it set to None for the application to choose
@@ -93,4 +94,4 @@ def client_keyup(radius):
 
 
 if __name__ == '__main__':
-    socketio.run(app)
+    socketio.run(app, debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
