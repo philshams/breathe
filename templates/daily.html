@@ -227,7 +227,7 @@
                     if (mode == "pair") {
                         const sun_server = document.getElementById("sun_server");
                         const moon_client = document.getElementById("moon_client");
-                        adjust_image(moon_client, circle_client, 1.5, 1.0)
+                        adjust_image(moon_client, circle_client, 2, 1.0)
                         adjust_image(sun_server, circle_server, -2, 1.1)
 
                         drawOuterCircle(circle_client);
@@ -468,6 +468,10 @@
                 const instructions2 = document.getElementById("instructions2"); 
                 instructions2.textContent = "Waiting for someone to join..."
                 instructions2.style.fontSize = "2.8vh"
+
+                circle_client.radius = start_radius * 0.9
+                circle_server.radius = start_radius * 0.9
+
 
                 mode = "pair"
 
