@@ -123,6 +123,7 @@
 
             window.onpopstate = function(event) {
                 if(event) {
+                    history.pushState({}, "", "");
                     location.reload()
                 }
             }
@@ -434,7 +435,7 @@
             function start_session_solo() {
 
                 start_session()
-                history.pushState({}, "", "solo-meditation");
+                history.pushState({}, "", "#solo");
                 mode = "solo"
 
             }
@@ -452,7 +453,7 @@
 
                 mode = "guided"
 
-                history.pushState({}, "", "guided-meditation");
+                history.pushState({}, "", "#guided");
 
             }
 
@@ -471,7 +472,7 @@
 
                 mode = "pair"
 
-                history.pushState({}, "", "partner-meditation");
+                history.pushState({}, "", "#partner");
                 
             }
 
