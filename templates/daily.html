@@ -126,13 +126,15 @@
                 if (mode=="guided" || mode =="solo") {
                     const gradient2 = ctx.createRadialGradient(circle.x, circle.y - circle.radius * screen_size_factor * 2, 0, circle.x, circle.y - circle.radius * screen_size_factor * 2, (circle.radius * 40) * screen_size_factor);
                     if (mode=="guided") {
-                        alpha = 0.03
+                        alpha = 0.04
+                        scale_factor = 100
                     } if (mode == "solo"){
-                        alpha = 0.025
+                        alpha = 0.03
+                        scale_factor = circle.radius
                     }
                     gradient2.addColorStop(0, ring_color + ', 0)');
-                    gradient2.addColorStop(1 / 24, ring_color + ', 0)');
-                    gradient2.addColorStop(1 / 23.9, ring_color + ', ' + alpha.toString() + ')');
+                    gradient2.addColorStop((1 / 24) * (scale_factor/100), ring_color + ', 0)');
+                    gradient2.addColorStop((1 / 23.9) * (scale_factor/100), ring_color + ', ' + alpha.toString() + ')');
                     gradient2.addColorStop(1, ring_color + ', ' + alpha.toString() + ')');
                     return gradient2
                 } else {
