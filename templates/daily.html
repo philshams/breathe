@@ -46,7 +46,7 @@
             const ctx = meditationCanvas.getContext('2d');
 
             const radius_scale = 0.5;
-            const screen_size_factor = (meditationCanvas.height / 2100) / 0.5;
+            var screen_size_factor = (window.innerHeight / 2100) / 0.5;
             const min_radius = 65 * radius_scale;
             var start_radius = 100 * radius_scale;
             const max_radius = 300 * radius_scale;
@@ -116,6 +116,7 @@
                 meditationCanvas.width = window.innerWidth;
                 meditationCanvas.height = window.innerHeight;
                 x_pos = meditationCanvas.width / 2;
+                screen_size_factor = (window.innerHeight / 2100) / 0.5;
                 circle_client.x = x_pos;
                 circle_server.x = x_pos;
             }
