@@ -123,10 +123,10 @@
 
             window.onpopstate = function(event) {
                 if(event) {
-                    history.pushState({}, "", "");
                     location.reload()
                 }
             }
+            history.pushState({}, "", "#home");
 
             window.addEventListener('resize', resizeCanvas); 
 
@@ -157,7 +157,6 @@
                     return gradient2;
                     
                 }
-                
             }
 
             function drawOuterCircle(circle) {
@@ -180,8 +179,8 @@
                 }
                 if (mode == "pair") {
                     if (Math.sign(translation_factor) > 0) {
-                        image.style.left = "calc(50% - " + (circle.radius * screen_size_factor + translation_factor * start_radius * screen_size_factor + Math.sign(translation_factor) * 2 /4 * circle.radius).toString() + "px)"
-                        circle.x = x_pos - translation_factor * start_radius * screen_size_factor - Math.sign(translation_factor) * 2 /4 * circle.radius
+                        image.style.left = "calc(50% - " + (circle.radius * screen_size_factor + translation_factor * start_radius * screen_size_factor + Math.sign(translation_factor) * 1 /4 * circle.radius).toString() + "px)"
+                        circle.x = x_pos - translation_factor * start_radius * screen_size_factor - Math.sign(translation_factor) * 1 /4 * circle.radius
                     } else {
                         image.style.left = "calc(50% - " + (circle.radius * screen_size_factor + translation_factor * start_radius * screen_size_factor).toString() + "px)"
                         circle.x = x_pos - translation_factor * start_radius * screen_size_factor
