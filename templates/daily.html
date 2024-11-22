@@ -46,7 +46,7 @@
             const ctx = meditationCanvas.getContext('2d');
 
             const radius_scale = 0.5;
-            var screen_size_factor = (window.innerHeight / 2100) / 0.5;
+            var screen_size_factor = (window.innerHeight / 2200) / 0.5;
             const min_radius = 65 * radius_scale;
             var start_radius = 100 * radius_scale;
             const max_radius = 300 * radius_scale;
@@ -565,12 +565,12 @@
                     fullscreen_factor = 1
                 }
 
-                circle_client.y = fullscreen_factor * window.innerHeight * 0.73 - 2.2 * circle_client.radius * screen_size_factor / fullscreen_factor
+                circle_client.y = fullscreen_factor * window.innerHeight * 0.75 - 2.2 * circle_client.radius * screen_size_factor / fullscreen_factor
                 if (mode=="guided"){
-                    circle_server.y = fullscreen_factor * window.innerHeight * 0.73 - 2.2 * circle_server.radius * screen_size_factor / fullscreen_factor
+                    circle_server.y = fullscreen_factor * window.innerHeight * 0.75 - 2.2 * circle_server.radius * screen_size_factor / fullscreen_factor
                 }
                 if (mode == "pair") {
-                    circle_server.y = fullscreen_factor * window.innerHeight * 0.73 - 2.2 * circle_server.radius * screen_size_factor / fullscreen_factor
+                    circle_server.y = fullscreen_factor * window.innerHeight * 0.75 - 2.2 * circle_server.radius * screen_size_factor / fullscreen_factor
                 }
             }
 
@@ -597,17 +597,17 @@
                 if ((cur_time - exhale_time) > 4700 && last_event_server == "exhale") {
                     return "inhale"
                 }
-                if ((cur_time - inhale_time) > 2500 + extra_time && instructions2.textContent == "breathe in" && num_breaths > 0) {
+                if ((cur_time - inhale_time) > (2200 + extra_time) && instructions2.textContent == "breathe in" && num_breaths > 0) {
                     display_prompt()
                     instructions2.textContent = "hold"
                     hold_time = (new Date).getTime()
                 }
-                if ((cur_time - hold_time) > 2500 + extra_time && instructions2.textContent == "hold") {
+                if ((cur_time - hold_time) > (2000 + extra_time/2) && instructions2.textContent == "hold") {
                     display_prompt()
                     instructions2.textContent = "breathe out"
                     exhale_time = (new Date).getTime()
                 }
-                if ((cur_time - hold_time) > 2800 + extra_time && instructions2.textContent == "breathe out") {
+                if ((cur_time - hold_time) > (2300 + extra_time/2) && instructions2.textContent == "breathe out") {
                     return "exhale"
                 }
 
