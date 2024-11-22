@@ -69,7 +69,7 @@
             var time_in_session = -1;
             var timer_on = true;
 
-            var session_duration = 3;
+            var session_duration = 2;
             var start_time = 0;
             var press_time = 0;
 
@@ -101,6 +101,10 @@
             var num_active;
             var last_event = 'paused';
             var last_event_server = 'paused';
+
+            var inhale_time = 0;
+            var exhale_time = 0;
+            var hold_time = 0;
 
             var mode = 'solo';
             var partner_id = 0
@@ -315,7 +319,8 @@
                     }
                     if (num_breaths==1 && mode=="guided"){
                         last_event_server = "inhale"
-                        speed_server = 0.12
+                        // speed_server = 0.12
+                        inhale_time = (new Date).getTime()
                     }
                     
                     
@@ -560,12 +565,12 @@
                     fullscreen_factor = 1
                 }
 
-                circle_client.y = fullscreen_factor * window.innerHeight * 0.71 - 2.2 * circle_client.radius * screen_size_factor / fullscreen_factor
+                circle_client.y = fullscreen_factor * window.innerHeight * 0.73 - 2.2 * circle_client.radius * screen_size_factor / fullscreen_factor
                 if (mode=="guided"){
-                    circle_server.y = fullscreen_factor * window.innerHeight * 0.71 - 2.2 * circle_server.radius * screen_size_factor / fullscreen_factor
+                    circle_server.y = fullscreen_factor * window.innerHeight * 0.73 - 2.2 * circle_server.radius * screen_size_factor / fullscreen_factor
                 }
                 if (mode == "pair") {
-                    circle_server.y = fullscreen_factor * window.innerHeight * 0.71 - 2.2 * circle_server.radius * screen_size_factor / fullscreen_factor
+                    circle_server.y = fullscreen_factor * window.innerHeight * 0.73 - 2.2 * circle_server.radius * screen_size_factor / fullscreen_factor
                 }
             }
 
@@ -574,28 +579,36 @@
                 console.log(circle_server.radius)
                 console.log(speed_server)
                 console.log("")
-                if (circle.radius < start_radius) {
-                    return "inhale"
-                }
-                if (circle.radius > max_radius * 0.755) {
-                    return "exhale"
+                const instructions2 = document.getElementById("instructions2");
+                cur_time = (new Date).getTime()
+
+                if (num_breaths > 1) {
+                    extra_time = 750
+                } else {
+                    extra_time = 0
                 }
 
-                const instructions2 = document.getElementById("instructions2");
-                
-                if (circle.radius < start_radius * 1.03 && instructions2.textContent != "breathe in") {
+
+                if ((cur_time - exhale_time) > 4200 && instructions2.textContent == "breathe out") {
                     display_prompt()
                     instructions2.textContent = "breathe in"
+                    inhale_time = (new Date).getTime()
                 }
-
-                if (circle.radius > max_radius * 0.755 * 0.90 && instructions2.textContent == "breathe in") {
+                if ((cur_time - exhale_time) > 4700 && last_event_server == "exhale") {
+                    return "inhale"
+                }
+                if ((cur_time - inhale_time) > 2500 + extra_time && instructions2.textContent == "breathe in" && num_breaths > 0) {
                     display_prompt()
                     instructions2.textContent = "hold"
+                    hold_time = (new Date).getTime()
                 }
-
-                if (circle.radius > max_radius * 0.755 * 0.991 && instructions2.textContent != "breathe out") {
+                if ((cur_time - hold_time) > 2500 + extra_time && instructions2.textContent == "hold") {
                     display_prompt()
                     instructions2.textContent = "breathe out"
+                    exhale_time = (new Date).getTime()
+                }
+                if ((cur_time - hold_time) > 2800 + extra_time && instructions2.textContent == "breathe out") {
+                    return "exhale"
                 }
 
                 return last_event_server
@@ -836,9 +849,9 @@
 
         <img class="noselect" id="moon_client" src="{{url_for('static', filename='moon.png')}}" style=" position: absolute; top: 220px; width: 200px; text-align: center; height: auto; display: none" alt="moon_client" />
 
-        <p class="noselect grad" id="instructions" style="position: absolute; top: 18vh; left: calc(50% - 8.4em); width: 16.8em; text-align: justify; text-align-last: justify; font-size: 2.3vh; line-height: 3.6vh; font-family: poppins; font-weight: 400;"><a style = "font-weight: 700;">A relaxing 4-minute meditation</a> Press and hold as you inhale, and then release as you exhale. Enjoy!</p>
+        <p class="noselect grad" id="instructions" style="position: absolute; top: 18vh; left: calc(50% - 8.4em); width: 16.8em; text-align: justify; text-align-last: justify; font-size: 2.3vh; line-height: 3.6vh; font-family: poppins; font-weight: 400;"><a style = "font-weight: 700;">A relaxing 2-minute meditation</a> Press and hold as you inhale, and then release as you exhale. Enjoy!</p>
 
-        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 6vh; left: calc(50% - 9em); width: 18em; text-align: center; font-size: 3.1vh; opacity: 1.0; font-family: poppins; font-weight: 400; display: none">Take a deep breath</p>
+        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 7vh; left: calc(50% - 9em); width: 18em; text-align: center; font-size: 3.1vh; opacity: 1.0; font-family: poppins; font-weight: 400; display: none">Take a deep breath</p>
 
         <p class="noselect" id="instructions3" style="position: absolute; top: 120px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; display: none"></p>
     
