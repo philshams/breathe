@@ -24,8 +24,6 @@ partners = dict()
 def orby():
     return render_template('daily.html', async_mode=socketio.async_mode)
 
-# TODO: if alone_user list has more than one user
-
 # when a client connects
 @socketio.on('connect')
 def on_connect():
@@ -34,26 +32,13 @@ def on_connect():
 
 def _leave_room(user_id):
     if user_id in partners and partners[user_id] is not None:
-            prev_partner = partners[user_id]
-            del partners[user_id]
-
-            if alone_user == [None]:
-                alone_user[-1] = prev_partner
-                partners[prev_partner] = None
-                emit('assign_partner', 0, room=prev_partner)
-            elif alone_user == []:
-                alone_user.append(prev_partner)
-                partners[prev_partner] = None
-                emit('assign_partner', 0, room=prev_partner)
-            else:
-                partner_id = alone_user.pop()
-                emit('assign_partner', partner_id, room=prev_partner)
-                emit('assign_partner', prev_partner, room=partner_id)
-                partners[partner_id] = prev_partner
-                partners[prev_partner] = partner_id
+        del partners[user_id]
 
     if alone_user and user_id == alone_user[-1]:
         alone_user.pop()
+
+    if alone_user and user_id in alone_user[-1] and user_id != alone_user[-1]:
+        alone_user.remove(user_id)
 
 
 # # when a client disconnects
@@ -82,15 +67,15 @@ def join_room():
 
 # when a client presses a key
 @socketio.event
-def client_keydown(radius):
+def client_keydown(radius, time_in_session):
     if request.sid in partners and partners[request.sid] is not None:
-        emit('partner_state', (radius, "inhale"), room=partners[request.sid])
+        emit('partner_state', (radius, "inhale", time_in_session), room=partners[request.sid])
 
 # when a client releases a key
 @socketio.event
-def client_keyup(radius):
+def client_keyup(radius, time_in_session):
     if request.sid in partners and partners[request.sid] is not None:
-        emit('partner_state', (radius, "exhale"), room=partners[request.sid])
+        emit('partner_state', (radius, "exhale", time_in_session), room=partners[request.sid])
 
 
 if __name__ == '__main__':

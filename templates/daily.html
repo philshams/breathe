@@ -51,8 +51,7 @@
             var start_radius = 100 * radius_scale;
             const max_radius = 300 * radius_scale;
 
-            const max_ring_width = 1600  * radius_scale
-            const color_change = 0.25;
+            const max_ring_width = 1200  * radius_scale
             const radius_change = 0.6 * radius_scale;
 
             const max_speed = 2.0;
@@ -63,11 +62,8 @@
             var speed_server = 0;
             var counter = 0;
 
-            var ring_color = "rgba(235,200,235"
+            var ring_color = "rgba(235,235,245"
             const circle_color = "white"
-            
-            var time_in_session = -1;
-            var timer_on = true;
 
             var session_duration = 2;
             var start_time = 0;
@@ -95,12 +91,14 @@
             };
 
             var num_breaths = 0;
-            var num_breaths_at_marker1 = 9999999;
-            var num_breaths_at_marker2 = 9999999;
-            var num_breaths_at_marker3 = 9999999;
+            var num_breaths_at_marker = 9999999;
             var num_active;
             var last_event = 'paused';
             var last_event_server = 'paused';
+            var time_in_session = 0;
+            var time_in_session_partner = 0;
+            var first_breath_received = false;
+            var first_breath_happened = false;
 
             var inhale_time = 0;
             var exhale_time = 0;
@@ -152,7 +150,7 @@
                 } else {
                     const gradient2 = ctx.createRadialGradient(circle.x, circle.y - circle.radius * screen_size_factor * 2, 0, circle.x, circle.y - circle.radius * screen_size_factor * 2, (max_ring_width) * (circle.radius / 150)**2.5 * screen_size_factor);
 
-                    alpha = Math.max(0.002, Math.min(0.14, 0.03 * (circle.radius / 40 - 1.2)))*1.5
+                    alpha = Math.max(0.002, Math.min(0.18, 0.05 * (circle.radius / 40 - 1.0)))*1.5
                     if (end_screen) {
                         alpha = 0.04
                     }
@@ -283,7 +281,7 @@
                 }
             }
 
-            function verbal_prompt() {
+            function verbal_prompt(source="client") {
                 const instructions2 = document.getElementById("instructions2");
                 
                 if ((num_breaths == 3 || num_breaths == 4) && !end_screen && mode=="solo") {
@@ -294,32 +292,56 @@
                     display_prompt()
                     instructions2.textContent = "Take a deep breath"
                     }
-                if (((new Date).getTime() - start_time) / 1000 / 60 > 0.5 * session_duration && num_breaths < num_breaths_at_marker2 && num_breaths > 4 && !end_screen && mode=="solo") {
+                if (time_in_session > 0.5 * session_duration && num_breaths < num_breaths_at_marker && num_breaths > 4 && !end_screen && mode=="solo") {
                     display_prompt()
-                    num_breaths_at_marker2 = num_breaths
+                    num_breaths_at_marker = num_breaths
                     instructions2.textContent = "Halfway done"
                 }
-                if (((new Date).getTime() - start_time) / 1000 / 60 > session_duration && !end_screen) {
+                if ((num_breaths == 3 || num_breaths == 4) && !end_screen && mode == "pair" && source=="client") {
+                    display_prompt()
+                    instructions2.textContent = "Enjoy your meditation!"
+                }
+
+                if ((session_duration - time_in_session) < 1 && (session_duration - time_in_session) > 0.5 && num_breaths < num_breaths_at_marker && num_breaths > 4 && !end_screen && mode=="pair" && source=="client") {
+                    display_prompt()
+                    num_breaths_at_marker = num_breaths
+                    instructions2.textContent = "1 min left"
+                }
+                if (time_in_session > session_duration && !end_screen) {
                     end_session()
                 }
             }
 
+            function calculate_time_in_session() {
+                if (mode == "pair") {
+                    if (first_breath_happened && first_breath_received) {
+                        time_in_session = Math.max(((new Date).getTime() - start_time) / 1000 / 60, time_in_session_partner)
+                    }
+                } else {
+                    time_in_session = ((new Date).getTime() - start_time)  / 1000 / 60
+                }
+                }
+
             function key_down_response(event) {
                 if (!last_event.includes('inhale') && !start_screen) {
-                    socket.emit('client_keydown', circle_client.radius);
-                    num_breaths = num_breaths + 1;
+                    
+                    if (mode!="pair" || first_breath_received) {
+                        num_breaths = num_breaths + 1;
+                    }
+                    
                     last_event = 'inhale'  
-                    
-                    if (num_breaths==1 || num_breaths==2) {
-                        start_time = (new Date).getTime();
+                    if (!first_breath_happened) {
+                        start_time = Math.max((new Date).getTime(), start_time);
+                        first_breath_happened = true;
                     }
+                    calculate_time_in_session()
+
+                    socket.emit('client_keydown', circle_client.radius, time_in_session);
                     
-                    if (mode == "solo" || mode == "guided"){
-                        verbal_prompt()
-                    }
+                    verbal_prompt()
+
                     if (num_breaths==1 && mode=="guided"){
                         last_event_server = "inhale"
-                        // speed_server = 0.12
                         inhale_time = (new Date).getTime()
                     }
                     
@@ -329,8 +351,10 @@
 
             function key_up_response(event) {
                 if (!last_event.includes('exhale') && !start_screen) {
-                    socket.emit('client_keyup', circle_client.radius);
-                    num_breaths = num_breaths + 1;
+                    socket.emit('client_keyup', circle_client.radius, time_in_session);
+                    if (mode!="pair" || first_breath_received) {
+                        num_breaths = num_breaths + 1;
+                    }
                     last_event = 'exhale'   
                 }
             }
@@ -400,9 +424,19 @@
                 console.log(msg)
             });
 
-            socket.on('partner_state', function (radius, direction) {
-                circle_server.radius = radius
+            socket.on('partner_state', function (radius, direction, time_in_session_received) {
+                if (!first_breath_received) {
+                    partner_prompt()
+                    first_breath_received = true
+                    circle_server.radius = radius
+                }
+                if (Math.abs(radius - circle_server.radius) > 30) {
+                    circle_server.radius = radius
+                }
                 last_event_server = direction
+                time_in_session_partner = time_in_session_received
+                calculate_time_in_session()
+                verbal_prompt("server")
             });
 
             function start_session() {
@@ -450,10 +484,6 @@
 
                 const instructions2 = document.getElementById("instructions2"); 
                 instructions2.textContent = "breathe in"
-                // instructions2.style.top = "7vh"
-
-                // circle_client.radius = start_radius * 1.1
-                // circle_server.radius = start_radius * 1.1
 
                 mode = "guided"
 
@@ -576,9 +606,6 @@
 
             function get_robot_event(circle, last_event_server) {
 
-                console.log(circle_server.radius)
-                console.log(speed_server)
-                console.log("")
                 const instructions2 = document.getElementById("instructions2");
                 cur_time = (new Date).getTime()
 
