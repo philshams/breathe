@@ -383,26 +383,36 @@
 
             // Add event listener for the "keydown" event on the document object
             document.addEventListener('mousedown', (event) => {
+                event.stopPropagation();
+                event.preventDefault();
                 key_down_response(event)
             });
 
             // Add event listener for the "keyup" event on the document object
             document.addEventListener('mouseup', (event) => {
+                event.stopPropagation();
+                event.preventDefault();
                 key_up_response(event)
             });
 
             // Add event listener for the "keydown" event on the document object
             document.addEventListener('touchstart', (event) => {
+                event.stopPropagation();
+                event.preventDefault();
                 key_down_response(event)
             });
 
             // Add event listener for the "keyup" event on the document object
             document.addEventListener('touchend', (event) => {
+                event.stopPropagation();
+                event.preventDefault();
                 key_up_response(event)
             });
 
             // Add event listener for the "keyup" event on the document object
             document.addEventListener('dblclick', (event) => {
+                event.stopPropagation();
+                event.preventDefault();
                 if (!start_screen) {
                     toggle_fullscreen("toggle")
                 }
