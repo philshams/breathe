@@ -622,7 +622,7 @@
                     instructions2.textContent = "breathe in"
                     inhale_time = (new Date).getTime()
                 }
-                if ((cur_time - exhale_time) > 4800 && last_event_server == "exhale") {
+                if (((cur_time - exhale_time) > 5000 || last_event == "inhale") && last_event_server == "exhale") {
                     return "inhale"
                 }
                 if ((cur_time - inhale_time) > (2000 + extra_time) && instructions2.textContent == "breathe in" && num_breaths > 0) {
@@ -635,7 +635,7 @@
                     instructions2.textContent = "breathe out"
                     exhale_time = (new Date).getTime()
                 }
-                if ((cur_time - hold_time) > (1950 + extra_time/2) && instructions2.textContent == "breathe out") {
+                if (((cur_time - hold_time) > (2250 + extra_time/2) || last_event == "exhale") && instructions2.textContent == "breathe out") {
                     return "exhale"
                 }
 
