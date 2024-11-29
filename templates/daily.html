@@ -416,8 +416,6 @@
             // Add event listener for the "keydown" event on the document object
             document.addEventListener('touchstart', (event) => {
                 if (!start_screen) {
-                    doubleClick()
-                    setTimeout(doubleClickOff, 300);
                     event.stopPropagation();
                     event.preventDefault();
                 }
@@ -426,6 +424,12 @@
 
             // Add event listener for the "keyup" event on the document object
             document.addEventListener('touchend', (event) => {
+                if (!start_screen) {
+                    doubleClick()
+                    setTimeout(doubleClickOff, 300);
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
                 key_up_response(event)
             });
 
