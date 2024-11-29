@@ -402,8 +402,8 @@
             // Add event listener for the "keydown" event on the document object
             document.addEventListener('touchstart', (event) => {
                 if (!start_screen) {
-                    event.stopPropagation();
-                    event.preventDefault();
+                    // event.stopPropagation();
+                    // event.preventDefault();
                 }
                 key_down_response(event)
             });
@@ -420,8 +420,6 @@
             // Add event listener for the "keyup" event on the document object
             document.addEventListener('dblclick', (event) => {
                 if (!start_screen) {
-                    // event.stopPropagation();
-                    // event.preventDefault();
                     toggle_fullscreen("toggle")
                 }
             });
