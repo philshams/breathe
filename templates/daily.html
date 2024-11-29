@@ -70,6 +70,8 @@
             var start_time = 0;
             var press_time = 0;
 
+            var tapped = false;
+
             var fullscreen = true;
             var fullscreen_factor = 1;
 
@@ -399,21 +401,31 @@
                 key_up_response(event)
             });
 
+            function doubleClickOff() {
+                tapped = false;               
+            }
+
+            function doubleClick() {
+                if (tapped) {
+                    toggle_fullscreen("toggle")
+                    tapped = false;
+                } else {
+                    tapped = true;
+                }
+            }
             // Add event listener for the "keydown" event on the document object
             document.addEventListener('touchstart', (event) => {
                 if (!start_screen) {
-                    // event.stopPropagation();
-                    // event.preventDefault();
+                    doubleClick()
+                    setTimeout(doubleClickOff, 300);
+                    event.stopPropagation();
+                    event.preventDefault();
                 }
                 key_down_response(event)
             });
 
             // Add event listener for the "keyup" event on the document object
             document.addEventListener('touchend', (event) => {
-                if (!start_screen) {
-                    event.stopPropagation();
-                    event.preventDefault();
-                }
                 key_up_response(event)
             });
 
