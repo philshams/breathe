@@ -411,8 +411,8 @@
             // Add event listener for the "keyup" event on the document object
             document.addEventListener('touchend', (event) => {
                 if (!start_screen) {
-                    // event.stopPropagation();
-                    // event.preventDefault();
+                    event.stopPropagation();
+                    event.preventDefault();
                 }
                 key_up_response(event)
             });
