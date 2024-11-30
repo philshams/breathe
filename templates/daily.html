@@ -1,6 +1,8 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
+    <!-- <script type='application/javascript' src='fastclick-main/lib/fastclick.js'></script> -->
+    <script type='application/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.js'></script>
     <title>Breathing Moon</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <style>
@@ -26,7 +28,7 @@
             display: block;
         }
     </style>
-    <link rel="icon" href="{{url_for('static', filename='moonicon2.png')}}">
+    <link rel="icon" href="{{url_for('static', filename='moonicon.png')}}">
 </head>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
@@ -41,6 +43,12 @@
 <canvas id="meditationCanvas"></canvas>
 <script type="text/javascript" charset="utf-8" > // 
         $(document).ready(function () {
+
+            if ('addEventListener' in document) {
+                document.addEventListener('DOMContentLoaded', function() {
+                    FastClick.attach(document.body);
+                }, false);
+            }
 
             const meditationCanvas = document.getElementById('meditationCanvas');
             meditationCanvas.width = window.innerWidth;
