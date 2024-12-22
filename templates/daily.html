@@ -1,8 +1,6 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-    <!-- <script type='application/javascript' src='fastclick-main/lib/fastclick.js'></script> -->
-    <script type='application/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.js'></script>
     <title>Breathing Moon</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <style>
@@ -43,12 +41,6 @@
 <canvas id="meditationCanvas"></canvas>
 <script type="text/javascript" charset="utf-8" > // 
         $(document).ready(function () {
-
-            if ('addEventListener' in document) {
-                document.addEventListener('DOMContentLoaded', function() {
-                    FastClick.attach(document.body);
-                }, false);
-            }
 
             const meditationCanvas = document.getElementById('meditationCanvas');
             meditationCanvas.width = window.innerWidth;
@@ -254,9 +246,9 @@
                     drawRects()
                 }
 
-                if (end_screen && mode == "solo") {
-                    drawOuterCircle(circle_client);
-                }
+                // if (end_screen && mode == "solo") {
+                //     drawOuterCircle(circle_client);
+                // }
 
                 requestAnimationFrame(animate);
             }
@@ -637,12 +629,12 @@
                     fullscreen_factor = 1
                 }
 
-                circle_client.y = fullscreen_factor * window.innerHeight * 0.75 - 2.2 * circle_client.radius * screen_size_factor / fullscreen_factor
+                circle_client.y = fullscreen_factor * window.innerHeight * 0.77 - 2.2 * circle_client.radius * screen_size_factor / fullscreen_factor
                 if (mode=="guided"){
-                    circle_server.y = fullscreen_factor * window.innerHeight * 0.75 - 2.2 * circle_server.radius * screen_size_factor / fullscreen_factor
+                    circle_server.y = fullscreen_factor * window.innerHeight * 0.77 - 2.2 * circle_server.radius * screen_size_factor / fullscreen_factor
                 }
                 if (mode == "pair") {
-                    circle_server.y = fullscreen_factor * window.innerHeight * 0.75 - 2.2 * circle_server.radius * screen_size_factor / fullscreen_factor
+                    circle_server.y = fullscreen_factor * window.innerHeight * 0.77 - 2.2 * circle_server.radius * screen_size_factor / fullscreen_factor
                 }
             }
 
