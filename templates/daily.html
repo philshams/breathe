@@ -113,6 +113,31 @@
             var start_screen = true;
             var end_screen = false;
 
+            function getOS() {
+                const userAgent = window.navigator.userAgent,
+                    platform = window.navigator?.userAgentData?.platform || window.navigator.platform,
+                    macosPlatforms = ['macOS', 'Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
+                    windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
+                    iosPlatforms = ['iPhone', 'iPad', 'iPod'];
+                let os = null;
+
+                if (macosPlatforms.indexOf(platform) !== -1) {
+                    os = 'Mac OS';
+                } else if (iosPlatforms.indexOf(platform) !== -1) {
+                    os = 'iOS';
+                } else if (windowsPlatforms.indexOf(platform) !== -1) {
+                    os = 'Windows';
+                } else if (/Android/.test(userAgent)) {
+                    os = 'Android';
+                } else if (/Linux/.test(platform)) {
+                    os = 'Linux';
+                }
+
+                return os;
+            }
+            const os = getOS()
+            console.log(os)
+
             // Connect to the Socket.IO server.
             var socket = io("/");
             console.log(socket)
@@ -497,8 +522,10 @@
                 const moon_client = document.getElementById("moon_client"); 
                 moon_client.style.display = ""
 
-                toggle_fullscreen("on")
-
+                if (os!="iOS") {
+                    toggle_fullscreen("on")
+                }
+                
                 start_screen = false;
 
             }
@@ -621,11 +648,11 @@
             function update_position() {
                 if (fullscreen && !document.fullscreenElement) {
                     fullscreen = false;
-                    fullscreen_factor = 1.05
+                    fullscreen_factor = 1.04
                 }
                 if (!fullscreen && document.fullscreenElement) {
                     fullscreen = true;
-                    fullscreen_factor = 1
+                    fullscreen_factor = 1.
                 }
 
                 circle_client.y = fullscreen_factor * window.innerHeight * 0.76 - 2.2 * circle_client.radius * screen_size_factor / fullscreen_factor
