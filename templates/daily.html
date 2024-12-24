@@ -161,14 +161,11 @@
             window.addEventListener('resize', resizeCanvas); 
 
             function createOuterCircle(circle){
-                if (mode=="guided" || mode =="solo") {
+                if (mode=="guided") {
                     const gradient2 = ctx.createRadialGradient(circle.x, circle.y - circle.radius * screen_size_factor * 2, 0, circle.x, circle.y - circle.radius * screen_size_factor * 2, (circle.radius * 40) * screen_size_factor);
                     if (mode=="guided") {
-                        alpha = 0.04
-                        scale_factor = circle.radius * 2 / 3 + 40
-                    } if (mode == "solo"){
-                        alpha = 0.03
-                        scale_factor = (circle.radius - 20) * 1.1
+                        alpha = 0.035
+                        scale_factor = circle.radius
                     }
                     gradient2.addColorStop(0, ring_color + ', 0)');
                     gradient2.addColorStop((1 / 24) * (scale_factor/100), ring_color + ', 0)');
@@ -178,7 +175,7 @@
                 } else {
                     const gradient2 = ctx.createRadialGradient(circle.x, circle.y - circle.radius * screen_size_factor * 2, 0, circle.x, circle.y - circle.radius * screen_size_factor * 2, (max_ring_width) * (circle.radius / 150)**2.5 * screen_size_factor);
 
-                    alpha = Math.max(0.002, Math.min(0.18, 0.05 * (circle.radius / 40 - 1.0)))*1.5
+                    alpha = Math.max(0.002, Math.min(0.18, 0.05 * (circle.radius / 40 - 1.0)))*1.8
                     if (end_screen) {
                         alpha = 0.04
                     }
