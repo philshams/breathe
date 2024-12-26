@@ -175,7 +175,12 @@
                 } else {
                     const gradient2 = ctx.createRadialGradient(circle.x, circle.y - circle.radius * screen_size_factor * 2, 0, circle.x, circle.y - circle.radius * screen_size_factor * 2, (max_ring_width) * (circle.radius / 150)**2.5 * screen_size_factor);
 
-                    alpha = Math.max(0.002, Math.min(0.25, 0.05 * (circle.radius / 40 - 1.0)))*1.8
+                    if (os == "Android" || os == "iOS") {
+                        alpha = Math.max(0.002, Math.min(0.5, 0.1 * (circle.radius / 40 - 1.0)))*1.8
+                    } else {
+                        alpha = Math.max(0.002, Math.min(0.25, 0.05 * (circle.radius / 40 - 1.0)))*1.8
+                    }
+
                     if (end_screen) {
                         alpha = 0.04
                     }
