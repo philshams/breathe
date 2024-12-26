@@ -163,10 +163,8 @@
             function createOuterCircle(circle){
                 if (mode=="guided") {
                     const gradient2 = ctx.createRadialGradient(circle.x, circle.y - circle.radius * screen_size_factor * 2, 0, circle.x, circle.y - circle.radius * screen_size_factor * 2, (circle.radius * 40) * screen_size_factor);
-                    if (mode=="guided") {
-                        alpha = 0.035
-                        scale_factor = circle.radius
-                    }
+                    alpha = 0.035
+                    scale_factor = circle.radius
                     gradient2.addColorStop(0, ring_color + ', 0)');
                     gradient2.addColorStop((1 / 24) * (scale_factor/100), ring_color + ', 0)');
                     gradient2.addColorStop((1 / 23.9) * (scale_factor/100), ring_color + ', ' + alpha.toString() + ')');
@@ -176,9 +174,9 @@
                     const gradient2 = ctx.createRadialGradient(circle.x, circle.y - circle.radius * screen_size_factor * 2, 0, circle.x, circle.y - circle.radius * screen_size_factor * 2, (max_ring_width) * (circle.radius / 150)**2.5 * screen_size_factor);
 
                     if (os == "Android" || os == "iOS") {
-                        alpha = Math.max(0.002, Math.min(0.5, 0.1 * (circle.radius / 40 - 1.0)))*1.8
-                    } else {
                         alpha = Math.max(0.002, Math.min(0.25, 0.05 * (circle.radius / 40 - 1.0)))*1.8
+                    } else {
+                        alpha = Math.max(0.002, Math.min(0.25, 0.05 * (circle.radius / 40 - 1.0)))*1.5
                     }
 
                     if (end_screen) {
@@ -512,8 +510,8 @@
                 const line1 = document.getElementById("line1"); 
                 line1.style.display = "none"
 
-                const stb = document.getElementById('start-button');
-                stb.style.display = "none"
+                // const stb = document.getElementById('start-button');
+                // stb.style.display = "none"
 
                 const gtb = document.getElementById('guided-button');
                 gtb.style.display = "none"
@@ -753,13 +751,13 @@
                 }
             }
 
-            const start_button = document.createElement("button");
-            start_button.setAttribute('id','start-button');
-            start_button.setAttribute('class','start-button noselect');
-            start_button.textContent = 'zen mode';
-            start_button.addEventListener('click', start_session_solo);
-            start_button.style.display = ""
-            document.body.appendChild(start_button);
+            // const start_button = document.createElement("button");
+            // start_button.setAttribute('id','start-button');
+            // start_button.setAttribute('class','start-button noselect');
+            // start_button.textContent = 'zen mode';
+            // start_button.addEventListener('click', start_session_solo);
+            // start_button.style.display = ""
+            // document.body.appendChild(start_button);
 
             const together_button = document.createElement("button");
             together_button.setAttribute('id','together-button');
@@ -830,6 +828,8 @@
         /* color: royalblue;  */
         cursor:  pointer;
         border-radius: 1px;
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
         display: block;
         width:  23vh;
         height:  4.2vh;

@@ -2,7 +2,7 @@ import numpy as np
 from PIL import Image
 
 # Load the image
-image = Image.open("static/dusky3.jpg")
+image = Image.open("static/dusky.jpg")
 
 # Convert to NumPy array
 image_np = np.array(image)
@@ -17,9 +17,12 @@ rows, cols = image_np[:,:,0].shape
 y_index_array = np.tile(np.arange(rows), (cols, 1)).T
 x_index_array = np.tile(np.arange(cols), (rows, 1))
 low_index = y_index_array < 900
-not_middle_index = (x_index_array < 1200) + (x_index_array > 2000) + (y_index_array < 600)
+not_middle_index1 = (x_index_array < 900) + (x_index_array > 2300) + (y_index_array < 600)
 
-image_np[bright_idx * low_index * not_middle_index] = 100
+not_middle_index2 = (x_index_array < 400) + (x_index_array > 2800) + (y_index_array < 300)
+
+image_np[bright_idx * low_index * not_middle_index1] = 80
+image_np[bright_idx * low_index * not_middle_index2] = 100
 
 # Convert back to PIL Image
 modified_image = Image.fromarray(image_np)
