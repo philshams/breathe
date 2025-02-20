@@ -164,7 +164,7 @@
 
                 const gradient2 = ctx.createRadialGradient(circle.x, circle.y - circle.radius * screen_size_factor * 2, 0, circle.x, circle.y - circle.radius * screen_size_factor * 2, (max_ring_width) * (circle.radius / 150)**2.5 * screen_size_factor);
 
-                alpha = Math.max(0.002, Math.min(0.20, 0.04 * (circle.radius / 40 - 1.0)))*1.5
+                alpha = Math.max(0.002, Math.min(0.25, 0.05 * (circle.radius / 40 - 1.0)))*1.5
 
                 gradient2.addColorStop(0, ring_color + ', ' + alpha.toString() + ')');
                 gradient2.addColorStop(1, ring_color + ', 0)');
@@ -866,7 +866,7 @@
 
         <p class="noselect grad" id="instructions" style="position: absolute; top: 17vh; left: calc(50% - 8.6em); width: 17.2em; text-align: justify; text-align-last: justify; font-size: 2.25vh; line-height: 1.8vh; font-family: poppins; font-weight: 400;"><a style = "font-weight: 700;">A two-minute breathing exercise</a><br /><br /><br /><br /><a style="font-style: italic;">How to use:</a> Press and hold as you <br /><br />inhale and release as you exhale.</p>
 
-        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 2vh; left: calc(50% - 9em); width: 18em; text-align: center; font-size: 3.4vh; opacity: 1.0; font-family: poppins; font-weight: 700; display: none">Take a deep breath</p>
+        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 2vh; left: calc(50% - 8.5em); width: 17em; text-align: center; font-size: 3.2vh; opacity: 1.0; font-family: poppins; font-weight: 700; display: none">Take a deep breath</p>
 
         <p class="noselect" id="instructions3" style="position: absolute; top: 120px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; display: none"></p>
     
