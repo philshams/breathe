@@ -146,7 +146,12 @@
                 meditationCanvas.width = window.innerWidth;
                 meditationCanvas.height = window.innerHeight;
                 x_pos = meditationCanvas.width / 2;
-                screen_size_factor = (window.innerHeight / 2100) / 0.5;
+                if (mode == "solo") {
+                    screen_size_factor = 1.2 * (window.innerHeight / 2200) / 0.5;
+                } else {
+                    screen_size_factor = (window.innerHeight / 2200) / 0.5;
+                }
+                
                 circle_client.x = x_pos;
                 circle_server.x = x_pos;
             }
@@ -224,10 +229,12 @@
                     }
 
                     if (mode == "pair") {
-                        const titan_server = document.getElementById("titan_server");
+                        const moon_partner = document.getElementById("moon_partner");
+                        const moon_partner2 = document.getElementById("moon_partner2");
                         const moon_client = document.getElementById("moon_client");
                         adjust_image(moon_client, circle_client, 1.75, 1.0)
-                        adjust_image(titan_server, circle_server, -1.75, 1.1)
+                        adjust_image(moon_partner, circle_server, -1.75, 1.1)
+                        adjust_image(moon_partner2, circle_server, -1.75, 1.1)
 
                         drawOuterCircle(circle_client);
                         drawOuterCircle(circle_server);
@@ -265,15 +272,15 @@
             function partner_prompt() {
                 const instructions2 = document.getElementById("instructions2");
                 display_prompt()
-                if (partner_id == 0){
-                    instructions2.textContent = "The next person to press 'partner meditation' will join this session."
-                    instructions2.style.fontSize = "2.8vh"
-                } else {
-                    instructions2.textContent = "Someone is here!"
+                if (partner_id != 0){
+
+                    instructions2.textContent = "Someone is here"
                     instructions2.style.fontSize = "3.1vh"
 
-                    const titan_server = document.getElementById("titan_server"); 
-                    titan_server.style.display = ""
+                    const moon_partner = document.getElementById("moon_partner"); 
+                    moon_partner.style.display = ""
+                    const moon_partner2 = document.getElementById("moon_partner2"); 
+                    moon_partner2.style.display = "none"
                 }
             }
 
@@ -496,9 +503,13 @@
 
             function start_session_solo() {
 
+                resizeCanvas()
                 start_session()
                 history.pushState({}, "", "#solo");
                 mode = "solo"
+
+                const instructions2 = document.getElementById("instructions2");
+                instructions2.textContent = "Take a deep breath"
 
             }
 
@@ -509,12 +520,8 @@
 
                 start_session()
 
-                // const titan_server = document.getElementById("titan_server"); 
-                // titan_server.style.display = ""
-
-                const instructions2 = document.getElementById("instructions2"); 
-                instructions2.textContent = "The next person to press 'partner meditation' will join this session."
-                instructions2.style.fontSize = "2.8vh"
+                const moon_partner2 = document.getElementById("moon_partner2"); 
+                moon_partner2.style.display = ""
 
                 circle_client.radius = start_radius * 0.9
                 circle_server.radius = start_radius * 0.9
@@ -607,45 +614,15 @@
                     fullscreen_factor = 1.
                 }
 
-                circle_client.y = fullscreen_factor * window.innerHeight * 0.76 - 2.2 * circle_client.radius * screen_size_factor / fullscreen_factor
+                if (mode == "solo") {
+                    circle_client.y = fullscreen_factor * window.innerHeight * 0.8 - 2.2 * circle_client.radius * screen_size_factor / fullscreen_factor
+                }
 
                 if (mode == "pair") {
+                    circle_client.y = fullscreen_factor * window.innerHeight * 0.76 - 2.2 * circle_client.radius * screen_size_factor / fullscreen_factor
+
                     circle_server.y = fullscreen_factor * window.innerHeight * 0.76 - 2.2 * circle_server.radius * screen_size_factor / fullscreen_factor
                 }
-            }
-
-            function get_robot_event(circle, last_event_server) {
-
-                const instructions2 = document.getElementById("instructions2");
-                cur_time = (new Date).getTime()
-
-                if (num_breaths > 1) {
-                    extra_time = 750
-                } else {
-                    extra_time = 0
-                }
-
-
-                if (((cur_time - exhale_time) > 4200 && instructions2.textContent == "Breathe out - release") || num_breaths == 0) {
-                    display_prompt()
-                    instructions2.textContent = "Breathe in - hold"
-                    instructions2.style.top = "60%"
-                    inhale_time = (new Date).getTime()
-                }
-                if (((cur_time - exhale_time) > 5000 || last_event == "inhale") && last_event_server == "exhale") {
-                    return "inhale"
-                }
-                if ((cur_time - inhale_time) > (3550 + extra_time*3/2) && instructions2.textContent == "Breathe in - hold") { //
-                    display_prompt()
-                    instructions2.textContent = "Breathe out - release"
-                    instructions2.style.top = "2vh"
-                    exhale_time = (new Date).getTime()
-                }
-                if (((cur_time - hold_time) > (2250 + extra_time/2) || last_event == "exhale") && instructions2.textContent == "Breathe out - release") {
-                    return "exhale"
-                }
-
-                return last_event_server
             }
 
 
@@ -712,42 +689,11 @@
 </script>
 <style>
 
-    .start-button {
-        position: absolute;
-        top:  45.71vh;
-        left: calc(50% - 11.5vh);
-        background-image: linear-gradient(to right, rgb(210,210,255) 0%, rgb(200,225,255) 90%);
-        border: none;
-        opacity: 0.98;
-        text-align: center;
-        color: rgb(40,60,150);
-        /* color: royalblue;  */
-        cursor:  pointer;
-        border-radius: 1px;
-        border-bottom-left-radius: 3px;
-        border-bottom-right-radius: 3px;
-        display: block;
-        width:  23vh;
-        height:  4.2vh;
-        line-height: 0px;
-        padding-bottom: 2px;
-        font-size: 2.5vh;
-        font-family: poppins;
-        font-weight: 400;
-        box-shadow:
-        0px 0px 2px 0px lightcyan;
-    }
-
-    .start-button:hover {
-        box-shadow:
-        0px 0px 5px 0px lightcyan;
-        opacity: 1.0;
-    }
 
     .together-button {
         position: absolute;
-        top:  44.4vh;
-        left: calc(50% - 13.5vh);
+        top:  37.45vh;
+        left: calc(50% - 14.5vh);
         background-image: linear-gradient(to right, rgb(210,210,255) 0%, rgb(200,225,255) 90%);
         border: none;
         opacity: 0.98;
@@ -759,13 +705,13 @@
         border-bottom-left-radius: 3px;
         border-bottom-right-radius: 3px;
         display: block;
-        width:  27vh;
+        width:  29vh;
         height:  4.2vh;
         line-height: 0px;
         padding-bottom: 2px;
         font-size: 2.4vh;
         font-family: poppins;
-        font-weight: 400;
+        font-weight: 500;
         box-shadow:
         0px 0px 2px 0px lightcyan;
     }
@@ -778,8 +724,8 @@
 
     .guided-button {
         position: absolute;
-        top:  39.99vh;
-        left: calc(50% - 13.5vh);
+        top:  32.99vh;
+        left: calc(50% - 14.5vh);
         background-image: linear-gradient(to right, rgb(210,210,255) 0%, rgb(200,225,255) 90%);
         border: none;
         opacity: 0.98;
@@ -791,13 +737,13 @@
         border-top-left-radius: 3px;
         border-top-right-radius: 3px;
         display: block;
-        width:  27vh;
+        width:  29vh;
         height:  4.3vh;
         line-height: 0px;
         padding-bottom: 2px;
         font-size: 2.4vh;
         font-family: poppins;
-        font-weight: 400;
+        font-weight: 500;
         box-shadow:
         0px 0px 2px 0px lightcyan;
     }
@@ -854,19 +800,19 @@
 
 <body>
 
-        <hr id = "line1" class="hr-style" style="position: absolute; top: 8.50vh; left: calc(50% - 4.3em); font-size: 5vh; width: 8.6em; text-align: center;">
+        <hr id = "line1" class="hr-style" style="position: absolute; top: 8.46vh; left: calc(50% - 4.3em); font-size: 5vh; width: 8.6em; text-align: center;">
 
         <p class="noselect grad2" id = "header" style="position: absolute; left: calc(50%-5em); top: 0vh; width: 10em; text-align: center; font-size: 5.15vh; font-weight: 600; font-family: poppins;">breathing moon</p>
 
-        <img class="noselect" id="moon2" src="{{url_for('static', filename='moon2.png')}}" style=" position: absolute; top: 220px; width: 200px; text-align: center; height: auto; display: none; pointer-events: none;" alt="moon" />
+        <img class="noselect" id="moon_partner" src="{{url_for('static', filename='titan.png')}}" style=" position: absolute; top: 220px; width: 200px; text-align: center; height: auto; display: none; pointer-events: none;" alt="moon_partner" />
 
-        <img class="noselect" id="titan_server" src="{{url_for('static', filename='titan.png')}}" style=" position: absolute; top: 220px; width: 200px; text-align: center; height: auto; display: none; pointer-events: none;" alt="titan_server" />
+        <img class="noselect" id="moon_partner2" src="{{url_for('static', filename='titan2.png')}}" style=" position: absolute; top: 220px; width: 200px; text-align: center; height: auto; display: none; pointer-events: none;" alt="No one else is in the breathing room" />
 
         <img class="noselect" id="moon_client" src="{{url_for('static', filename='moon.png')}}" style=" position: absolute; top: 220px; width: 200px; text-align: center; height: auto; display: none; pointer-events: none;" alt="moon_client" />
 
-        <p class="noselect grad" id="instructions" style="position: absolute; top: 17vh; left: calc(50% - 8.6em); width: 17.2em; text-align: justify; text-align-last: justify; font-size: 2.25vh; line-height: 1.8vh; font-family: poppins; font-weight: 400;"><a style = "font-weight: 700;">A two-minute breathing exercise</a><br /><br /><br /><br /><a style="font-style: italic;">How to use:</a> Press and hold as you <br /><br />inhale and release as you exhale.</p>
+        <p class="noselect grad" id="instructions" style="position: absolute; top: 12vh; left: calc(50% - 8.65em); width: 17.3em; text-align: justify; text-align-last: justify; font-size: 2.25vh; line-height: 3.2vh; font-family: poppins; font-weight: 400;"><a style = "font-weight: 700;">A two-minute breathing exercise</a><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><a style="font-style: italic;">How to use :</a> Tap and hold as you <br />inhale and release as you exhale.</p>
 
-        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 2vh; left: calc(50% - 8.5em); width: 17em; text-align: center; font-size: 3.2vh; opacity: 1.0; font-family: poppins; font-weight: 700; display: none">Take a deep breath</p>
+        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 2vh; left: calc(50% - 6.5em); width: 13em; text-align: center; font-size: 2.8vh; opacity: 1.0; font-family: poppins; font-weight: 700; display: none">The next person to select <br />"partner meditation" <br />will join you here</p>
 
         <p class="noselect" id="instructions3" style="position: absolute; top: 120px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; display: none"></p>
     
