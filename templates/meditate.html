@@ -140,7 +140,7 @@
 
             // Connect to the Socket.IO server.
             var socket = io("/");
-            console.log(socket)
+            // console.log(socket)
 
             function resizeCanvas() {
                 meditationCanvas.width = window.innerWidth;
@@ -161,9 +161,8 @@
                     location.reload()
                 }
             }
-            history.pushState({}, "", "#home");
 
-            window.addEventListener('resize', resizeCanvas); 
+            window.addEventListener('resize', resizeCanvas);    
 
             function createOuterCircle(circle){
 
@@ -442,8 +441,7 @@
 
             socket.on('assign_user_id', function (msg) {
                 user_id = msg;
-                console.log("user id")
-                console.log(msg)
+                console.log("ID: " + msg.toString())
             });
 
             socket.on('end_session', function (msg) {
@@ -453,8 +451,7 @@
             socket.on('assign_partner', function (msg) {
                 partner_id = msg;
                 partner_prompt()
-                console.log("partner")
-                console.log(msg)
+                console.log("partner ID: " + msg.toString())
             });
 
             socket.on('partner_state', function (radius, direction, time_in_session_received) {
@@ -509,7 +506,7 @@
 
                 resizeCanvas()
                 start_session()
-                history.pushState({}, "", "#solo");
+                history.pushState({}, "", "solo");
                 mode = "solo"
 
                 const instructions2 = document.getElementById("instructions2");
@@ -530,10 +527,9 @@
                 circle_client.radius = start_radius * 0.9
                 circle_server.radius = start_radius * 0.9
 
-
                 mode = "pair"
 
-                history.pushState({}, "", "#partner");
+                history.pushState({}, "", "partner");
                 
             }
 
@@ -689,6 +685,14 @@
             setInterval(update, 16);
 
             animate();
+
+            console.log(document.referrer)
+            if (document.referrer.split("/").pop() == "solo") {
+                start_session_solo()
+            }   
+            if (document.referrer.split("/").pop() == "partner") {
+                start_session_pair()
+            }  
         });
 </script>
 <style>

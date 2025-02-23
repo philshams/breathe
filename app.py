@@ -21,8 +21,16 @@ partners = dict()
 
 
 @app.route('/')
-def orby():
-    return render_template('daily.html', async_mode=socketio.async_mode)
+def meditate():
+    return render_template('meditate.html', async_mode=socketio.async_mode)
+
+@app.route('/solo')
+def solo():
+    return render_template('solo.html', async_mode=socketio.async_mode)
+
+@app.route('/partner')
+def partner():
+    return render_template('partner.html', async_mode=socketio.async_mode)
 
 # when a client connects
 @socketio.on('connect')
