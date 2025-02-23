@@ -168,7 +168,7 @@
 
                 const gradient2 = ctx.createRadialGradient(circle.x, circle.y - circle.radius * screen_size_factor * 2, 0, circle.x, circle.y - circle.radius * screen_size_factor * 2, (max_ring_width) * (circle.radius / 150)**2.5 * screen_size_factor);
 
-                alpha = Math.max(0.002, Math.min(0.25, 0.05 * (circle.radius / 40 - 1.0)))*1.5
+                alpha = Math.max(0.002, Math.min(0.3, 0.07 * (circle.radius / 40 - 1.0)))*1.5
 
                 gradient2.addColorStop(0, ring_color + ', ' + alpha.toString() + ')');
                 gradient2.addColorStop(1, ring_color + ', 0)');
