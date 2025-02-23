@@ -32,6 +32,7 @@ def on_connect():
 
 def _leave_room(user_id):
     if user_id in partners and partners[user_id] is not None:
+        emit('end_session', {}, to = partners[user_id])
         del partners[user_id]
 
     if alone_user and user_id == alone_user[-1]:
