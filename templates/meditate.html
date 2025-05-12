@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-    <title>Breathing Moon</title>
+    <title>2-min meditation</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <style>
         body {
@@ -286,13 +286,17 @@
             function verbal_prompt(source="client") {
                 const instructions2 = document.getElementById("instructions2");
                 
-                if ((num_breaths == 3 || num_breaths == 4) && !end_screen && mode=="solo") {
+                if ((num_breaths == 5 || num_breaths == 6) && !end_screen && mode=="solo") {
                     display_prompt()
                     instructions2.textContent = "Enjoy your meditation!"
                 }
-                if ((num_breaths == 1 || num_breaths == 2) && mode=="solo") {
+                if ((num_breaths == 1 || num_breaths == 3) && mode=="solo") {
                     display_prompt()
-                    instructions2.textContent = "Take a deep breath"
+                    instructions2.textContent = "Press and hold as you inhale"
+                    }
+                if ((num_breaths == 2 || num_breaths == 4) && mode=="solo") {
+                    display_prompt()
+                    instructions2.textContent = "Release as you exhale"
                     }
                 if (time_in_session > 0.5 * session_duration && num_breaths < num_breaths_at_marker && num_breaths > 4 && !end_screen && mode=="solo") {
                     display_prompt()
@@ -302,6 +306,10 @@
                 if ((num_breaths == 1 || num_breaths == 2) && !end_screen && mode == "pair" && source=="client") {
                     display_prompt()
                     instructions2.textContent = "Enjoy your meditation!"
+                }
+                if ((num_breaths == 5 || num_breaths == 6) && !end_screen && mode == "pair" && source=="client") {
+                    const instructions4 = document.getElementById("instructions4");
+                    instructions4.style.display = "none"
                 }
 
                 if ((session_duration - time_in_session) < 1 && (session_duration - time_in_session) > 0.5 && num_breaths < num_breaths_at_marker && num_breaths > 4 && !end_screen && mode=="pair" && source=="client") {
@@ -353,6 +361,10 @@
                     if (mode!="pair" || first_breath_received) {
                         num_breaths = num_breaths + 1;
                     }
+                    if ((num_breaths == 2 || num_breaths == 4) && mode == "solo") {
+                        verbal_prompt()
+                    }
+                    
                     last_event = 'exhale'   
                 }
             }
@@ -510,7 +522,7 @@
                 mode = "solo"
 
                 const instructions2 = document.getElementById("instructions2");
-                instructions2.textContent = "Take a deep breath"
+                instructions2.textContent = "Press and hold as you inhale"
 
             }
 
@@ -523,6 +535,9 @@
 
                 const moon_partner2 = document.getElementById("moon_partner2"); 
                 moon_partner2.style.display = ""
+
+                const instructions4 = document.getElementById("instructions4"); 
+                instructions4.style.display = ""
 
                 circle_client.radius = start_radius * 0.9
                 circle_server.radius = start_radius * 0.9
@@ -818,13 +833,14 @@
 
         <img class="noselect" id="moon_client" src="{{url_for('static', filename='moon.png')}}" style=" position: absolute; top: 220px; width: 200px; text-align: center; height: auto; display: none; pointer-events: none;" alt="moon_client" />
 
-        <p class="noselect grad" id="instructions" style="position: absolute; top: 12vh; left: calc(50% - 8.6em); width: 17.2em; text-align: justify; text-align-last: justify; font-size: 2.2vh; line-height: 3.2vh; font-family: poppins; font-weight: 400;"><a style = "font-weight: 700;">A two-minute breathing exercise</a><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />How to use : Tap and hold as you <br />inhale and release as you exhale.</p>
+        <p class="noselect grad" id="instructions" style="position: absolute; top: 12vh; left: calc(50% - 8.6em); width: 17.2em; text-align: center; font-size: 2.2vh; line-height: 3.2vh; font-family: poppins; font-weight: 400;">Take a moment to reset.</p>
 
-        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 2vh; left: calc(50% - 6.5em); width: 13em; text-align: center; font-size: 2.8vh; opacity: 1.0; font-family: poppins; font-weight: 700; display: none">The next person to select <br />"partner meditation" <br />will join you here</p>
+        <p class="noselect grad" id="instructions4" style="position: absolute; bottom: 16vh; left: calc(50% - 8.6em); width: 17.2em; text-align: justify; text-align-last: justify; font-size: 2.2vh; line-height: 3.2vh; font-family: poppins; font-weight: 400; display: none;"><a style = "font-weight: 600;">Instructions</a> : Tap and hold as you <br />inhale and release as you exhale.</p>
+
+
+        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 8vh; left: calc(50% - 7.5em); width: 15em; text-align: center; font-size: 2.8vh; opacity: 1.0; font-family: poppins; font-weight: 700; display: none">The next person to select <br />"partner meditation" <br />will join you here</p>
 
         <p class="noselect" id="instructions3" style="position: absolute; top: 120px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; display: none"></p>
-    
-        <p class="noselect" id="encourage" style=" position: absolute; top: 390px; left: 180px; width: 20em; text-align: right; font-size: 22px; line-height: 30px; font-family: poppins; color: skyblue"></p>
     
 
 </body>
