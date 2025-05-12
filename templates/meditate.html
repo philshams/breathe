@@ -325,7 +325,7 @@
             function calculate_time_in_session() {
                 if (mode == "pair") {
                     if (first_breath_happened && first_breath_received) {
-                        time_in_session = Math.max(((new Date).getTime() - start_time) / 1000 / 60, time_in_session_partner)
+                        time_in_session = Math.min(((new Date).getTime() - start_time) / 1000 / 60, time_in_session_partner)
                     }
                 } else {
                     time_in_session = ((new Date).getTime() - start_time)  / 1000 / 60
