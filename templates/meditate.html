@@ -323,14 +323,14 @@
             }
 
             function calculate_time_in_session() {
-                if (mode == "pair") {
-                    if (first_breath_happened && first_breath_received) {
-                        time_in_session = Math.min(((new Date).getTime() - start_time) / 1000 / 60, time_in_session_partner)
-                    }
-                } else {
+                console.log(first_breath_happened)
+                console.log(first_breath_received)
+                if (first_breath_happened && (first_breath_received || mode == "solo")){
                     time_in_session = ((new Date).getTime() - start_time)  / 1000 / 60
+                
                 }
-                }
+                console.log(time_in_session) 
+            }
 
             function key_down_response(event) {
                 if (!last_event.includes('inhale') && !start_screen) {
@@ -340,9 +340,16 @@
                     }
                     
                     last_event = 'inhale'  
+
                     if (!first_breath_happened) {
-                        start_time = Math.max((new Date).getTime(), start_time);
                         first_breath_happened = true;
+                        if (mode == "solo") {
+                        start_time = Math.max((new Date).getTime(), start_time);
+                        }
+
+                        if (first_breath_received && mode == "pair") {
+                        start_time = Math.max((new Date).getTime(), start_time);
+                        }
                     }
                     calculate_time_in_session()
 
@@ -471,6 +478,9 @@
                     partner_prompt()
                     first_breath_received = true
                     circle_server.radius = radius
+                    if (first_breath_happened && mode == "pair") {
+                        start_time = Math.max((new Date).getTime(), start_time);
+                    }
                 }
                 if (Math.abs(radius - circle_server.radius) > 30) {
                     circle_server.radius = radius
