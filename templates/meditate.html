@@ -286,18 +286,10 @@
             function verbal_prompt(source="client") {
                 const instructions2 = document.getElementById("instructions2");
                 
-                if ((num_breaths == 5 || num_breaths == 6) && !end_screen && mode=="solo") {
+                if ((num_breaths == 3) && !end_screen && mode=="solo") {
                     display_prompt()
-                    instructions2.textContent = "Enjoy your meditation!"
+                    instructions2.textContent = "Enjoy your 2-minute meditation!"
                 }
-                if ((num_breaths == 1 || num_breaths == 3) && mode=="solo") {
-                    display_prompt()
-                    instructions2.textContent = "Press and hold as you inhale"
-                    }
-                if ((num_breaths == 2 || num_breaths == 4) && mode=="solo") {
-                    display_prompt()
-                    instructions2.textContent = "Release as you exhale"
-                    }
                 if (time_in_session > 0.5 * session_duration && num_breaths < num_breaths_at_marker && num_breaths > 4 && !end_screen && mode=="solo") {
                     display_prompt()
                     num_breaths_at_marker = num_breaths
@@ -305,9 +297,9 @@
                 }
                 if ((num_breaths == 1 || num_breaths == 2) && !end_screen && mode == "pair" && source=="client") {
                     display_prompt()
-                    instructions2.textContent = "Enjoy your meditation!"
+                    instructions2.textContent = "Enjoy your 2-minute meditation!"
                 }
-                if ((num_breaths == 5 || num_breaths == 6) && !end_screen && mode == "pair" && source=="client") {
+                if ((num_breaths == 7 || num_breaths == 8) && !end_screen && source=="client") {
                     const instructions4 = document.getElementById("instructions4");
                     instructions4.style.display = "none"
                 }
@@ -531,8 +523,11 @@
                 history.pushState({}, "", "solo");
                 mode = "solo"
 
+                const instructions4 = document.getElementById("instructions4"); 
+                instructions4.style.display = ""
+
                 const instructions2 = document.getElementById("instructions2");
-                instructions2.textContent = "Press and hold as you inhale"
+                instructions2.textContent = "Welcome to Breathing Moon!"
 
             }
 
@@ -847,8 +842,7 @@
 
         <p class="noselect grad" id="instructions4" style="position: absolute; bottom: 16vh; left: calc(50% - 8.6em); width: 17.2em; text-align: justify; text-align-last: justify; font-size: 2.2vh; line-height: 3.2vh; font-family: poppins; font-weight: 400; display: none;"><a style = "font-weight: 600;">Instructions</a> -- Press and hold as<br />you inhale. Release as you exhale.</p>
 
-
-        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 8vh; left: calc(50% - 7.5em); width: 15em; text-align: center; font-size: 2.8vh; opacity: 1.0; font-family: poppins; font-weight: 700; display: none">The next person to select <br />"partner meditation" <br />will join you here</p>
+        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 8vh; left: calc(50% - 8.5em); width: 17em; text-align: center; font-size: 2.8vh; opacity: 1.0; font-family: poppins; font-weight: 700; display: none">Welcome to Breathing Moon!<br />&nbsp;<br /><a style = "font-weight: 400;">The next person to select <br />"partner meditation" <br />will join you here</a></p>
 
         <p class="noselect" id="instructions3" style="position: absolute; top: 120px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; display: none"></p>
     
