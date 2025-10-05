@@ -30,7 +30,12 @@ def solo():
 
 @app.route('/partner')
 def partner():
-    return render_template('partner.html', async_mode=socketio.async_mode)
+    room_id = os.urandom(4).hex()
+    return render_template('partner.html', room_id=room_id, async_mode=socketio.async_mode)
+
+@app.route('/room/<room_id>')
+def room(room_id):
+    return render_template('meditate.html', room_id=room_id, async_mode=socketio.async_mode)
 
 # when a client connects
 @socketio.on('connect')
@@ -39,15 +44,11 @@ def on_connect():
 
 
 def _leave_room(user_id):
-    if user_id in partners and partners[user_id] is not None:
-        emit('end_session', {}, to = partners[user_id])
-        del partners[user_id]
-
-    if alone_user and user_id == alone_user[-1]:
-        alone_user.pop()
-
-    if alone_user and user_id in alone_user[-1] and user_id != alone_user[-1]:
-        alone_user.remove(user_id)
+    for room_id, users in list(rooms.items()):
+        if user_id in users:
+            users.remove(user_id)
+            if not users:
+                del rooms[room_id]
 
 
 # # when a client disconnects
@@ -59,33 +60,29 @@ def disconnect():
 def leave_room():
     _leave_room(request.sid)
 
-@socketio.event
-def join_room():
-    if alone_user == [None]:
-        alone_user[-1] = request.sid
-        partners[request.sid] = None
-    elif alone_user == []:
-        alone_user.append(request.sid)
-        partners[request.sid] = None
-    else:
-        partner_id = alone_user.pop()
-        emit('assign_partner', partner_id, broadcast=False)
-        emit('assign_partner', request.sid, room=partner_id)
-        partners[partner_id] = request.sid
-        partners[request.sid] = partner_id
+from flask_socketio import join_room, leave_room as leave_socket_room
+rooms = {}  # room_id → [user_ids]
 
-# when a client presses a key
 @socketio.event
-def client_keydown(radius, time_in_session):
-    if request.sid in partners and partners[request.sid] is not None:
-        emit('partner_state', (radius, "inhale", time_in_session), room=partners[request.sid])
+def join_room_event(data):
+    room_id = data['room']
+    join_room(room_id)
+    if room_id not in rooms:
+        rooms[room_id] = []
+    rooms[room_id].append(request.sid)
+    if len(rooms[room_id]) == 2:
+        for uid in rooms[room_id]:
+            partner_id = [x for x in rooms[room_id] if x != uid][0]
+            emit('assign_partner', partner_id, to=uid)
 
-# when a client releases a key
+
 @socketio.event
-def client_keyup(radius, time_in_session):
-    if request.sid in partners and partners[request.sid] is not None:
-        emit('partner_state', (radius, "exhale", time_in_session), room=partners[request.sid])
+def client_keydown(radius, time_in_session, room):
+    emit('partner_state', (radius, "inhale", time_in_session), to=room, include_self=False)
 
+@socketio.event
+def client_keyup(radius, time_in_session, room):
+    emit('partner_state', (radius, "exhale", time_in_session), to=room, include_self=False)
 
 if __name__ == '__main__':
     socketio.run(app)

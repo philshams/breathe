@@ -345,7 +345,8 @@
                     }
                     calculate_time_in_session()
 
-                    socket.emit('client_keydown', circle_client.radius, time_in_session);
+                    const roomId = "{{ room_id }}" || window.location.pathname.split("/").pop();
+                    socket.emit("client_keydown", circle_client.radius, time_in_session, roomId);
                     
                     verbal_prompt()
 
@@ -356,7 +357,8 @@
 
             function key_up_response(event) {
                 if (!last_event.includes('exhale') && !start_screen) {
-                    socket.emit('client_keyup', circle_client.radius, time_in_session);
+                    const roomId = "{{ room_id }}" || window.location.pathname.split("/").pop();
+                    socket.emit("client_keyup", circle_client.radius, time_in_session, roomId);
                     if (mode!="pair" || first_breath_received) {
                         num_breaths = num_breaths + 1;
                     }
@@ -533,25 +535,33 @@
 
 
             function start_session_pair() {
+                // Detect if we’re already in a /room/<id> URL
+                const path = window.location.pathname;
+                const roomMatch = path.match(/\/room\/([a-z0-9]+)/);
 
-                socket.emit('join_room');
+                // If no room_id in template and not already in /room/<id>, make one
+                if (!"{{ room_id }}" && !roomMatch) {
+                    const newRoom = Math.random().toString(36).substring(2, 8);
+                    window.location.href = `/room/${newRoom}`;
+                    return;
+                }
 
-                start_session()
+                // Use the room_id from Flask OR from the URL path
+                const roomId = "{{ room_id }}" || roomMatch[1];
+                socket.emit('join_room_event', { room: roomId });
+
+                // Now start the visual/session setup
+                start_session();
 
                 const moon_partner2 = document.getElementById("moon_partner2"); 
-                moon_partner2.style.display = ""
-
+                moon_partner2.style.display = "";
                 const instructions4 = document.getElementById("instructions4"); 
-                instructions4.style.display = ""
-
-                circle_client.radius = start_radius * 0.9
-                circle_server.radius = start_radius * 0.9
-
-                mode = "pair"
-
-                history.pushState({}, "", "partner");
-                
+                instructions4.style.display = "";
+                circle_client.radius = start_radius * 0.9;
+                circle_server.radius = start_radius * 0.9;
+                mode = "pair";
             }
+
 
             socket.on('assign_user_id', function (msg) {
                 user_id = msg;
@@ -706,14 +716,29 @@
 
             animate();
 
-            console.log(document.referrer)
-            if (document.referrer.split("/").pop() == "solo") {
-                start_session_solo()
-            }   
-            if (document.referrer.split("/").pop() == "partner") {
-                start_session_pair()
-            }  
+            const path = window.location.pathname;
+            if (path.includes("/room/")) {
+                const roomId = path.split("/").pop();
+                const roomURL = window.location.href;
+                const linkEl = document.getElementById("roomLink");
+                if (linkEl) {
+                    linkEl.textContent = roomURL;
+                    linkEl.href = roomURL;
+                    linkEl.addEventListener("click", () => {
+                        navigator.clipboard.writeText(roomURL)
+                            .then(() => {
+                                linkEl.textContent = "Copied!";
+                                setTimeout(() => linkEl.textContent = roomURL, 1500);
+                            });
+                    });
+                }
+                start_session_pair();
+            } else if (path.endsWith("/solo")) {
+                start_session_solo();
+            }
+
         });
+
 </script>
 <style>
 
@@ -842,7 +867,7 @@
 
         <p class="noselect grad" id="instructions4" style="position: absolute; bottom: 16vh; left: calc(50% - 8.6em); width: 17.2em; text-align: justify; text-align-last: justify; font-size: 2.2vh; line-height: 3.2vh; font-family: poppins; font-weight: 400; display: none;"><a style = "font-weight: 600;">Instructions</a> -- Press and hold as<br />you inhale. Release as you exhale.</p>
 
-        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 8vh; left: calc(50% - 8.5em); width: 17em; text-align: center; font-size: 2.8vh; opacity: 1.0; font-family: poppins; font-weight: 700; display: none">Welcome to Breathing Moon!<br />&nbsp;<br /><a style = "font-weight: 400;">The next person to select <br />"partner meditation" <br />will join you here</a></p>
+        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 8vh; left: calc(50% - 8.5em); width: 17em; text-align: center; font-size: 2.8vh; opacity: 1.0; font-family: poppins; font-weight: 700; display: none">Welcome to Breathing Moon!<br />&nbsp;<br /><a style = "font-weight: 400;">The next person to go to<br /><span id="roomLink" style="cursor:pointer; color:#407ecf;"></span><br />will join you here</a></p>
 
         <p class="noselect" id="instructions3" style="position: absolute; top: 120px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; display: none"></p>
     
