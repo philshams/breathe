@@ -1,5 +1,5 @@
 from threading import Lock
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_socketio import SocketIO, emit
 import os
 
@@ -16,8 +16,7 @@ thread_lock = Lock()
 
 # this is the state of the app
 # all events update and/or use this state
-alone_user = []
-partners = dict()
+rooms = {}  # { room_id: [sid1, sid2] }
 
 
 @app.route('/')
@@ -33,9 +32,20 @@ def partner():
     room_id = os.urandom(4).hex()
     return render_template('partner.html', room_id=room_id, async_mode=socketio.async_mode)
 
+# @app.route('/room/<room_id>')
+# def room(room_id):
+#     return render_template('meditate.html', room_id=room_id, async_mode=socketio.async_mode)
+
 @app.route('/room/<room_id>')
 def room(room_id):
+    # Check if room exists and is full
+    if room_id in rooms and len(rooms[room_id]) >= 2:
+        return """<script>
+            alert("Sorry, the room you are trying to access is already full.");
+            window.location.href = "/";
+        </script>"""
     return render_template('meditate.html', room_id=room_id, async_mode=socketio.async_mode)
+
 
 # when a client connects
 @socketio.on('connect')
@@ -66,10 +76,6 @@ rooms = {}  # room_id → [user_ids]
 @socketio.event
 def join_room_event(data):
     room_id = data['room']
-    if room_id in rooms and len(rooms[room_id]) > 1:
-    # room full -> send redirect message
-        emit('room_full', {'msg': "Sorry, the room you entered is already full."}, room=request.sid)
-        return
     join_room(room_id)
     if room_id not in rooms:
         rooms[room_id] = []
@@ -78,6 +84,9 @@ def join_room_event(data):
         for uid in rooms[room_id]:
             partner_id = [x for x in rooms[room_id] if x != uid][0]
             emit('assign_partner', partner_id, to=uid)
+    if len(rooms[room_id]) > 2:
+    # room full -> send redirect message
+        emit('room_full', {'msg': "Sorry, the room you entered is already full."}, room=request.sid)
 
 
 
