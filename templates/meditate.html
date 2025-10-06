@@ -37,7 +37,7 @@
         integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ=="
         crossorigin="anonymous">
 </script>
-<canvas class = "noselect" id="meditationCanvas"></canvas>
+<canvas class = "noselect" id="meditationCanvas" data-is-host="{% if is_host %}true{% else %}false{% endif %}"></canvas>
 <script type="text/javascript" charset="utf-8" > // 
         $(document).ready(function () {
 
@@ -102,6 +102,8 @@
             var time_in_session_partner = 0;
             var first_breath_received = false;
             var first_breath_happened = false;
+
+            var isHost = document.getElementById('meditationCanvas').getAttribute('data-is-host') === 'true';
 
             var inhale_time = 0;
             var exhale_time = 0;
@@ -272,13 +274,16 @@
                 const instructions2 = document.getElementById("instructions2");
                 display_prompt()
                 if (partner_id != 0){
-
-                    instructions2.textContent = "Someone is here"
+                    if (isHost) {
+                        instructions2.textContent = "Your partner is here"
+                    } else {
+                        instructions2.textContent = "Connected to host"
+                    }
                     instructions2.style.fontSize = "3.1vh"
 
-                const moon_partner = document.getElementById("moon_partner"); 
+                    const moon_partner = document.getElementById("moon_partner"); 
                     moon_partner.style.display = ""
-                const moon_partner2 = document.getElementById("moon_partner2"); 
+                    const moon_partner2 = document.getElementById("moon_partner2"); 
                     moon_partner2.style.display = "none"
                 }
             }
@@ -500,8 +505,10 @@
                 const instructions = document.getElementById("instructions"); 
                 instructions.style.display = "none"
 
-                const instructions2 = document.getElementById("instructions2"); 
-                instructions2.style.display = ""
+                if (isHost) {
+                    const instructions2 = document.getElementById("instructions2"); 
+                    instructions2.style.display = ""
+                }
 
                 const header = document.getElementById("header"); 
                 header.style.display = "none"
@@ -730,10 +737,10 @@
             const path = window.location.pathname;
             if (path.includes("/room/")) {
                 const roomId = path.split("/").pop();
-                const roomURL = window.location.href.replace(/^https?:\/\//, '');;
+                const roomURL = window.location.href.replace(/^https?:\/\//, '');
                 const linkEl = document.getElementById("roomLink");
 
-                if (linkEl) {
+                if (linkEl && isHost) {
                     linkEl.textContent = roomURL;
                     linkEl.href = roomURL;
 
@@ -747,6 +754,10 @@
                             setTimeout(() => (linkEl.textContent = prev), 1500);
                         });
                     }, true); // <-- capture phase
+                } else if (!isHost) {
+                    // Joiner - hide the room link instructions immediately
+                    const instructions2 = document.getElementById("instructions2");
+                    instructions2.style.display = "none";
                 }
                 start_session_pair();
             } else if (path.endsWith("/solo")) {
@@ -881,9 +892,9 @@
 
         <p class="noselect grad" id="instructions" style="position: absolute; top: 12vh; left: calc(50% - 8.6em); width: 17.2em; text-align: center; font-size: 2.2vh; line-height: 3.2vh; font-family: poppins; font-weight: 400;">Take a moment to reset.</p>
 
-        <p class="noselect grad" id="instructions4" style="position: absolute; bottom: 16vh; left: calc(50% - 8.6em); width: 17.2em; text-align: justify; text-align-last: justify; font-size: 2.2vh; line-height: 3.2vh; font-family: poppins; font-weight: 400; display: none;"><a style = "font-weight: 600;">Instructions</a> -- Press and hold as<br />you inhale. Release as you exhale.</p>
+        <p class="noselect grad" id="instructions4" style="position: absolute; bottom: 16vh; left: calc(50% - 8.6em); width: 17.2em; text-align: justify; text-align-last: justify; font-size: 2.2vh; line-height: 3.2vh; font-family: poppins; font-weight: 400; display: none;"><a style = "font-weight: 600;">Instructions</a> -- Press and hold as<br />you inhale. Release as you exhale.<br /><br /></p>
 
-        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 8vh; left: calc(50% - 8.5em); width: 17em; text-align: center; font-size: 2.8vh; opacity: 1.0; font-family: poppins; font-weight: 700; display: none">Welcome to Breathing Moon!<br />&nbsp;<br /><a style = "font-weight: 400; font-size: 2.4vh;line-height: 2.4vh;">This room is empty.<br />Have your breathing partner go to<br /><span id="roomLink" style="cursor:pointer; color:#407ecf; font-weight: 600;"></span><br />(click link to copy)</a></p>
+        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 8vh; left: calc(50% - 8.5em); width: 17em; text-align: center; font-size: 2.8vh; opacity: 1.0; font-family: poppins; font-weight: 700; display: none">Welcome to Breathing Moon!<br />&nbsp;<br /><a style = "font-weight: 400; font-size: 2.4vh;line-height: 2.4vh;">It's just you in here.<br /><br />Have your breathing partner go to<br /><span id="roomLink" style="cursor:pointer; color:#407ecf; font-weight: 600;"></span><br />(click link to copy)</a></p>
 
         <p class="noselect" id="instructions3" style="position: absolute; top: 120px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; display: none"></p>
     

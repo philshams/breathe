@@ -30,11 +30,7 @@ def solo():
 @app.route('/partner')
 def partner():
     room_id = os.urandom(4).hex()
-    return render_template('partner.html', room_id=room_id, async_mode=socketio.async_mode)
-
-# @app.route('/room/<room_id>')
-# def room(room_id):
-#     return render_template('meditate.html', room_id=room_id, async_mode=socketio.async_mode)
+    return render_template('meditate.html', room_id=room_id, is_host=True, async_mode=socketio.async_mode)
 
 @app.route('/room/<room_id>')
 def room(room_id):
@@ -44,8 +40,9 @@ def room(room_id):
             alert("Sorry, the room you are trying to access is already full.");
             window.location.href = "/";
         </script>"""
-    return render_template('meditate.html', room_id=room_id, async_mode=socketio.async_mode)
-
+    # Joiner - room_id exists but user is not the creator
+    is_host = room_id not in rooms or len(rooms[room_id]) == 0
+    return render_template('meditate.html', room_id=room_id, is_host=is_host, async_mode=socketio.async_mode)
 
 # when a client connects
 @socketio.on('connect')
