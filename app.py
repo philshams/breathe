@@ -66,6 +66,10 @@ rooms = {}  # room_id → [user_ids]
 @socketio.event
 def join_room_event(data):
     room_id = data['room']
+    if room_id in rooms and len(rooms[room_id]) > 1:
+    # room full -> send redirect message
+        emit('room_full', {'msg': "Sorry, the room you entered is already full."}, room=request.sid)
+        return
     join_room(room_id)
     if room_id not in rooms:
         rooms[room_id] = []
@@ -74,6 +78,7 @@ def join_room_event(data):
         for uid in rooms[room_id]:
             partner_id = [x for x in rooms[room_id] if x != uid][0]
             emit('assign_partner', partner_id, to=uid)
+
 
 
 @socketio.event
