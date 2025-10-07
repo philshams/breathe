@@ -102,6 +102,7 @@
             var time_in_session_partner = 0;
             var first_breath_received = false;
             var first_breath_happened = false;
+            var enjoy_shown = false;
 
             var isHost = true;
 
@@ -299,20 +300,27 @@
                     display_prompt()
                     num_breaths_at_marker = num_breaths
                     instructions2.textContent = "Halfway done"
-                }
-                if ((num_breaths == 1 || num_breaths == 2) && !end_screen && mode == "pair" && source=="client") {
-                    display_prompt()
-                    instructions2.textContent = "Enjoy your 2-minute meditation!"
-                }
-                if ((num_breaths >= 7) && !end_screen && source=="client" && time_in_session > 0.5) {
                     const instructions4 = document.getElementById("instructions4");
                     instructions4.style.display = "none"
                 }
+                if (num_breaths >= 3 && !end_screen && mode == "pair" && source=="client") {
+                    if (instructions2.style.display == "none" && !enjoy_shown) {
+                        display_prompt()
+                        instructions2.textContent = "Enjoy your 2-minute meditation!"
+                        enjoy_shown = true
+                    }
+                }
+                // if ((num_breaths >= 3) && !end_screen && source=="client" && time_in_session > 0.5) {
+                //     const instructions4 = document.getElementById("instructions4");
+                //     instructions4.style.display = "none"
+                // }
 
                 if ((session_duration - time_in_session) < 1 && (session_duration - time_in_session) > 0.5 && num_breaths < num_breaths_at_marker && num_breaths > 4 && !end_screen && mode=="pair" && source=="client") {
                     display_prompt()
                     num_breaths_at_marker = num_breaths
-                    instructions2.textContent = "1 min left"
+                    instructions2.textContent = "One minute left"
+                    const instructions4 = document.getElementById("instructions4");
+                    instructions4.style.display = "none"
                 }
                 if (time_in_session > session_duration && !end_screen) {
                     end_session()
@@ -504,11 +512,6 @@
                 const instructions = document.getElementById("instructions"); 
                 instructions.style.display = "none"
 
-                if (isHost) {
-                    const instructions2 = document.getElementById("instructions2"); 
-                    instructions2.style.display = ""
-                }
-
                 const header = document.getElementById("header"); 
                 header.style.display = "none"
 
@@ -582,6 +585,10 @@
 
             socket.on('assign_host', function (msg) {
                 isHost = msg;
+                if (isHost) {
+                    const instructions2 = document.getElementById("instructions2"); 
+                    instructions2.style.display = ""
+                }
             });
 
             socket.on('assign_user_id', function (msg) {
@@ -648,7 +655,7 @@
             function update_text() {
                 const text = document.getElementById("instructions2");
                 if (text.style.display == "" && ((new Date).getTime() - press_time) > 2000 && !end_screen && num_breaths > 0 && !text.textContent.includes("partner meditation")) {
-                    text.style.opacity = text.style.opacity - 0.005
+                    text.style.opacity = text.style.opacity - 0.004
                     if (text.style.opacity < 0.01) {
                         text.style.display = "none"
                     }
