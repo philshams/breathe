@@ -499,6 +499,11 @@
                 verbal_prompt("server")
             });
 
+            socket.on('reset_partner', function () {
+                circle_server.radius = start_radius
+                last_event_server = 'paused'
+            });
+
         socket.on('room_full', function(data){
             window.location.href = '/'; // redirect to home
             alert(data.msg);
@@ -997,7 +1002,7 @@
             font-size: 2.0vh;
             line-height: 3.2vh;
         ">
-            <span id="closeInstructions" style="
+            <span id="closeInstructions" class="noselect" style="
                 position: absolute; 
                 top: 0.25em; 
                 right: 0.35em; 
@@ -1009,7 +1014,7 @@
             </p>
         </div>
 
-        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 8vh; left: calc(50% - 8.5em); width: 17em; text-align: center; font-size: 2.8vh; opacity: 1.0; font-family: poppins; font-weight: 700; display: none">Welcome to Breathing Moon!<br />&nbsp;<br /><span style = "font-weight: 400; font-size: 2.4vh;line-height: 1.6vh;">It's just you in here.<br /><br />Have your breathing partner go to<br /><span id="roomLink" style="cursor:text; color:#407ecf; font-weight: 600; -webkit-touch-callout: text !important; -webkit-user-select: text !important; -khtml-user-select: text !important; -moz-user-select: text !important; -ms-user-select: text !important; user-select: text !important;"></p>
+        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 8vh; left: calc(50% - 8.5em); width: 17em; text-align: center; font-size: 2.8vh; opacity: 1.0; font-family: poppins; font-weight: 700; display: none">Welcome to Breathing Moon!<br />&nbsp;<br /><span style = "font-weight: 400; font-size: 2.4vh;line-height: 1.6vh;">It's just you in here.<br /><br />Have your breathing partner go to<br /><span id="roomLink" style="cursor:text; color:#407ecf; font-weight: 600; -webkit-touch-callout: all !important; -webkit-user-select: all !important; -khtml-user-select: all !important; -moz-user-select: all !important; -ms-user-select: all !important; user-select: all !important;"></p>
 
         <p class="noselect" id="instructions3" style="position: absolute; top: 120px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; display: none"></p>
     

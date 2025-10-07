@@ -47,6 +47,7 @@ def _leave_room(user_id):
     for room_id, users in list(rooms.items()):
         if user_id in users:
             users.remove(user_id)
+            emit('reset_partner', to=room_id, include_self=False)
             if not users:
                 del rooms[room_id]
 
