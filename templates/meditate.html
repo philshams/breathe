@@ -563,7 +563,7 @@
 
                 // If no room_id in template and not already in /room/<id>, make one
                 if (!"{{ room_id }}" && !roomMatch) {
-                    const newRoom = Math.random().toString(36).substring(2, 8);
+                    const newRoom = Math.random().toString(36).substring(2, 6);
                     window.location.href = `/room/${newRoom}`;
                     return;
                 }
@@ -772,38 +772,49 @@
                 const roomId = path.split("/").pop();
                 const linkEl = document.getElementById("roomLink");
 
+                const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+
                 if (linkEl && isHost) {
-                    linkEl.textContent = window.location.href.replace(/^https?:\/\//, '');
-                    
-                    const copyToClipboard = (e) => {
-                        e.preventDefault();
-                        e.stopImmediatePropagation();
-                        
-                        const textarea = document.createElement('textarea');
-                        textarea.value = window.location.href;
-                        textarea.style.position = 'fixed';
-                        textarea.style.opacity = '0';
-                        document.body.appendChild(textarea);
-                        textarea.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(textarea);
-                        
-                        const prev = linkEl.textContent;
-                        linkEl.textContent = "Copied!";
-                        setTimeout(() => (linkEl.textContent = prev), 1500);
-                    };
-                    
-                    // Wrap in clickable div
-                    const wrapper = document.createElement('div');
-                    wrapper.style.display = 'inline-block';
-                    wrapper.style.padding = '3em 4em';
-                    wrapper.style.margin = '-3em -4em';
-                    wrapper.style.cursor = 'pointer';
-                    linkEl.parentNode.insertBefore(wrapper, linkEl);
-                    wrapper.appendChild(linkEl);
-                    
-                    wrapper.addEventListener("mousedown", copyToClipboard, true);
-                    wrapper.addEventListener("touchstart", copyToClipboard, true);
+                    linkEl.textContent = window.location.href;
+
+                    if (!isMobile) {
+                        // Desktop: copy on click
+                        const copyToClipboard = (e) => {
+                            e.preventDefault();
+                            e.stopImmediatePropagation();
+
+                            const textarea = document.createElement('textarea');
+                            textarea.value = window.location.href;
+                            textarea.style.position = 'fixed';
+                            textarea.style.opacity = '0';
+                            document.body.appendChild(textarea);
+                            textarea.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(textarea);
+
+                            const prev = linkEl.textContent;
+                            linkEl.textContent = "Copied!";
+                            setTimeout(() => (linkEl.textContent = prev), 1500);
+                        };
+
+                        const wrapper = document.createElement('div');
+                        wrapper.style.display = 'inline-block';
+                        wrapper.style.padding = '3em 4em';
+                        wrapper.style.margin = '-3em -4em';
+                        wrapper.style.cursor = 'pointer';
+                        linkEl.parentNode.insertBefore(wrapper, linkEl);
+                        wrapper.appendChild(linkEl);
+
+                        wrapper.addEventListener("mousedown", copyToClipboard, true);
+                        wrapper.addEventListener("touchstart", copyToClipboard, true);
+                    } else {
+                        // Mobile: just selectable text
+                        linkEl.style.userSelect = 'text';
+                        linkEl.style.cursor = 'text';
+                        ['mousedown', 'mouseup', 'touchstart', 'touchend'].forEach(evt => {
+                            linkEl.addEventListener(evt, e => e.stopPropagation());
+                        });
+                    }
                 } else if (!isHost) {
                     const instructions2 = document.getElementById("instructions2");
                     instructions2.style.display = "none";
@@ -998,7 +1009,7 @@
             </p>
         </div>
 
-        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 8vh; left: calc(50% - 8.5em); width: 17em; text-align: center; font-size: 2.8vh; opacity: 1.0; font-family: poppins; font-weight: 700; display: none">Welcome to Breathing Moon!<br />&nbsp;<br /><span style = "font-weight: 400; font-size: 2.4vh;line-height: 1.6vh;">It's just you in here.<br /><br />Have your breathing partner go to<br /><span id="roomLink" style="cursor:pointer; color:#407ecf; font-weight: 600; -webkit-touch-callout: text !important; -webkit-user-select: text !important; -khtml-user-select: text !important; -moz-user-select: text !important; -ms-user-select: text !important; user-select: text !important;"></p>
+        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 8vh; left: calc(50% - 8.5em); width: 17em; text-align: center; font-size: 2.8vh; opacity: 1.0; font-family: poppins; font-weight: 700; display: none">Welcome to Breathing Moon!<br />&nbsp;<br /><span style = "font-weight: 400; font-size: 2.4vh;line-height: 1.6vh;">It's just you in here.<br /><br />Have your breathing partner go to<br /><span id="roomLink" style="cursor:text; color:#407ecf; font-weight: 600; -webkit-touch-callout: text !important; -webkit-user-select: text !important; -khtml-user-select: text !important; -moz-user-select: text !important; -ms-user-select: text !important; user-select: text !important;"></p>
 
         <p class="noselect" id="instructions3" style="position: absolute; top: 120px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; display: none"></p>
     
