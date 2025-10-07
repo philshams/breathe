@@ -1,6 +1,8 @@
 from threading import Lock
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_socketio import SocketIO, emit
+from flask_socketio import join_room, leave_room as leave_socket_room
+
 import os
 
 # Set this variable to "threading", "eventlet" or "gevent" to test the
@@ -34,15 +36,7 @@ def partner():
 
 @app.route('/room/<room_id>')
 def room(room_id):
-    # Check if room exists and is full
-    if room_id in rooms and len(rooms[room_id]) >= 2:
-        return """<script>
-            alert("Sorry, the room you are trying to access is already full.");
-            window.location.href = "/";
-        </script>"""
-    # Joiner - room_id exists but user is not the creator
-    is_host = room_id not in rooms or len(rooms[room_id]) == 0
-    return render_template('meditate.html', room_id=room_id, is_host=is_host, async_mode=socketio.async_mode)
+    return render_template('meditate.html', room_id=room_id, async_mode=socketio.async_mode)
 
 # when a client connects
 @socketio.on('connect')
@@ -62,30 +56,38 @@ def _leave_room(user_id):
 @socketio.on('disconnect')
 def disconnect():
     _leave_room(request.sid)
+    print('disconnect I')
+    print(rooms)
 
 @socketio.event
 def leave_room():
     _leave_room(request.sid)
-
-from flask_socketio import join_room, leave_room as leave_socket_room
-rooms = {}  # room_id → [user_ids]
+    print('disconnect II')
+    print(rooms)
 
 @socketio.event
 def join_room_event(data):
     room_id = data['room']
     join_room(room_id)
-    if room_id not in rooms:
+    if room_id not in rooms or rooms[room_id] == []:
         rooms[room_id] = []
+        is_host = True
+    elif len(rooms[room_id]) == 1:
+        is_host = False
+    else:
+        # room full -> send redirect message
+        emit('room_full', {'msg': "Sorry, the room you entered is already full."}, room=request.sid)
+        return
+
+    emit('assign_host', is_host, to=request.sid)
+    print("join room event")
+    print(rooms)
     rooms[room_id].append(request.sid)
+    print(rooms)
     if len(rooms[room_id]) == 2:
         for uid in rooms[room_id]:
             partner_id = [x for x in rooms[room_id] if x != uid][0]
             emit('assign_partner', partner_id, to=uid)
-    if len(rooms[room_id]) > 2:
-    # room full -> send redirect message
-        emit('room_full', {'msg': "Sorry, the room you entered is already full."}, room=request.sid)
-
-
 
 @socketio.event
 def client_keydown(radius, time_in_session, room):

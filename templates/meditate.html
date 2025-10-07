@@ -37,7 +37,7 @@
         integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ=="
         crossorigin="anonymous">
 </script>
-<canvas class = "noselect" id="meditationCanvas" data-is-host="{% if is_host %}true{% else %}false{% endif %}"></canvas>
+<canvas class = "noselect" id="meditationCanvas"></canvas>
 <script type="text/javascript" charset="utf-8" > // 
         $(document).ready(function () {
 
@@ -103,7 +103,7 @@
             var first_breath_received = false;
             var first_breath_happened = false;
 
-            var isHost = document.getElementById('meditationCanvas').getAttribute('data-is-host') === 'true';
+            var isHost = true;
 
             var inhale_time = 0;
             var exhale_time = 0;
@@ -482,6 +482,7 @@
                     if (first_breath_happened && mode == "pair") {
                         start_time = Math.max((new Date).getTime(), start_time);
                     }
+                    
                 }
                 if (Math.abs(radius - circle_server.radius) > 30) {
                     circle_server.radius = radius
@@ -579,6 +580,9 @@
                 mode = "pair";
             }
 
+            socket.on('assign_host', function (msg) {
+                isHost = msg;
+            });
 
             socket.on('assign_user_id', function (msg) {
                 user_id = msg;
