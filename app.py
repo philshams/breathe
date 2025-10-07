@@ -29,10 +29,9 @@ def meditate():
 def solo():
     return render_template('solo.html', async_mode=socketio.async_mode)
 
-@app.route('/partner')
+@app.route('/room')
 def partner():
-    room_id = os.urandom(4).hex()
-    return render_template('meditate.html', room_id=room_id, is_host=True, async_mode=socketio.async_mode)
+    return render_template('room.html', async_mode=socketio.async_mode)
 
 @app.route('/room/<room_id>')
 def room(room_id):

@@ -264,6 +264,9 @@
                 instructions2.style.display = ""
                 instructions2.style.opacity = 1.0
                 instructions2.textContent = "Meditation complete"
+                const again_button = document.getElementById('again-button');
+                again_button.style.display = ""
+                document.getElementById("instructionsPanel").style.display = "none";
                 toggle_fullscreen("off")
                 end_screen = true;
                 if (mode == "pair"){
@@ -303,8 +306,6 @@
                     display_prompt()
                     num_breaths_at_marker = num_breaths
                     instructions2.textContent = "Less than one minute left!"
-                    const instructions4 = document.getElementById("instructions4");
-                    instructions4.style.display = "none"
                 }
                 if (num_breaths >= 3 && !end_screen && mode == "pair" && source=="client") {
                     if (instructions2.style.display == "none" && !enjoy_shown) {
@@ -318,8 +319,6 @@
                     display_prompt()
                     num_breaths_at_marker = num_breaths
                     instructions2.textContent = "Less than one minute left!"
-                    const instructions4 = document.getElementById("instructions4");
-                    instructions4.style.display = "none"
                 }
                 if (time_in_session > session_duration && !end_screen) {
                     end_session()
@@ -529,6 +528,9 @@
                 const moon_client = document.getElementById("moon_client"); 
                 moon_client.style.display = ""
 
+                // Show panel
+                document.getElementById("instructionsPanel").style.display = "block";
+
                 // if (os!="iOS") {
                 //     toggle_fullscreen("on")
                 // }
@@ -544,8 +546,8 @@
                 history.pushState({}, "", "solo");
                 mode = "solo"
 
-                const instructions4 = document.getElementById("instructions4"); 
-                instructions4.style.display = ""
+                // const instructions4 = document.getElementById("instructions4"); 
+                // instructions4.style.display = ""
 
                 const instructions2 = document.getElementById("instructions2");
                 instructions2.textContent = "Welcome to Breathing Moon!"
@@ -575,8 +577,8 @@
 
                 const moon_partner2 = document.getElementById("moon_partner2"); 
                 moon_partner2.style.display = "";
-                const instructions4 = document.getElementById("instructions4"); 
-                instructions4.style.display = "";
+                // const instructions4 = document.getElementById("instructions4"); 
+                // instructions4.style.display = "";
                 circle_client.radius = start_radius * 0.9;
                 circle_server.radius = start_radius * 0.9;
                 mode = "pair";
@@ -720,6 +722,15 @@
                     document.documentElement.removeAttribute("fullscreen"); 
                 }
             }
+            const again_button = document.createElement('again-button');
+            again_button.setAttribute('id','again-button');
+            again_button.setAttribute('class','again-button noselect');
+            again_button.textContent = 'Go again';
+            again_button.addEventListener('click', () => {
+                location.href = '/'; // go to homepage
+            });
+            again_button.style.display = "none"
+            document.body.appendChild(again_button);
 
             const together_button = document.createElement("button");
             together_button.setAttribute('id','together-button');
@@ -737,6 +748,19 @@
             guided_button.style.display = ""
             document.body.appendChild(guided_button);
 
+            const closeBtn = document.getElementById("closeInstructions");
+            ["mousedown", "touchstart", "mouseup", "touchend"].forEach(evt => {
+                closeBtn.addEventListener(evt, function(event) {
+                    event.stopPropagation(); // prevents moon detection
+                });
+            });
+
+            // Close button
+            document.getElementById("closeInstructions").onclick = function() {
+                document.getElementById("instructionsPanel").style.display = "none";
+            }
+
+
             document.body.style.backgroundImage = `url("{{url_for('static', filename='duskyIII.jpg')}}")`;
 
             setInterval(update, 16);
@@ -749,7 +773,7 @@
                 const linkEl = document.getElementById("roomLink");
 
                 if (linkEl && isHost) {
-                    linkEl.textContent = window.location.href;
+                    linkEl.textContent = window.location.href.replace(/^https?:\/\//, '');
                     
                     const copyToClipboard = (e) => {
                         e.preventDefault();
@@ -779,6 +803,7 @@
                     wrapper.appendChild(linkEl);
                     
                     wrapper.addEventListener("mousedown", copyToClipboard, true);
+                    wrapper.addEventListener("touchstart", copyToClipboard, true);
                 } else if (!isHost) {
                     const instructions2 = document.getElementById("instructions2");
                     instructions2.style.display = "none";
@@ -859,6 +884,35 @@
         opacity: 1.0;
     }
 
+    .again-button {
+    position: absolute;
+    bottom:  18vh;
+    left: calc(50% - 9vh);
+    background-image: linear-gradient(to right, rgb(210,210,255) 0%, rgb(200,225,255) 90%);
+    border: none;
+    opacity: 0.98;
+    text-align: center;
+    color: rgb(40,60,150);
+    /* color: royalblue;  */
+    cursor:  pointer;
+    border-radius: 3px;
+    display: block;
+    width:  18vh;
+    height:  4.2vh;
+    /* line-height: 0px; */
+    /* padding-bottom: 2px; */
+    font-size: 2.5vh;
+    font-family: poppins;
+    font-weight: 500;
+    box-shadow:
+    0px 0px 2px 0px lightcyan;
+    }
+
+    .again-button:hover {
+        box-shadow:
+        0px 0px 5px 0px lightcyan;
+        opacity: 1.0;
+    }
 
     .hr-style {
     border: 0;
@@ -917,7 +971,32 @@
 
         <p class="noselect grad" id="instructions" style="position: absolute; top: 12vh; left: calc(50% - 8.6em); width: 17.2em; text-align: center; font-size: 2.2vh; line-height: 3.2vh; font-family: poppins; font-weight: 400;">Take a moment to reset.</p>
 
-        <p class="noselect grad" id="instructions4" style="position: absolute; bottom: 16vh; left: calc(50% - 8.6em); width: 17.2em; text-align: justify; text-align-last: justify; font-size: 2.2vh; line-height: 3.2vh; font-family: poppins; font-weight: 400; display: none;"><a style = "font-weight: 600;">Instructions</a> -- Press and hold as<br />you inhale. Release as you exhale.<br /><br /></p>
+        <div id="instructionsPanel" style="
+            position: absolute; 
+            bottom: 12vh; 
+            left: 50%; 
+            transform: translateX(-50%);
+            width: 18em; 
+            background: rgba(0, 0, 0, 0.4); 
+            color: white; 
+            padding: 0.1em 0.4em 0.1em 1.5em;
+            border-radius: 0.5em;
+            display: none;
+            font-family: poppins;
+            font-size: 2.0vh;
+            line-height: 3.2vh;
+        ">
+            <span id="closeInstructions" style="
+                position: absolute; 
+                top: 0.25em; 
+                right: 0.35em; 
+                cursor: pointer; 
+                font-size: 1.5em;
+            ">&times;</span>
+            <p class="noselect grad" style="text-align: left; font-weight: 400;">
+                <a style="font-weight: 600;">Instructions</a> - Press and hold as<br>you inhale. Release as you exhale.
+            </p>
+        </div>
 
         <p class="noselect grad2" id="instructions2" style="position: absolute; top: 8vh; left: calc(50% - 8.5em); width: 17em; text-align: center; font-size: 2.8vh; opacity: 1.0; font-family: poppins; font-weight: 700; display: none">Welcome to Breathing Moon!<br />&nbsp;<br /><span style = "font-weight: 400; font-size: 2.4vh;line-height: 1.6vh;">It's just you in here.<br /><br />Have your breathing partner go to<br /><span id="roomLink" style="cursor:pointer; color:#407ecf; font-weight: 600; -webkit-touch-callout: text !important; -webkit-user-select: text !important; -khtml-user-select: text !important; -moz-user-select: text !important; -ms-user-select: text !important; user-select: text !important;"></p>
 
