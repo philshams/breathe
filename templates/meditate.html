@@ -304,7 +304,7 @@
                     display_prompt()
                     instructions2.textContent = "Enjoy your 2-minute meditation!"
                 }
-                if ((num_breaths == 7 || num_breaths == 8) && !end_screen && source=="client") {
+                if ((num_breaths >= 7) && !end_screen && source=="client" && time_in_session > 0.5) {
                     const instructions4 = document.getElementById("instructions4");
                     instructions4.style.display = "none"
                 }
@@ -320,8 +320,6 @@
             }
 
             function calculate_time_in_session() {
-                console.log(first_breath_happened)
-                console.log(first_breath_received)
                 if (first_breath_happened && (first_breath_received || mode == "solo")){
                     time_in_session = ((new Date).getTime() - start_time)  / 1000 / 60
                 
@@ -548,6 +546,7 @@
 
                 const instructions2 = document.getElementById("instructions2");
                 instructions2.textContent = "Welcome to Breathing Moon!"
+                instructions2.style.display = ""
 
             }
 
@@ -728,7 +727,7 @@
             guided_button.style.display = ""
             document.body.appendChild(guided_button);
 
-            document.body.style.backgroundImage = `url("{{url_for('static', filename='duskyIII.png')}}")`;
+            document.body.style.backgroundImage = `url("{{url_for('static', filename='duskyIII.jpg')}}")`;
 
             setInterval(update, 16);
 
@@ -742,30 +741,34 @@
                 if (linkEl && isHost) {
                     linkEl.textContent = window.location.href;
                     
-                    linkEl.addEventListener("click", (e) => {
+                    const copyToClipboard = (e) => {
                         e.preventDefault();
                         e.stopImmediatePropagation();
                         
-                        fallbackCopy();
+                        const textarea = document.createElement('textarea');
+                        textarea.value = window.location.href;
+                        textarea.style.position = 'fixed';
+                        textarea.style.opacity = '0';
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textarea);
                         
-                        function fallbackCopy() {
-                            const textarea = document.createElement('textarea');
-                            textarea.value = window.location.href;
-                            textarea.style.position = 'fixed';
-                            textarea.style.opacity = '0';
-                            document.body.appendChild(textarea);
-                            textarea.select();
-                            document.execCommand('copy');
-                            document.body.removeChild(textarea);
-                            showCopied();
-                        }
-                        
-                        function showCopied() {
-                            const prev = linkEl.textContent;
-                            linkEl.textContent = "Copied!";
-                            setTimeout(() => (linkEl.textContent = prev), 1500);
-                        }
-                    }, true);
+                        const prev = linkEl.textContent;
+                        linkEl.textContent = "Copied!";
+                        setTimeout(() => (linkEl.textContent = prev), 1500);
+                    };
+                    
+                    // Wrap in clickable div
+                    const wrapper = document.createElement('div');
+                    wrapper.style.display = 'inline-block';
+                    wrapper.style.padding = '3em 4em';
+                    wrapper.style.margin = '-3em -4em';
+                    wrapper.style.cursor = 'pointer';
+                    linkEl.parentNode.insertBefore(wrapper, linkEl);
+                    wrapper.appendChild(linkEl);
+                    
+                    wrapper.addEventListener("mousedown", copyToClipboard, true);
                 } else if (!isHost) {
                     const instructions2 = document.getElementById("instructions2");
                     instructions2.style.display = "none";
@@ -906,9 +909,7 @@
 
         <p class="noselect grad" id="instructions4" style="position: absolute; bottom: 16vh; left: calc(50% - 8.6em); width: 17.2em; text-align: justify; text-align-last: justify; font-size: 2.2vh; line-height: 3.2vh; font-family: poppins; font-weight: 400; display: none;"><a style = "font-weight: 600;">Instructions</a> -- Press and hold as<br />you inhale. Release as you exhale.<br /><br /></p>
 
-        <!-- <p class="noselect grad2" id="instructions2" style="position: absolute; top: 8vh; left: calc(50% - 8.5em); width: 17em; text-align: center; font-size: 2.8vh; opacity: 1.0; font-family: poppins; font-weight: 700; display: none">Welcome to Breathing Moon!<br />&nbsp;<br /><a style = "font-weight: 400; font-size: 2.4vh;line-height: 2.0vh;">It's just you in here.<br /><br />Have your breathing partner go to<br /><span id="roomLink" style="cursor:pointer; color:#407ecf; font-weight: 600; user-select: text;"></span><br />(click link to copy)</a></p> -->
-
-        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 8vh; left: calc(50% - 8.5em); width: 17em; text-align: center; font-size: 2.8vh; opacity: 1.0; font-family: poppins; font-weight: 700; display: none">Welcome to Breathing Moon!<br />&nbsp;<br /><span style = "font-weight: 400; font-size: 2.4vh;line-height: 1.6vh;">It's just you in here.<br /><br />Have your breathing partner go to<br /><span id="roomLink" style="cursor:pointer; color:#407ecf; font-weight: 600; -webkit-touch-callout: text !important; -webkit-user-select: text !important; -khtml-user-select: text !important; -moz-user-select: text !important; -ms-user-select: text !important; user-select: text !important;"></span><br />(click link to copy it)</span></p>
+        <p class="noselect grad2" id="instructions2" style="position: absolute; top: 8vh; left: calc(50% - 8.5em); width: 17em; text-align: center; font-size: 2.8vh; opacity: 1.0; font-family: poppins; font-weight: 700; display: none">Welcome to Breathing Moon!<br />&nbsp;<br /><span style = "font-weight: 400; font-size: 2.4vh;line-height: 1.6vh;">It's just you in here.<br /><br />Have your breathing partner go to<br /><span id="roomLink" style="cursor:pointer; color:#407ecf; font-weight: 600; -webkit-touch-callout: text !important; -webkit-user-select: text !important; -khtml-user-select: text !important; -moz-user-select: text !important; -ms-user-select: text !important; user-select: text !important;"></p>
 
         <p class="noselect" id="instructions3" style="position: absolute; top: 120px; left: calc(50% - 300px); width: 600px; text-align: center; font-size: 32px; line-height: 32px; opacity: 1.0; font-family: poppins; font-weight: 200; color: lightcyan; text-shadow: 0 0 3px lightblue; display: none"></p>
     
