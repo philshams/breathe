@@ -267,7 +267,7 @@
                 const again_button = document.getElementById('again-button');
                 again_button.style.display = ""
                 document.getElementById("instructionsPanel").style.display = "none";
-                toggle_fullscreen("off")
+                // toggle_fullscreen("off")
                 end_screen = true;
                 if (mode == "pair"){
                     socket.emit('leave_room');
@@ -406,7 +406,8 @@
 
             // Add event listener for the "keydown" event on the document object
             document.addEventListener('mousedown', (event) => {
-                if (!start_screen) {
+                const instructions2 = document.getElementById("instructions2");
+                if (!start_screen && !instructions2.textContent.includes("your breathing partner go to")) {
                     event.stopPropagation();
                     event.preventDefault();
                 }
@@ -415,28 +416,30 @@
 
             // Add event listener for the "keyup" event on the document object
             document.addEventListener('mouseup', (event) => {
-                if (!start_screen) {
+                const instructions2 = document.getElementById("instructions2");
+                if (!start_screen && !instructions2.textContent.includes("your breathing partner go to")) {
                     event.stopPropagation();
                     event.preventDefault();
                 }
                 key_up_response(event)
             });
 
-            function doubleClickOff() {
-                tapped = false;               
-            }
+            // function doubleClickOff() {
+            //     tapped = false;               
+            // }
 
-            function doubleClick() {
-                if (tapped) {
-                    toggle_fullscreen("toggle")
-                    tapped = false;
-                } else {
-                    tapped = true;
-                }
-            }
+            // function doubleClick() {
+            //     if (tapped) {
+            //         toggle_fullscreen("toggle")
+            //         tapped = false;
+            //     } else {
+            //         tapped = true;
+            //     }
+            // }
             // Add event listener for the "keydown" event on the document object
             document.addEventListener('touchstart', (event) => {
-                if (!start_screen) {
+                const instructions2 = document.getElementById("instructions2");
+                if (!start_screen && !instructions2.textContent.includes("your breathing partner go to")) {
                     event.stopPropagation();
                     event.preventDefault();
                 }
@@ -445,9 +448,10 @@
 
             // Add event listener for the "keyup" event on the document object
             document.addEventListener('touchend', (event) => {
-                if (!start_screen) {
-                    doubleClick()
-                    setTimeout(doubleClickOff, 300);
+                const instructions2 = document.getElementById("instructions2");
+                if (!start_screen && !instructions2.textContent.includes("your breathing partner go to")) {
+                    // doubleClick()
+                    // setTimeout(doubleClickOff, 300);
                     event.stopPropagation();
                     event.preventDefault();
                 }
@@ -455,11 +459,11 @@
             });
 
             // Add event listener for the "keyup" event on the document object
-            document.addEventListener('dblclick', (event) => {
-                if (!start_screen) {
-                    toggle_fullscreen("toggle")
-                }
-            });
+            // document.addEventListener('dblclick', (event) => {
+            //     if (!start_screen) {
+            //         toggle_fullscreen("toggle")
+            //     }
+            // });
 
             window.onbeforeunload = function () {
                 socket.emit('leave');
