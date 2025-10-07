@@ -56,14 +56,10 @@ def _leave_room(user_id):
 @socketio.on('disconnect')
 def disconnect():
     _leave_room(request.sid)
-    print('disconnect I')
-    print(rooms)
 
 @socketio.event
 def leave_room():
     _leave_room(request.sid)
-    print('disconnect II')
-    print(rooms)
 
 @socketio.event
 def join_room_event(data):
@@ -80,10 +76,7 @@ def join_room_event(data):
         return
 
     emit('assign_host', is_host, to=request.sid)
-    print("join room event")
-    print(rooms)
     rooms[room_id].append(request.sid)
-    print(rooms)
     if len(rooms[room_id]) == 2:
         for uid in rooms[room_id]:
             partner_id = [x for x in rooms[room_id] if x != uid][0]

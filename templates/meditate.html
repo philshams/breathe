@@ -292,14 +292,17 @@
             function verbal_prompt(source="client") {
                 const instructions2 = document.getElementById("instructions2");
                 
-                if ((num_breaths == 3) && !end_screen && mode=="solo") {
-                    display_prompt()
-                    instructions2.textContent = "Enjoy your 2-minute meditation!"
+                if (num_breaths >= 3 && !end_screen && mode=="solo") {
+                    if (instructions2.style.display == "none" && !enjoy_shown) {
+                        display_prompt()
+                        instructions2.textContent = "Enjoy your 2-minute meditation!"
+                        enjoy_shown = true
+                    }
                 }
                 if (time_in_session > 0.5 * session_duration && num_breaths < num_breaths_at_marker && num_breaths > 4 && !end_screen && mode=="solo") {
                     display_prompt()
                     num_breaths_at_marker = num_breaths
-                    instructions2.textContent = "Halfway done"
+                    instructions2.textContent = "Less than one minute left!"
                     const instructions4 = document.getElementById("instructions4");
                     instructions4.style.display = "none"
                 }
@@ -310,15 +313,11 @@
                         enjoy_shown = true
                     }
                 }
-                // if ((num_breaths >= 3) && !end_screen && source=="client" && time_in_session > 0.5) {
-                //     const instructions4 = document.getElementById("instructions4");
-                //     instructions4.style.display = "none"
-                // }
 
                 if ((session_duration - time_in_session) < 1 && (session_duration - time_in_session) > 0.5 && num_breaths < num_breaths_at_marker && num_breaths > 4 && !end_screen && mode=="pair" && source=="client") {
                     display_prompt()
                     num_breaths_at_marker = num_breaths
-                    instructions2.textContent = "One minute left"
+                    instructions2.textContent = "Less than one minute left!"
                     const instructions4 = document.getElementById("instructions4");
                     instructions4.style.display = "none"
                 }
@@ -654,7 +653,7 @@
 
             function update_text() {
                 const text = document.getElementById("instructions2");
-                if (text.style.display == "" && ((new Date).getTime() - press_time) > 2000 && !end_screen && num_breaths > 0 && !text.textContent.includes("partner meditation")) {
+                if (text.style.display == "" && ((new Date).getTime() - press_time) > 2000 && !end_screen && ((num_breaths > 2 && mode=="solo") || (num_breaths > 0 && mode == "pair")) ) {
                     text.style.opacity = text.style.opacity - 0.004
                     if (text.style.opacity < 0.01) {
                         text.style.display = "none"
