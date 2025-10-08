@@ -47,8 +47,7 @@
             meditationCanvas.height = window.innerHeight;
             const ctx = meditationCanvas.getContext('2d');
 
-            const roomId = "{{ room_id }}";
-            const roomMatch = path.match(/\/room\/([a-z0-9]+)/);
+            var roomId = "{{ room_id }}";
 
             const radius_scale = 0.5;
             var screen_size_factor = (window.innerHeight / 2200) / 0.5;
@@ -343,7 +342,7 @@
                     }
                     calculate_time_in_session()
 
-                    socket.emit("client_keydown", circle_client.radius, time_in_session, roomId || roomMatch);
+                    socket.emit("client_keydown", circle_client.radius, time_in_session, roomId);
                     
                     verbal_prompt()
 
@@ -356,7 +355,7 @@
                 if (event && event.target && event.target.closest && event.target.closest('#roomLink')) return;
 
                 if (!last_event.includes('exhale') && !start_screen) {
-                    socket.emit("client_keyup", circle_client.radius, time_in_session, roomId || roomMatch);
+                    socket.emit("client_keyup", circle_client.radius, time_in_session, roomId);
                     if (mode!="pair" || first_breath_received) {
                         num_breaths = num_breaths + 1;
                     }
@@ -383,7 +382,7 @@
                 }
                 if (!start_screen && !end_screen){
                     // Use the room_id from Flask OR from the URL path
-                    socket.emit('join_room_lite', { room: roomId  || roomMatch});
+                    socket.emit('join_room_lite', { room: roomId});
                 }
 
             });
@@ -562,18 +561,16 @@
 
 
             function start_session_pair() {
-                // Detect if we’re already in a /room/<id> URL
-                const path = window.location.pathname;
 
                 // If no room_id in template and not already in /room/<id>, make one
-                if (!"{{ room_id }}" && !roomMatch) {
-                    const newRoom = Math.random().toString(36).substring(2, 6);
-                    window.location.href = `/room/${newRoom}`;
+                if (!roomId) {
+                    roomId = Math.random().toString(36).substring(2, 6);
+                    window.location.href = `/room/${roomId}`;
                     return;
                 }
 
                 // Use the room_id from Flask OR from the URL path
-                socket.emit('join_room_event', { room: roomId || roomMatch});
+                socket.emit('join_room_event', { room: roomId});
 
                 setTimeout(function() {
                     if (!joinSuccessReceived) {
@@ -789,7 +786,7 @@
             // Rejoin room when returning to page (Safari + other browsers)
             window.addEventListener('pageshow', function () {
             if (path.includes("/room/")) {
-                socket.emit('join_room_event', { room: roomId || roomMatch});
+                socket.emit('join_room_event', { room: roomId});
             }
             });
 
@@ -798,7 +795,7 @@
                 if (!document.hidden) {
                     // Page became visible again - rejoin the room
                     if (path.includes("/room/")) {
-                        socket.emit('join_room_event', {room: roomId || roomMatch});
+                        socket.emit('join_room_event', {room: roomId});
                     }
                 }
             });
