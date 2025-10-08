@@ -74,6 +74,7 @@
             var joinSuccessReceived = false;
             var tapped = false;
             var minute_warning_given = false;
+            var partner_prompt_shown = false;
 
             var fullscreen = true;
             var fullscreen_factor = 1;
@@ -278,21 +279,21 @@
             }
 
             function partner_prompt() {
-                const instructions2 = document.getElementById("instructions2");
-                display_prompt()
-                if (partner_id != 0){
+                if (partner_id != 0 && !partner_prompt_shown){
+                    const instructions2 = document.getElementById("instructions2");
+                    display_prompt()
                     if (isHost) {
                         instructions2.textContent = "Someone has joined you."
                     } else {
                         instructions2.textContent = "Your breathing partner is here."
                     }
                     instructions2.style.fontSize = "3.1vh"
-
-                    const moon_partner = document.getElementById("moon_partner"); 
-                    moon_partner.style.display = ""
-                    const moon_partner2 = document.getElementById("moon_partner2"); 
-                    moon_partner2.style.display = "none"
+                    partner_prompt_shown = true;
                 }
+                const moon_partner = document.getElementById("moon_partner"); 
+                moon_partner.style.display = ""
+                const moon_partner2 = document.getElementById("moon_partner2"); 
+                moon_partner2.style.display = "none"
             }
 
             function verbal_prompt(source="client") {
@@ -777,6 +778,14 @@
                 closePnl.addEventListener(evt, function(event) {
                     event.stopPropagation(); // prevents moon detection
                 });
+            });
+
+            // Rejoin room when returning to page (Safari + other browsers)
+            window.addEventListener('pageshow', function () {
+            if (path.includes("/room/")) {
+                const roomId = path.split("/").pop();
+                socket.emit('join_room_event', { room: roomId });
+            }
             });
 
             // rejoin room if backgrounding removes it
