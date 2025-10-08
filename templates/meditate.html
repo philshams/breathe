@@ -764,19 +764,19 @@
             guided_button.style.display = ""
             document.body.appendChild(guided_button);
 
-            const closeBtn = document.getElementById("closeInstructions");
-            ["mousedown", "touchstart", "mouseup", "touchend"].forEach(evt => {
-                closeBtn.addEventListener(evt, function(event) {
-                    event.stopPropagation(); // prevents moon detection
-                });
-            });
+            // const closeBtn = document.getElementById("closeInstructions");
+            // ["mousedown", "touchstart", "mouseup", "touchend"].forEach(evt => {
+            //     closeBtn.addEventListener(evt, function(event) {
+            //         event.stopPropagation(); // prevents moon detection
+            //     });
+            // });
 
-            const closePnl = document.getElementById("instructionsPanel");
-            ["mousedown", "touchstart", "mouseup", "touchend"].forEach(evt => {
-                closePnl.addEventListener(evt, function(event) {
-                    event.stopPropagation(); // prevents moon detection
-                });
-            });
+            // const closePnl = document.getElementById("instructionsPanel");
+            // ["mousedown", "touchstart", "mouseup", "touchend"].forEach(evt => {
+            //     closePnl.addEventListener(evt, function(event) {
+            //         event.stopPropagation(); // prevents moon detection
+            //     });
+            // });
 
             // rejoin room if backgrounding removes it
             document.addEventListener('visibilitychange', function() {
