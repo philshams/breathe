@@ -71,6 +71,7 @@
             var start_time = 0;
             var press_time = 0;
 
+            var joinSuccessReceived = false;
             var tapped = false;
             var minute_warning_given = false;
 
@@ -566,6 +567,12 @@
                 // Use the room_id from Flask OR from the URL path
                 const roomId = "{{ room_id }}" || roomMatch[1];
                 socket.emit('join_room_event', { room: roomId });
+
+                setTimeout(function() {
+                    if (!joinSuccessReceived) {
+                        window.location.reload();
+                    }
+                }, 2000);
                 
                 // Now start the visual/session setup
                 start_session();
@@ -578,6 +585,10 @@
                 circle_server.radius = start_radius * 0.9;
                 mode = "pair";
             }
+
+            socket.on('join_success', function() {
+                joinSuccessReceived = true;
+            });
 
             socket.on('assign_host', function (msg) {
                 isHost = msg;
@@ -765,16 +776,6 @@
                 closePnl.addEventListener(evt, function(event) {
                     event.stopPropagation(); // prevents moon detection
                 });
-            });
-
-            // rejoin room if backgrounding removes it
-            document.addEventListener('visibilitychange', function() {
-                if (!document.hidden) {
-                    // Page became visible again - rejoin the room
-                    if (currentRoomId) {
-                        socket.emit('join_room_event', {room: currentRoomId});
-                    }
-                }
             });
 
             // Close button

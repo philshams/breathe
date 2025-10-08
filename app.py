@@ -66,17 +66,6 @@ def join_room_event(data):
     room_id = data['room']
     join_room(room_id)
 
-    # ADD THIS: Check if user already in room (reconnection after backgrounding)
-    if request.sid in rooms.get(room_id, []):
-        # User is reconnecting - just re-send their state, don't add again
-        is_host = (rooms[room_id][0] == request.sid)
-        emit('assign_host', is_host, to=request.sid)
-        if len(rooms[room_id]) == 2:
-            partner_id = [x for x in rooms[room_id] if x != request.sid][0]
-            emit('assign_partner', partner_id, to=request.sid)
-        return
-    # END OF ADDITION
-    
     if room_id not in rooms or rooms[room_id] == []:
         rooms[room_id] = []
         is_host = True
@@ -89,6 +78,8 @@ def join_room_event(data):
 
     emit('assign_host', is_host, to=request.sid)
     rooms[room_id].append(request.sid)
+    emit('join_success', to=request.sid)
+    
     if len(rooms[room_id]) == 2:
         for uid in rooms[room_id]:
             partner_id = [x for x in rooms[room_id] if x != uid][0]
