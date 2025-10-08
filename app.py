@@ -70,6 +70,11 @@ def leave_room_complete():
     _leave_room_complete(request.sid)
 
 @socketio.event
+def join_room_lite(data):
+    room_id = data['room']
+    join_room(room_id)
+
+@socketio.event
 def join_room_event(data):
     room_id = data['room']
     join_room(room_id)
@@ -79,6 +84,11 @@ def join_room_event(data):
         # User is reconnecting - just re-send their state, don't add again
         is_host = (rooms[room_id][0] == request.sid)
         emit('assign_host', is_host, to=request.sid)
+
+        if len(rooms[room_id]) == 2:
+            for uid in rooms[room_id]:
+                partner_id = [x for x in rooms[room_id] if x != uid][0]
+                emit('assign_partner', partner_id, to=uid)
         return
     # END OF ADDITION
 

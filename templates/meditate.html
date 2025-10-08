@@ -380,6 +380,11 @@
                 } else {
                     key_down_response(event)
                 }
+                if (!start_screen && !end_screen){
+                    // Use the room_id from Flask OR from the URL path
+                    const roomId = "{{ room_id }}" || roomMatch[1];
+                    socket.emit('join_room_lite', { room: roomId });
+                }
 
             });
 
@@ -469,6 +474,13 @@
             });
 
             socket.on('partner_state', function (radius, direction, time_in_session_received) {
+                const moon_partner = document.getElementById("moon_partner"); 
+                if (moon_partner.style.display = "none") {
+                    moon_partner.style.display = ""
+                    const moon_partner2 = document.getElementById("moon_partner2"); 
+                    moon_partner2.style.display = "none"
+                }
+                
                 if (!first_breath_received) {
                     partner_prompt()
                     first_breath_received = true
