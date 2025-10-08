@@ -35,7 +35,7 @@ def partner():
 
 @app.route('/room/<room_id>')
 def room(room_id):
-    return render_template('meditate.html', room_id=room_id, async_mode=socketio.async_mode)
+    return render_template('meditate.html', room_id=room_id, meta_title="Join my breathing room", async_mode=socketio.async_mode)
 
 # when a client connects
 @socketio.on('connect')
