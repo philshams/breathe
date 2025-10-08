@@ -488,6 +488,10 @@
             socket.on('reset_partner', function () {
                 circle_server.radius = start_radius
                 last_event_server = 'paused'
+                const moon_partner = document.getElementById("moon_partner"); 
+                moon_partner.style.display = "none"
+                const moon_partner2 = document.getElementById("moon_partner2"); 
+                moon_partner2.style.display = ""
             });
 
         socket.on('room_full', function(data){
@@ -756,8 +760,18 @@
                 });
             });
 
+            const closePnl = document.getElementById("instructionsPanel");
+            ["mousedown", "touchstart", "mouseup", "touchend"].forEach(evt => {
+                closePnl.addEventListener(evt, function(event) {
+                    event.stopPropagation(); // prevents moon detection
+                });
+            });
+
             // Close button
             document.getElementById("closeInstructions").onclick = function() {
+                document.getElementById("instructionsPanel").style.display = "none";
+            }
+            document.getElementById("instructionsPanel").onclick = function() {
                 document.getElementById("instructionsPanel").style.display = "none";
             }
 
@@ -997,6 +1011,7 @@
             font-family: poppins;
             font-size: 2.0vh;
             line-height: 3.2vh;
+            cursor: pointer; 
         ">
             <span id="closeInstructions" class="noselect" style="
                 position: absolute; 
