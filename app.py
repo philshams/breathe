@@ -1,7 +1,7 @@
 from threading import Lock
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
-from flask_socketio import join_room, leave_room as leave_socket_room
+from flask_socketio import join_room, leave_room
 
 import os
 
@@ -51,6 +51,14 @@ def _leave_room(user_id):
             if not users:
                 del rooms[room_id]
 
+def _leave_room_complete(user_id):
+    for room_id, users in list(rooms.items()):
+        if user_id in users:
+            users.remove(user_id)
+            leave_room(room_id)
+            if not users:
+                del rooms[room_id]
+
 
 # # when a client disconnects
 @socketio.on('disconnect')
@@ -58,8 +66,8 @@ def disconnect():
     _leave_room(request.sid)
 
 @socketio.event
-def leave_room():
-    _leave_room(request.sid)
+def leave_room_complete():
+    _leave_room_complete(request.sid)
 
 @socketio.event
 def join_room_event(data):
@@ -71,9 +79,6 @@ def join_room_event(data):
         # User is reconnecting - just re-send their state, don't add again
         is_host = (rooms[room_id][0] == request.sid)
         emit('assign_host', is_host, to=request.sid)
-        if len(rooms[room_id]) == 2:
-            partner_id = [x for x in rooms[room_id] if x != request.sid][0]
-            emit('assign_partner', partner_id, to=request.sid)
         return
     # END OF ADDITION
 
