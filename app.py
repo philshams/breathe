@@ -113,6 +113,11 @@ def join_room_event(data):
 @socketio.event
 def client_keydown(radius, time_in_session, room):
     emit('partner_state', (radius, "inhale", time_in_session), to=room, include_self=False)
+    room_info = {}
+    for room, members in rooms.items():
+        room_info[room] = list(members)
+    # Emit to all clients
+    socketio.emit('room_update', room_info)
 
 @socketio.event
 def client_keyup(radius, time_in_session, room):
