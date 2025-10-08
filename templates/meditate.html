@@ -731,11 +731,11 @@
             again_button.setAttribute('id','again-button');
             again_button.setAttribute('class','again-button noselect');
             again_button.textContent = 'Go again';
+            document.body.appendChild(again_button);
+            again_button.style.display = "none"
             again_button.addEventListener('click', () => {
                 location.href = '/'; // go to homepage
             });
-            again_button.style.display = "none"
-            document.body.appendChild(again_button);
 
             const together_button = document.createElement("button");
             together_button.setAttribute('id','together-button');
