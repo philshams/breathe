@@ -72,6 +72,7 @@
             var press_time = 0;
 
             var tapped = false;
+            var minute_warning_given = false;
 
             var fullscreen = true;
             var fullscreen_factor = 1;
@@ -296,19 +297,7 @@
             function verbal_prompt(source="client") {
                 const instructions2 = document.getElementById("instructions2");
                 
-                if (num_breaths >= 3 && !end_screen && mode=="solo") {
-                    if (instructions2.style.display == "none" && !enjoy_shown) {
-                        display_prompt()
-                        instructions2.textContent = "Enjoy your 2-minute meditation!"
-                        enjoy_shown = true
-                    }
-                }
-                if (time_in_session > 0.5 * session_duration && num_breaths < num_breaths_at_marker && num_breaths > 4 && !end_screen && mode=="solo") {
-                    display_prompt()
-                    num_breaths_at_marker = num_breaths
-                    instructions2.textContent = "Less than one minute left!"
-                }
-                if (num_breaths >= 3 && !end_screen && mode == "pair" && source=="client") {
+                if (num_breaths >= 3 && !end_screen && source=="client" && (session_duration - time_in_session) > 1) {
                     if (instructions2.style.display == "none" && !enjoy_shown) {
                         display_prompt()
                         instructions2.textContent = "Enjoy your 2-minute meditation!"
@@ -316,14 +305,6 @@
                     }
                 }
 
-                if ((session_duration - time_in_session) < 1 && (session_duration - time_in_session) > 0.5 && num_breaths < num_breaths_at_marker && num_breaths > 4 && !end_screen && mode=="pair" && source=="client") {
-                    display_prompt()
-                    num_breaths_at_marker = num_breaths
-                    instructions2.textContent = "Less than one minute left!"
-                }
-                if (time_in_session > session_duration && !end_screen) {
-                    end_session()
-                }
             }
 
             function calculate_time_in_session() {
@@ -331,7 +312,7 @@
                     time_in_session = ((new Date).getTime() - start_time)  / 1000 / 60
                 
                 }
-                console.log(time_in_session) 
+                // console.log(time_in_session) 
             }
 
             function key_down_response(event) {
@@ -390,16 +371,16 @@
                     // Prevent default behavior of the spacebar key
                     event.preventDefault();
                 }
-                if (event.code === 'Esc') {
+                if (event.code === 'Escape') {
                     toggle_fullscreen("off")
-                } else if (event.altKey) {
-                    
+                } else if (event.ctrlKey || event.altKey || event.code === 'Tab' || event.key.toLowerCase() === 'c') {
+                    return;
                 } else {
                     key_down_response(event)
                 }
 
             });
- 
+
             // Add event listener for the "keyup" event on the document object
             document.addEventListener('keyup', (event) => {
                 key_up_response(event)
@@ -666,7 +647,7 @@
             function update_text() {
                 const text = document.getElementById("instructions2");
                 if (text.style.display == "" && ((new Date).getTime() - press_time) > 2000 && !end_screen && ((num_breaths > 2 && mode=="solo") || (num_breaths > 0 && mode == "pair")) ) {
-                    text.style.opacity = text.style.opacity - 0.004
+                    text.style.opacity = text.style.opacity - 0.003
                     if (text.style.opacity < 0.01) {
                         text.style.display = "none"
                     }
@@ -717,6 +698,16 @@
                         update_inner_circle(circle_server, speed_server)
                         speed_server = check_value_limits(circle_server, speed_server)
                     }
+
+                    calculate_time_in_session()
+                    if ((session_duration - time_in_session) <= 1.0 && !minute_warning_given) {
+                        display_prompt()
+                        instructions2.textContent = "One minute left"
+                        minute_warning_given = true;
+                    }
+                    if (time_in_session > session_duration && !end_screen) {
+                        end_session()
+                    }
                 }
                 update_position()
                 
@@ -732,7 +723,7 @@
                     document.documentElement.removeAttribute("fullscreen"); 
                 }
             }
-            const again_button = document.createElement('again-button');
+            const again_button = document.createElement("button");
             again_button.setAttribute('id','again-button');
             again_button.setAttribute('class','again-button noselect');
             again_button.textContent = 'Go again';
