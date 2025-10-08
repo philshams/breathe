@@ -778,6 +778,16 @@
                 });
             });
 
+            // rejoin room if backgrounding removes it
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden) {
+                    // Page became visible again - rejoin the room
+                    if (currentRoomId) {
+                        socket.emit('join_room_event', {room: currentRoomId});
+                    }
+                }
+            });
+
             // Close button
             document.getElementById("closeInstructions").onclick = function() {
                 document.getElementById("instructionsPanel").style.display = "none";
