@@ -390,7 +390,7 @@
             // Add event listener for the "keydown" event on the document object
             document.addEventListener('mousedown', (event) => {
                 const instructions2 = document.getElementById("instructions2");
-                if (!start_screen && !instructions2.textContent.includes("your breathing partner go to")) {
+                if (!start_screen && !end_screen && !instructions2.textContent.includes("your breathing partner go to")) {
                     event.stopPropagation();
                     event.preventDefault();
                 }
@@ -400,7 +400,7 @@
             // Add event listener for the "keyup" event on the document object
             document.addEventListener('mouseup', (event) => {
                 const instructions2 = document.getElementById("instructions2");
-                if (!start_screen && !instructions2.textContent.includes("your breathing partner go to")) {
+                if (!start_screen && !end_screen && !instructions2.textContent.includes("your breathing partner go to")) {
                     event.stopPropagation();
                     event.preventDefault();
                 }
@@ -422,7 +422,7 @@
             // Add event listener for the "keydown" event on the document object
             document.addEventListener('touchstart', (event) => {
                 const instructions2 = document.getElementById("instructions2");
-                if (!start_screen && !instructions2.textContent.includes("your breathing partner go to")) {
+                if (!start_screen && !end_screen && !instructions2.textContent.includes("your breathing partner go to")) {
                     event.stopPropagation();
                     event.preventDefault();
                 }
@@ -432,7 +432,7 @@
             // Add event listener for the "keyup" event on the document object
             document.addEventListener('touchend', (event) => {
                 const instructions2 = document.getElementById("instructions2");
-                if (!start_screen && !instructions2.textContent.includes("your breathing partner go to")) {
+                if (!start_screen && !end_screen && !instructions2.textContent.includes("your breathing partner go to")) {
                     // doubleClick()
                     // setTimeout(doubleClickOff, 300);
                     event.stopPropagation();
@@ -745,7 +745,8 @@
             document.body.appendChild(again_button);
             again_button.style.display = "none"
             again_button.addEventListener('click', () => {
-                location.href = '/'; // go to homepage
+                console.log('BUTTON PRESSED')
+                window.location.href = '/'; // go to homepage
             });
 
             const together_button = document.createElement("button");
@@ -764,26 +765,27 @@
             guided_button.style.display = ""
             document.body.appendChild(guided_button);
 
-            // const closeBtn = document.getElementById("closeInstructions");
-            // ["mousedown", "touchstart", "mouseup", "touchend"].forEach(evt => {
-            //     closeBtn.addEventListener(evt, function(event) {
-            //         event.stopPropagation(); // prevents moon detection
-            //     });
-            // });
+            const closeBtn = document.getElementById("closeInstructions");
+            ["mousedown", "touchstart", "mouseup", "touchend"].forEach(evt => {
+                closeBtn.addEventListener(evt, function(event) {
+                    event.stopPropagation(); // prevents moon detection
+                });
+            });
 
-            // const closePnl = document.getElementById("instructionsPanel");
-            // ["mousedown", "touchstart", "mouseup", "touchend"].forEach(evt => {
-            //     closePnl.addEventListener(evt, function(event) {
-            //         event.stopPropagation(); // prevents moon detection
-            //     });
-            // });
+            const closePnl = document.getElementById("instructionsPanel");
+            ["mousedown", "touchstart", "mouseup", "touchend"].forEach(evt => {
+                closePnl.addEventListener(evt, function(event) {
+                    event.stopPropagation(); // prevents moon detection
+                });
+            });
 
             // rejoin room if backgrounding removes it
             document.addEventListener('visibilitychange', function() {
                 if (!document.hidden) {
                     // Page became visible again - rejoin the room
-                    if (currentRoomId) {
-                        socket.emit('join_room_event', {room: currentRoomId});
+                    if (path.includes("/room/")) {
+                        const roomId = path.split("/").pop();
+                        socket.emit('join_room_event', {room: roomId});
                     }
                 }
             });
