@@ -47,6 +47,9 @@
             meditationCanvas.height = window.innerHeight;
             const ctx = meditationCanvas.getContext('2d');
 
+            const roomId = "{{ room_id }}";
+            const roomMatch = path.match(/\/room\/([a-z0-9]+)/);
+
             const radius_scale = 0.5;
             var screen_size_factor = (window.innerHeight / 2200) / 0.5;
             const min_radius = 75 * radius_scale;
@@ -340,8 +343,7 @@
                     }
                     calculate_time_in_session()
 
-                    const roomId = "{{ room_id }}" || window.location.pathname.split("/").pop();
-                    socket.emit("client_keydown", circle_client.radius, time_in_session, roomId);
+                    socket.emit("client_keydown", circle_client.radius, time_in_session, roomId || roomMatch);
                     
                     verbal_prompt()
 
@@ -354,8 +356,7 @@
                 if (event && event.target && event.target.closest && event.target.closest('#roomLink')) return;
 
                 if (!last_event.includes('exhale') && !start_screen) {
-                    const roomId = "{{ room_id }}" || window.location.pathname.split("/").pop();
-                    socket.emit("client_keyup", circle_client.radius, time_in_session, roomId);
+                    socket.emit("client_keyup", circle_client.radius, time_in_session, roomId || roomMatch);
                     if (mode!="pair" || first_breath_received) {
                         num_breaths = num_breaths + 1;
                     }
@@ -382,8 +383,7 @@
                 }
                 if (!start_screen && !end_screen){
                     // Use the room_id from Flask OR from the URL path
-                    const roomId = "{{ room_id }}" || roomMatch[1];
-                    socket.emit('join_room_lite', { room: roomId });
+                    socket.emit('join_room_lite', { room: roomId  || roomMatch});
                 }
 
             });
@@ -461,10 +461,6 @@
             socket.on('assign_user_id', function (msg) {
                 user_id = msg;
                 console.log("ID: " + msg.toString())
-            });
-
-            socket.on('end_session', function (msg) {
-                end_session()
             });
 
             socket.on('assign_partner', function (msg) {
@@ -568,7 +564,6 @@
             function start_session_pair() {
                 // Detect if we’re already in a /room/<id> URL
                 const path = window.location.pathname;
-                const roomMatch = path.match(/\/room\/([a-z0-9]+)/);
 
                 // If no room_id in template and not already in /room/<id>, make one
                 if (!"{{ room_id }}" && !roomMatch) {
@@ -578,8 +573,7 @@
                 }
 
                 // Use the room_id from Flask OR from the URL path
-                const roomId = "{{ room_id }}" || roomMatch[1];
-                socket.emit('join_room_event', { room: roomId });
+                socket.emit('join_room_event', { room: roomId || roomMatch});
 
                 setTimeout(function() {
                     if (!joinSuccessReceived) {
@@ -795,8 +789,7 @@
             // Rejoin room when returning to page (Safari + other browsers)
             window.addEventListener('pageshow', function () {
             if (path.includes("/room/")) {
-                const roomId = path.split("/").pop();
-                socket.emit('join_room_event', { room: roomId });
+                socket.emit('join_room_event', { room: roomId || roomMatch});
             }
             });
 
@@ -805,8 +798,7 @@
                 if (!document.hidden) {
                     // Page became visible again - rejoin the room
                     if (path.includes("/room/")) {
-                        const roomId = path.split("/").pop();
-                        socket.emit('join_room_event', {room: roomId});
+                        socket.emit('join_room_event', {room: roomId || roomMatch});
                     }
                 }
             });
@@ -828,7 +820,6 @@
 
             const path = window.location.pathname;
             if (path.includes("/room/")) {
-                const roomId = path.split("/").pop();
                 const linkEl = document.getElementById("roomLink");
 
                 const isMobile = /Mobi|Android/i.test(navigator.userAgent);

@@ -47,6 +47,7 @@ def _leave_room(user_id):
     for room_id, users in list(rooms.items()):
         if user_id in users:
             users.remove(user_id)
+            leave_room(room_id)
             emit('reset_partner', to=room_id, include_self=False)
             if not users:
                 del rooms[room_id]
@@ -89,6 +90,7 @@ def join_room_event(data):
             for uid in rooms[room_id]:
                 partner_id = [x for x in rooms[room_id] if x != uid][0]
                 emit('assign_partner', partner_id, to=uid)
+        emit('join_success', to=request.sid)
         return
     # END OF ADDITION
 
@@ -99,6 +101,7 @@ def join_room_event(data):
         is_host = False
     else:
         # room full -> send redirect message
+        leave_room(room_id)
         emit('room_full', {'msg': "Sorry, the room you entered is already full."}, room=request.sid)
         return
 
