@@ -298,7 +298,7 @@
             function verbal_prompt(source="client") {
                 const instructions2 = document.getElementById("instructions2");
                 
-                if (num_breaths >= 3 && !end_screen && source=="client" && (session_duration - time_in_session) > 1) {
+                if (num_breaths >= 3 && !end_screen && source=="client" && (session_duration - time_in_session) > 1.5) {
                     if (instructions2.style.display == "none" && !enjoy_shown) {
                         display_prompt()
                         instructions2.textContent = "Enjoy your 2-minute meditation!"
