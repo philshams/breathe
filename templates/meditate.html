@@ -403,7 +403,7 @@
                 }
                 if (!start_screen && !end_screen){
                     // Use the room_id from Flask OR from the URL path
-                    socket.emit('join_room_lite', { room: roomId});
+                    socket.emit('join_room_event', { room: roomId});
                 }
 
             });
@@ -421,6 +421,10 @@
                     event.preventDefault();
                 }
                 key_down_response(event)
+                if (!start_screen && !end_screen){
+                // Use the room_id from Flask OR from the URL path
+                socket.emit('join_room_event', { room: roomId});
+                }
             });
 
             // Add event listener for the "keyup" event on the document object
@@ -453,6 +457,10 @@
                     event.preventDefault();
                 }
                 key_down_response(event)
+                if (!start_screen && !end_screen){
+                // Use the room_id from Flask OR from the URL path
+                socket.emit('join_room_event', { room: roomId});
+                }
             });
 
             // Add event listener for the "keyup" event on the document object

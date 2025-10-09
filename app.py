@@ -42,7 +42,6 @@ def room(room_id):
 def on_connect():
     emit('assign_user_id', request.sid, broadcast=False)       
 
-
 def _leave_room(user_id):
     for room_id, users in list(rooms.items()):
         if user_id in users:
@@ -59,7 +58,6 @@ def _leave_room_complete(user_id):
             leave_room(room_id)
             if not users:
                 del rooms[room_id]
-
 
 # # when a client disconnects
 @socketio.on('disconnect')
@@ -113,6 +111,7 @@ def join_room_event(data):
 @socketio.event
 def client_keydown(radius, time_in_session, room):
     emit('partner_state', (radius, "inhale", time_in_session), to=room, include_self=False)
+    
     room_info = {}
     for room, members in rooms.items():
         room_info[room] = list(members)
@@ -122,6 +121,15 @@ def client_keydown(radius, time_in_session, room):
 @socketio.event
 def client_keyup(radius, time_in_session, room):
     emit('partner_state', (radius, "exhale", time_in_session), to=room, include_self=False)
+
+    room_info = {}
+    namespace = '/'  # default namespace
+    for room, members in socketio.server.manager.rooms[namespace].items():
+        room_info[room] = list(members)  # convert set of sids to list
+
+    # Emit to all clients
+    socketio.emit('room_update', room_info)
+
 
 if __name__ == '__main__':
     socketio.run(app)
