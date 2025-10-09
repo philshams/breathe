@@ -25,19 +25,6 @@
         #meditationCanvas {
             display: block;
         }
-        #roomDebug {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: red;
-            background: rgba(0,0,0,0.1);
-            padding: 20px;
-            font-family: monospace;
-            text-align: center;
-            z-index: 9999;
-            border-radius: 10px;
-        }
     </style>
     <link rel="icon" href="{{url_for('static', filename='moonicon.png')}}">
 </head>
@@ -163,14 +150,6 @@
             // Connect to the Socket.IO server.
             var socket = io("/");
             // console.log(socket)
-            socket.on('room_update', (data) => {
-                const div = document.getElementById('roomDebug');
-                let text = '';
-                for (const [room, members] of Object.entries(data)) {
-                    text += `Room: ${room}<br>Members: ${members.join(', ')}<br><br>`;
-                }
-                div.innerHTML = text || 'No rooms';
-            });
 
             function resizeCanvas() {
                 meditationCanvas.width = window.innerWidth;
@@ -343,7 +322,7 @@
             function key_down_response(event) {
                 if (event && event.target && event.target.closest && event.target.closest('#roomLink')) return;
 
-                if (!last_event.includes('inhale') && !start_screen) {
+                if (!last_event.includes('inhale') && !start_screen && !end_screen) {
                     
                     if (mode!="pair" || first_breath_received) {
                         num_breaths = num_breaths + 1;
@@ -375,7 +354,7 @@
             function key_up_response(event) {
                 if (event && event.target && event.target.closest && event.target.closest('#roomLink')) return;
 
-                if (!last_event.includes('exhale') && !start_screen) {
+                if (!last_event.includes('exhale') && !start_screen && !end_screen) {
                     socket.emit("client_keyup", circle_client.radius, time_in_session, roomId);
                     if (mode!="pair" || first_breath_received) {
                         num_breaths = num_breaths + 1;
@@ -532,10 +511,14 @@
                 moon_partner2.style.display = ""
             });
 
-        socket.on('room_full', function(data){
-            window.location.href = '/'; // redirect to home
-            alert(data.msg);
-        });
+            socket.on('pause_partner', function () {
+                last_event_server = 'paused'
+            });
+
+            socket.on('room_full', function(data){
+                window.location.href = '/'; // redirect to home
+                alert(data.msg);
+            });
 
 
 
@@ -696,7 +679,7 @@
                 const text = document.getElementById("instructions2");
                 if (text.style.display == "" && ((new Date).getTime() - press_time) > 2000 && !end_screen && ((num_breaths > 2 && mode=="solo") || (num_breaths > 0 && mode == "pair")) ) {
                     text.style.opacity = text.style.opacity - 0.003
-                    if (text.style.opacity < 0.01) {
+                    if (text.style.opacity < 0.05) {
                         text.style.display = "none"
                     }
                 }
@@ -778,7 +761,6 @@
             document.body.appendChild(again_button);
             again_button.style.display = "none"
             again_button.addEventListener('click', () => {
-                console.log('BUTTON PRESSED')
                 window.location.href = '/'; // go to homepage
             });
 
@@ -1045,8 +1027,7 @@
 
 
 <body>
-        <div id="roomDebug">Waiting for room info...</div>
-
+      
         <hr id = "line1" class="hr-style" style="position: absolute; top: 8.46vh; left: calc(50% - 4.3em); font-size: 5vh; width: 8.6em; text-align: center;">
 
         <p class="noselect grad2" id = "header" style="position: absolute; left: calc(50%-5em); top: 0vh; width: 10em; text-align: center; font-size: 5.15vh; font-weight: 600; font-family: poppins;">breathing moon</p>
